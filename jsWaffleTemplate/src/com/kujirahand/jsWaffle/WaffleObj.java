@@ -276,9 +276,10 @@ public class WaffleObj
 	}
 	/**
 	 * get file list
+	 * @param path
 	 * @return filenames (splitter ";")
 	 */
-	public String fileList() {
+	public String fileList(String path) {
 		//TODO: fileList with file scheme
 		File dir = waffle_activity.getFilesDir();
 		File[] files = dir.listFiles();
