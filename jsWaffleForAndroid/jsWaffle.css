@@ -1,0 +1,32 @@
+body {
+	margin: 8px;
+}
+
+h1.title {
+	font-size: 24px;
+	text-align:center;
+	background-color: red;
+	color:white;
+	padding: 6px;
+}
+
+#inputForm { }
+
+#inputForm input {
+	width: 400px;
+}
+
+div.flabel {
+	float:left;
+	width: 100px;
+	color: #993333;
+	font-size: 14px;
+	text-align:right;
+	margin: 0 10px 0 0;
+	padding: 6px 0 0 0;
+}
+
+div.frow {
+	float:none;
+	clear:both;
+}

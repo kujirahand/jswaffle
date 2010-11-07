@@ -1,0 +1,177 @@
+<html>
+    <head>
+        <title>jsWaffle for Android</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script type="text/javascript" src="lib/air/AIRAliases.js"></script>
+		<link rel="stylesheet" href="jsWaffle.css">
+    </head>
+    <body>
+    	<!-- form body -->
+		<h1 class="title">jsWaffle for Android</h1>
+		<div>Create Android Project with HTML/JavaScript!!</div>
+		<br/>
+		<div id="inputForm">
+			<div class="frow">
+				<div class="flabel">ProjectName:</div>
+				<input id="projectName" type="text" value="WaffleTest" />
+			</div>
+			<div class="frow">
+				<div class="flabel">PackageName:</div>
+				<input id="packageName" type="text" value="com.example.WaffleText" />
+			</div>
+			<div class="frow">
+				<div class="flabel">OutputDir:</div>
+				<input id="outputDir" type="text" value="" />
+				<button onclick="selectDir()">...</button>
+			</div>
+			<div class="frow">
+				<div class="flabel">&nbsp;</div>
+				<button onclick="makeProjectPre()">Make Project</button>
+			<div>
+		</div>
+		<div id="next">
+			<h2>Success!! ... Next!!</h2>
+			<div>
+				<a href="http://d.aoikujira.com/jsWaffle/wiki/index.php?Next">Import project to Eclipse!!</a>
+			</div>
+		</div>
+		<!-- script -->
+		<script>
+			window.onload = function () {
+				$("next").style.visibility = "hidden";
+				$("outputDir").value = air.File.documentsDirectory.nativePath + "\\WaffleTest";
+			};
+			function $(id) { return document.getElementById(id); }
+			function selectDir() {
+				var file = air.File.documentsDirectory;
+				file.addEventListener( air.Event.SELECT, doSelect );
+				file.browseForDirectory("Select Outpu Directory");
+			}
+			function doSelect(e) {
+				var f = e.target;
+				var path = f.nativePath;
+				$("outputDir").value = path;
+			}
+			function makeProjectPre() {
+				try {
+					makeProject();
+				} catch (e) {
+					alert("Sorry, could not make project.\n" + e.message);
+				}
+			}
+			function makeProject() {
+				// alert(air.File.applicationDirectory.nativePath);
+				var projectName = $("projectName").value;
+				var packageName = $("packageName").value;
+				var outputDir = $("outputDir").value;
+				if (projectName == "") { alert("Please Input ProjectName"); return; }
+				if (packageName == "") { alert("Please Input packageName"); return; }
+				if (outputDir == "") { alert("Please Input outputDir"); return; }
+				// check outputDir
+				var d_outdir = new air.File(outputDir);
+				if (d_outdir == null) { alert("Please set outputDir"); return; }
+				try {
+					if (!d_outdir.exists) {
+						d_outdir.createDirectory();
+					}
+					else {
+						d_outdir.deleteDirectory(true);
+					}
+				}catch(e) {
+					throw new Error("Cound not make outputDir : " + e.message);
+				}
+				// copy framework
+				var d_framework = air.File.applicationDirectory.resolvePath("framework");
+				d_framework.copyTo(d_outdir, true);
+				//-------------------
+				// modify
+				var package_path = packageName.replace(/\./g, "/");
+				// gen
+				var f_gen_from = d_outdir.clone().resolvePath("gen/com/kujirahand/template/R.java");
+				var f_gen_to   = d_outdir.clone().resolvePath("gen/" + package_path + "/R.java");
+				var d_gen_from = d_outdir.clone().resolvePath("gen/com/kujirahand");
+				forceMoveTo(f_gen_from, f_gen_to, d_gen_from);
+				// main activity
+				var d = d_outdir;
+				var f_src_from = d.clone().resolvePath("src/com/kujirahand/template/ShowHTML.java");
+				var f_src_to   = d.clone().resolvePath("src/" + package_path + "/" + projectName + ".java");
+				var d_src_from = d.clone().resolvePath("src/com/kujirahand/template");
+				forceMoveTo(f_src_from, f_src_to, d_src_from);
+				// replace text
+				// 1.manifest
+				var f_manifest = d.clone().resolvePath("AndroidManifest.xml");
+				var txt = load(f_manifest);
+				txt = txt.replace(/com\.kujirahand\.template/g, packageName);
+				txt = txt.replace(/ShowHTML/g, projectName);
+				save(f_manifest, txt);
+				// 2.main source
+				txt = load(f_src_to);
+				txt = txt.replace(/com\.kujirahand\.template/g, packageName);
+				txt = txt.replace(/class ShowHTML/g, "class " + projectName);
+				save(f_src_to, txt);
+				// 3.appname
+				var f_string = d.clone().resolvePath("res/values/strings.xml");
+				txt = load(f_string);
+				txt = txt.replace(/jsWaffleTestApp/g, projectName);
+				save(f_string, txt);
+				// packagename
+				d.openWithDefaultApplication();
+				$("next").style.visibility = "visible";
+				//alert("Complete!!");
+			}
+			
+			/**
+			 * Create Directories (force)
+			 * @param {air.File} dir_obj
+			 */
+			function createForceDirectories(dir_obj) {
+				var parent = dir_obj.parent;
+				if (!parent.exists) {
+					createForceDirectories(parent);
+				}
+				if (!dir_obj.exists) {
+					dir_obj.createDirectory();
+					//air.trace("create:" + dir_obj.nativePath);
+				}
+			}
+			/**
+			 * Force Move file
+			 * @param {air.File} from_file
+			 * @param {air.File} to_file
+			 * @param {air.File} remove_dir
+			 */
+			function forceMoveTo(from_file, to_file, remove_dir) {
+				// makedir
+				createForceDirectories(to_file.parent);
+				// moveto
+				from_file.moveTo(to_file);
+				// test
+				if (remove_dir.getDirectoryListing().length == 0) {
+					remove_dir.deleteDirectory(true);
+				}
+			}
+			
+			function load(file_obj) {
+				var strm = new air.FileStream();
+				try {
+					strm.open(file_obj, air.FileMode.READ);
+					var str = strm.readUTFBytes(strm.bytesAvailable);
+					return str;
+				}
+				finally {
+					strm.close();
+				}
+			}
+			function save(file_obj, text) {
+				var strm = new air.FileStream();
+				try {
+					strm.open(file_obj, air.FileMode.WRITE);
+					strm.writeUTFBytes(text);
+				}
+				finally {
+					strm.close();
+				}
+			}
+		</script>
+    </body>
+</html>
