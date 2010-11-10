@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -31,7 +32,6 @@ public class WaffleActivity extends Activity {
 	public static String LOG_TAG = "DroidWaffle";
 	protected LinearLayout root;
 	protected Handler handler = new Handler();
-	protected Menu menu;
 	
 	//----------------------------------------------------------------
 	// Set Window Flags
@@ -113,18 +113,74 @@ public class WaffleActivity extends Activity {
 	    return super.onKeyDown(keyCode, event);
 	}
 	
+	//--- menu
+	private MenuItemInfo menuInfo[] = new MenuItemInfo[6];
+	public boolean setMenuItem(int itemNo, boolean visible, String title, String iconName) {
+		if (0 <= itemNo && itemNo <= 5) {
+			MenuItemInfo i = menuInfo[itemNo];
+			if (i == null) {
+				menuInfo[itemNo] = i = new MenuItemInfo();
+			}
+			i.visible = visible;
+			i.title = title;
+			i.iconName = iconName;
+			return true;
+		}
+		return false;
+	}
+	private void setMenuItemSetting(Menu menu) {
+		int resId;
+		for (int i = 0; i < 6; i++) {
+			MenuItemInfo info = menuInfo[i];
+			if (info == null) {
+				info = menuInfo[i] = new MenuItemInfo();
+				info.visible = false;
+			}
+			MenuItem item = menu.getItem(i);
+			item.setVisible(info.visible);
+			resId = android.R.drawable.ic_btn_speak_now;
+			if (info.visible) {
+				item.setTitle(info.title);
+				// icon
+				resId = getResources().getIdentifier(
+						info.iconName, "drawable",
+						getPackageName()
+						);
+				if (resId == 0) {
+					resId = getResources().getIdentifier(
+							info.iconName, "drawable", "android");
+				}
+				if (resId > 0) {
+					item.setIcon(resId);
+				}
+			}
+		}
+	}
+	
 	@Override
 	 public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
-		this.menu = menu;
+		menu.add(0, 0, 0, "menu0");
+		menu.add(0, 1, 1, "menu1");
+		menu.add(0, 2, 2, "menu2");
+		menu.add(0, 3, 3, "menu3");
+		menu.add(0, 4, 4, "menu4");
+		menu.add(0, 5, 5, "menu5");
+		setMenuItemSetting(menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		setMenuItemSetting(menu);
+	    return super.onPrepareOptionsMenu(menu);
+	}
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		waffle_obj.onMenuItemSelected(item.getItemId());
 		return true;
 	}
 	
-	public Menu getMenu() {
-		return menu;
-	}
-	
-	public void updateFullscreenStatus(boolean bUseFullscreen)
+	protected void updateFullscreenStatus(boolean bUseFullscreen)
 	{   
 	   if(bUseFullscreen)
 	   {
@@ -136,7 +192,6 @@ public class WaffleActivity extends Activity {
 	        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 	        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 	    }
-
 	    root.requestLayout();
 	}
 	
@@ -271,9 +326,14 @@ public class WaffleActivity extends Activity {
 		}
 		
 	}
-	
 }
 
+// for Menu Item
+class MenuItemInfo {
+	public String title;
+	public String iconName;
+	public boolean visible;
+}
 
 
 

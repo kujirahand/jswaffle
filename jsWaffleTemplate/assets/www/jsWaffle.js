@@ -19,7 +19,8 @@
 	// global temporary object
 	DroidWaffle = {
 		x:0, y:0, z:0,
-		_shake_fn_user : null
+		_shake_fn_user : null,
+		_menu_item_fn : []
 	};
 	// _DroidWaffle shortcut
 	var _w = _DroidWaffle;
@@ -272,13 +273,26 @@
 	};
 	
 	/**
-	 * Keep Screen (no sleep)
-	 * @param {boolean} value
+	 * Set MenuItem
+	 * (ex) iconName =ic_menu_edit/ic_menu_gallery/ic_menu_help/ic_menu_info_details/ic_menu_manage/ic_menu_preferences
+	 * @see http://www.taosoftware.co.jp/blog/2008/11/android_5.html
+	 * @param {Integer} itemNo (0-5)
+	 * @param {boolean} visible
+	 * @param {String} title
+	 * @param {String} iconName (resourceName])
+	 * @param {Function} callback_fn
 	 */
-	jsWaffle.prototype.keepScreen = function (value) {
-		_w.keepScreen(value);
+	jsWaffle.prototype.setMenuItem = function (itemNo, visible, title, iconName, callback_fn) {
+		_w.setMenuItem(itemNo, visible, title, iconName);
+		DroidWaffle._menu_item_fn[itemNo] = callback_fn;
+		_w.setMenuItemCallback("DroidWaffle._menu_onSelected");
 	};
-	
+	DroidWaffle._menu_onSelected = function (itemNo) {
+		var f = DroidWaffle._menu_item_fn[itemNo];
+		if (typeof(f) == "function") {
+			f();
+		}
+	};
 	//-----------------------------------
 	// dummy function for PC Browser
 	//-----------------------------------

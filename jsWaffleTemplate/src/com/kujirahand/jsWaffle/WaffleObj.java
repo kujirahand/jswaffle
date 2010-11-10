@@ -20,6 +20,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.view.MenuItem.OnMenuItemClickListener;
@@ -31,7 +32,7 @@ import android.widget.Toast;
  */
 public class WaffleObj
 {
-	public static double WAFFLE_VERSON = 0.1;
+	public static double WAFFLE_VERSON = 0.2;
 	//
 	public static WaffleActivity waffle_activity = null;
 	public static boolean flag_sensor = false;
@@ -454,32 +455,14 @@ public class WaffleObj
 	}
 	
 	/**
-	 * KEEP_SCREEN_ON
-	 * @see http://www.adakoda.com/android/000207.html
+	 * Add menu
 	 */
-	public void keepScreen(boolean value) {
-		
-		/*
-		if (value) {
-			waffle_activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		} else {
-			waffle_activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		}
-		*/
-		waffle_activity.updateFullscreenStatus(value);
-		log("setKeepScreen:" + value);
-		/*
-		final WaffleObj obj = this;
-		MenuItem item = waffle_activity.getMenu()
-			.add("hoge")
-			.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-				@Override
-				public boolean onMenuItemClick(MenuItem item) {
-					obj.callJsEvent("hoge");
-					return false;
-				}
-			});
-			*/
+	public void setMenuItem(int itemNo, boolean visible, String title, String iconName) {
+		waffle_activity.setMenuItem(itemNo, visible, title, iconName);
+	}
+	public static String menu_item_callback_funcname = null;
+	public void setMenuItemCallback(String callback_fn) {
+		menu_item_callback_funcname = callback_fn;
 	}
 	
 	//---------------------------------------------------------------
@@ -523,4 +506,9 @@ public class WaffleObj
 		});
         // log(query);
     }
+
+    // menu selected
+	public void onMenuItemSelected(int itemId) {
+		callJsEvent(menu_item_callback_funcname + "(" + itemId + ")");
+	}
 }

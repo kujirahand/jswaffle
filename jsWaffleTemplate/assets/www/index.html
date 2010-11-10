@@ -16,12 +16,24 @@
 		<script type="text/javascript">
 			function init() {
 				$("ver").innerHTML = droid.getWaffleVersion();
+				setMyMenuItem();
 			}
-			function hoge() {
-				alert("hoge");
-			}
-			function aa() {
-				droid.startIntentFullScreen("file:///android_asset/www/index.html");
+			function setMyMenuItem() {
+				// info
+				droid.setMenuItem(
+					0, true, "About","ic_menu_info_details",
+					function(){
+						alert("jsWaffle for Android");
+					}
+				);
+				// quit
+				droid.setMenuItem(
+					1, true, "Quit", "ic_menu_close_clear_cancel",
+					function() {
+						var b = confirm("Quit?");
+						if (b) droid.finish();
+					}
+				);
 			}
 		</script>
 	</head>
