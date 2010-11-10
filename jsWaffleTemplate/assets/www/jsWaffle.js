@@ -242,6 +242,13 @@
 		return _w.startIntent(url);
 	};
 	/**
+	 * Start Intent with FullScreen
+	 * @param {Object} url (ex) file:///assets/www/full.html
+	 */
+	jsWaffle.prototype.startIntentFullScreen = function (url) {
+		return _w.startIntentFullScreen(url);
+	};
+	/**
 	 * Custom Intent
 	 * @param {String}action
 	 * @param {String}uri
@@ -255,6 +262,21 @@
 	};
 	jsWaffle.prototype.intent_startActivity = function (intent) {
 		_w.intent_startActivity(intent);
+	};
+	
+	/**
+	 * finish app
+	 */
+	jsWaffle.prototype.finish = function() {
+		_w.finish();
+	};
+	
+	/**
+	 * Keep Screen (no sleep)
+	 * @param {boolean} value
+	 */
+	jsWaffle.prototype.keepScreen = function (value) {
+		_w.keepScreen(value);
 	};
 	
 	//-----------------------------------

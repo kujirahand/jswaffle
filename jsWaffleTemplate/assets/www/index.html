@@ -17,10 +17,17 @@
 			function init() {
 				$("ver").innerHTML = droid.getWaffleVersion();
 			}
+			function hoge() {
+				alert("hoge");
+			}
+			function aa() {
+				droid.startIntentFullScreen("file:///android_asset/www/index.html");
+			}
 		</script>
 	</head>
 	<body onload="init()">
-		<h1>*jsWaffle DEMO*</h1>
+		<button onclick="aa()">test</button>
+		<h1>jsWaffle DEMO</h1>
 		<div id="logo">
 			<div style="text-align:center;">
 				<img src="res/logo150.png" onclick="droid.vibrate()">
