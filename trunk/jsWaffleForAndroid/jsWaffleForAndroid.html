@@ -103,6 +103,7 @@
 				var txt = load(f_manifest);
 				txt = txt.replace(/com\.kujirahand\.template/g, packageName);
 				txt = txt.replace(/ShowHTML/g, projectName);
+				txt = txt.replace('android:debuggable="true"', 'android:debuggable="false"'); // debug false
 				save(f_manifest, txt);
 				// 2.main source
 				txt = load(f_src_to);
