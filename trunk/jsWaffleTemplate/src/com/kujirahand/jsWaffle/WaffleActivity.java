@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -29,18 +30,31 @@ public class WaffleActivity extends Activity {
 	public WaffleObj waffle_obj;
 	public static String LOG_TAG = "DroidWaffle";
 	protected LinearLayout root;
-	protected Handler handler;
+	protected Handler handler = new Handler();
+	protected Menu menu;
+	
+	//----------------------------------------------------------------
+	// Set Window Flags
+	//----------------------------------------------------------------
+	public void onSetWindowFlags(Window w) {
+        w.requestFeature(Window.FEATURE_NO_TITLE);
+        w.setFlags(
+        		WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN,
+        		WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        // * Full Screen
+        // w.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        // * Keep Screen (Not Sleep)
+        // w.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+	}
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	//
-    	// 動的に作った WebView を View として登録する処理
     	super.onCreate(savedInstanceState);
-        getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(
-        		WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN,
-        		WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-        //
+    	
+    	// Windowの初期化処理
+        onSetWindowFlags(getWindow());
+        
+    	// 動的に作った WebView を View として登録する処理
         LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, 
         		ViewGroup.LayoutParams.FILL_PARENT, 0.0F);
         LinearLayout.LayoutParams webviewParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
@@ -48,14 +62,13 @@ public class WaffleActivity extends Activity {
         //
         root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(Color.WHITE);
+        root.setBackgroundColor(Color.BLACK);
         root.setLayoutParams(containerParams);
         //
         webview = new WebView(this);
         webview.setLayoutParams(webviewParams);
         //
-        handler = new Handler();
-        // setting
+        // WebView Setting
         WebSettings setting = webview.getSettings();
         webview.setWebChromeClient(new jsWaffleChromeClient(this));
         webview.setWebViewClient(new jsWaffleWebViewClient(this));
@@ -72,7 +85,6 @@ public class WaffleActivity extends Activity {
         //
         root.addView(webview);
         setContentView(root);
-        //
     }
        
     public void showPage(String uri) {
@@ -99,6 +111,33 @@ public class WaffleActivity extends Activity {
 	        return true;
 	    }
 	    return super.onKeyDown(keyCode, event);
+	}
+	
+	@Override
+	 public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
+		this.menu = menu;
+		return true;
+	}
+	
+	public Menu getMenu() {
+		return menu;
+	}
+	
+	public void updateFullscreenStatus(boolean bUseFullscreen)
+	{   
+	   if(bUseFullscreen)
+	   {
+	        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+	        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+	    }
+	    else
+	    {
+	        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+	        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+	    }
+
+	    root.requestLayout();
 	}
 	
 	//-------------------------------------------------------------------

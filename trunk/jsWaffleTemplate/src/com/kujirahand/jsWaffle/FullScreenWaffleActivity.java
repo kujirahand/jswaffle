@@ -2,8 +2,10 @@ package com.kujirahand.jsWaffle;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
 
-public class SubWaffleActivity extends WaffleActivity {
+public class FullScreenWaffleActivity extends WaffleActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
@@ -17,4 +19,11 @@ public class SubWaffleActivity extends WaffleActivity {
         	this.showPage("file:///android_asset/www/index.html");
         }
     }
+    @Override
+	public void onSetWindowFlags(Window w) {
+        w.requestFeature(Window.FEATURE_NO_TITLE);
+        // * Full Screen
+        w.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+	}
+
 }

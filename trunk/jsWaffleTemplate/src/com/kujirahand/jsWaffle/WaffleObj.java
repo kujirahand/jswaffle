@@ -7,9 +7,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -17,6 +20,9 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.WindowManager;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.webkit.WebView;
 import android.widget.Toast;
 
@@ -375,10 +381,26 @@ public class WaffleObj
 	 * @param url
 	 */
 	public boolean startIntent(String url) {
-		// assets?
+		return _startIntent(url, false);
+	}
+	/**
+	 * Start Intent with FullScreen
+	 * @param url
+	 */
+	public boolean startIntentFullScreen(String url) {
+		return _startIntent(url, true);
+	}
+	
+	private boolean _startIntent(String url, boolean bFull) {
+		// android_asset?
 		if (url.startsWith("file:///android_asset/")) {
 			try {
-				Intent i = new Intent(waffle_activity, SubWaffleActivity.class);
+				Intent i;
+				if (bFull) {
+					i = new Intent(waffle_activity, FullScreenWaffleActivity.class);
+				} else {
+					i = new Intent(waffle_activity, SubWaffleActivity.class);
+				}
 				i.putExtra("url", url);
 				i.setAction(Intent.ACTION_VIEW);
 				waffle_activity.startActivityForResult(i, 1);
@@ -410,6 +432,54 @@ public class WaffleObj
 		} catch (Exception e) {
 			log_error("activityError:" + e.getMessage());
 		}
+	}
+	
+	/**
+	 * Intent Exists?
+	 * @param intentName (ex: com.kujirahand.jsWaffle.xxx)
+	 */
+	public boolean intent_exists(String intentName) {
+		final Intent intent = new Intent(intentName);
+		final PackageManager packMan = waffle_activity.getPackageManager();
+		List<ResolveInfo> list = packMan.queryIntentActivities(intent,
+				PackageManager.MATCH_DEFAULT_ONLY);
+		return (list.size() > 0);
+	}
+	
+	/**
+	 * finish activity
+	 */
+	public void finish() {
+		waffle_activity.finish();
+	}
+	
+	/**
+	 * KEEP_SCREEN_ON
+	 * @see http://www.adakoda.com/android/000207.html
+	 */
+	public void keepScreen(boolean value) {
+		
+		/*
+		if (value) {
+			waffle_activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		} else {
+			waffle_activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		}
+		*/
+		waffle_activity.updateFullscreenStatus(value);
+		log("setKeepScreen:" + value);
+		/*
+		final WaffleObj obj = this;
+		MenuItem item = waffle_activity.getMenu()
+			.add("hoge")
+			.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(MenuItem item) {
+					obj.callJsEvent("hoge");
+					return false;
+				}
+			});
+			*/
 	}
 	
 	//---------------------------------------------------------------
@@ -451,6 +521,6 @@ public class WaffleObj
 				webview.loadUrl(s);
 			}
 		});
-        log(query);
+        // log(query);
     }
 }
