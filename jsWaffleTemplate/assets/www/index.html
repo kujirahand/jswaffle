@@ -258,6 +258,25 @@
 			}
 		</script>
 		
+		<h2>Barcode(QR/1D)</h2>
+		<div class="buttons">
+			<button class="func" onclick="TestBarcode2d()">Scan QRCode</button>
+			<button class="func" onclick="TestBarcodeAuto()">Scan Barcode(Auto)</button>
+		</div>
+		<script>
+			function TestBarcode2d() {
+				droid.scanQRCode(function(str){
+					alert(str);
+				}, true);
+			}
+			function TestBarcodeAuto() {
+				droid.scanBarcode(function(str){
+					alert(str);
+				}, true);
+			}
+		</script>
+			
+		
 		<br/>
 		<br/>
 		<br/>

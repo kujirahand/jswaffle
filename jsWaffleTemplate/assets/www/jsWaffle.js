@@ -5,7 +5,12 @@
  * @version	0.1
  * @see http://d.aoikujira.com/jsWaffle/wiki/
  */
-(function(){
+
+/**
+ * jsWaffle Default Instance
+ * @type {jsWaffle}
+ */
+var droid = (function(){
 	if (typeof(jsWaffle) != 'undefined') return;
 	// helper
 	if (typeof($) == 'undefined') {
@@ -236,7 +241,7 @@
 	};
 	/**
 	 * Start Intent (ex) mailto:hoge@example.com?subject=xxx&body=xxx
-	 * @param {String}url (http/https/tel/sms/geo/mailto/file/camera/video)
+	 * @param {String}url (http/https/market/tel/sms/geo/mailto/file/camera/video)
 	 * @return {Boolean} result
 	 */
 	jsWaffle.prototype.startIntent = function (url) {
@@ -264,11 +269,50 @@
 	jsWaffle.prototype.intent_startActivity = function (intent) {
 		_w.intent_startActivity(intent);
 	};
+	/**
+	 * Scan Barcode
+	 * require "com.google.zxing.client.android"
+	 * @see http://code.google.com/p/zxing/
+	 * @param {Object} callback_fn
+	 * @param {String} mode (AUTO|QR_CODE_MODE|ONE_D_MODE|DATA_MATRIX_MODE)
+	 * @param {boolean} show_help
+	 * @return {boolean} Scanner exisits?
+	 */
+	jsWaffle.prototype.scanBarcode = function (callback_fn, mode, show_help) {
+		// params
+		DroidWaffle._scanbarcode_fn = callback_fn;
+		if (typeof(mode) != "string") { mode = "AUTO"; }
+		// execute
+		var b = _w.scanBarcode("DroidWaffle._scanbarcode_onResult", mode);
+		if (b) return true;
+		// show help
+		if (!show_help) return false;
+		var show_link = confirm("You need Barcode Scanner. Download?");
+		if (show_link) {
+			droid.startIntent("market://search?q=pname:com.google.zxing.client.android");
+		}
+	};
+	DroidWaffle._scanbarcode_onResult = function (contents) {
+		var f = DroidWaffle._scanbarcode_fn;
+		if (typeof(f) == "function") {
+			f(contents);
+		}
+	};
+	/**
+	 * Scan QRCode
+	 * @see getBarcode
+	 */
+	jsWaffle.prototype.scanQRCode = function (callback_fn, show_help) {
+		return this.scanBarcode(callback_fn, "QR_CODE_MODE", show_help);
+	};
 	
 	/**
 	 * finish app
 	 */
 	jsWaffle.prototype.finish = function() {
+		_w.finish();
+	};
+	jsWaffle.prototype.quit = function() {
 		_w.finish();
 	};
 	
@@ -293,6 +337,8 @@
 			f();
 		}
 	};
+	return (new jsWaffle());
+	
 	//-----------------------------------
 	// dummy function for PC Browser
 	//-----------------------------------
@@ -344,12 +390,4 @@
 			___ : 0
 		};
 	}
-	
 })();
-
-/**
- * jsWaffle Default Instance
- * @type {jsWaffle}
- */
-var droid = new jsWaffle();
-

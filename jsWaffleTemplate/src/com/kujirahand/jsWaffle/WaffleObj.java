@@ -32,7 +32,9 @@ import android.widget.Toast;
  */
 public class WaffleObj
 {
-	public static double WAFFLE_VERSON = 0.2;
+	public static double WAFFLE_VERSON = 0.3;
+	//
+	public static int ACTIVITY_REQUEST_CODE_BARCODE = 0xFF0001;
 	//
 	public static WaffleActivity waffle_activity = null;
 	public static boolean flag_sensor = false;
@@ -42,6 +44,10 @@ public class WaffleObj
 	public static float accelZ = 0;
 	//
 	private WebView webview;
+	
+	// callback string
+	private String intent_startActivity_callback = null;
+	private String intent_startActivity_callback_barcode = null;
 	
 	// constructor
 	public WaffleObj(WaffleActivity activity) {
@@ -138,6 +144,7 @@ public class WaffleObj
 		geolocation_listeners.add(geo_listener);
 		return geolocation_listeners.size();
 	}
+	
 	/**
 	 * geolocation_clearWatch
 	 * @param watchId
@@ -398,9 +405,9 @@ public class WaffleObj
 			try {
 				Intent i;
 				if (bFull) {
-					i = new Intent(waffle_activity, FullScreenWaffleActivity.class);
+					i = new Intent(waffle_activity, WaffleActivityFullScreen.class);
 				} else {
-					i = new Intent(waffle_activity, SubWaffleActivity.class);
+					i = new Intent(waffle_activity, WaffleActivitySub.class);
 				}
 				i.putExtra("url", url);
 				i.setAction(Intent.ACTION_VIEW);
@@ -427,11 +434,56 @@ public class WaffleObj
 	public void intent_putExtra(Intent intent, String name, String value) {
 		intent.putExtra(name, value);
 	}
+	public String intent_getExtra(Intent intent, String name) {
+		return intent.getStringExtra(name);
+	}
+	/**
+	 * Start Intent
+	 * @param intent
+	 */
 	public void intent_startActivity(Intent intent) {
 		try {
 			waffle_activity.startActivity(intent);
 		} catch (Exception e) {
 			log_error("activityError:" + e.getMessage());
+		}
+	}
+	
+	/**
+	 * Start Intent (and Request Result)
+	 * @param intent
+	 * @param requestCode
+	 */
+	public void intent_startActivityForResult(Intent intent, int requestCode, String callbackName) {
+		try {
+			this.intent_startActivity_callback = callbackName;
+			waffle_activity.startActivityForResult(intent, requestCode);
+		} catch (Exception e) {
+			log_error("activityError:" + e.getMessage());
+		}
+	}
+	
+	/**
+	 * Get Barcode
+	 * @param callbackName
+	 * @param mode (null|QR_CODE_MODE|ONE_D_MODE|DATA_MATRIX_MODE)
+	 * @return tried
+	 */
+	public boolean scanBarcode(String callbackName, String mode) {
+		if (!intent_exists("com.google.zxing.client.android.SCAN")) {
+			return false;
+		}
+		intent_startActivity_callback_barcode = callbackName;
+		try {
+			Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+			if (mode == "QR_CODE_MODE" || mode == "ONE_D_MODE" || mode == "DATA_MATRIX_MODE") {
+				intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
+			}
+			waffle_activity.startActivityForResult(intent, ACTIVITY_REQUEST_CODE_BARCODE);
+			return true;
+		}
+		catch (Exception e) {
+			return false;
 		}
 	}
 	
@@ -465,17 +517,10 @@ public class WaffleObj
 		menu_item_callback_funcname = callback_fn;
 	}
 	
-	//---------------------------------------------------------------
-	// Private method
-	//---------------------------------------------------------------
-
-	protected void stopSensor() {
-		if (accel_listener != null) accel_listener.stop();
-	}
-	protected void startSensor() {
-		if (accel_listener != null) accel_listener.start();
-	}
 	
+	//---------------------------------------------------------------
+	// Event Wrapper
+	//---------------------------------------------------------------
 	public void onStop() {
 		if (flag_sensor) stopSensor();
 		// geolocation_listeners
@@ -496,6 +541,41 @@ public class WaffleObj
 		}
 	}
     
+	// @see intent_startActivityForResult
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		String param;
+		if (requestCode == ACTIVITY_REQUEST_CODE_BARCODE && intent_startActivity_callback_barcode != null) {
+			String contents = "";
+			if (intent != null) {
+				contents = intent.getStringExtra("SCAN_RESULT");
+		        // String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
+				if (contents != null) contents = contents.replace("'", "\'");
+			}
+	        param = intent_startActivity_callback_barcode + "('" + contents +"')";
+			callJsEvent(param);
+		} else {
+			if (intent_startActivity_callback == null) return;
+			param = intent_startActivity_callback + "(" + requestCode + "," + resultCode + ")";
+			callJsEvent(param);
+		}
+	}
+	
+    // menu selected
+	public void onMenuItemSelected(int itemId) {
+		callJsEvent(menu_item_callback_funcname + "(" + itemId + ")");
+	}
+	
+	//---------------------------------------------------------------
+	// Private method
+	//---------------------------------------------------------------
+	protected void stopSensor() {
+		if (accel_listener != null) accel_listener.stop();
+	}
+	
+	protected void startSensor() {
+		if (accel_listener != null) accel_listener.start();
+	}
+	
     public void callJsEvent(String query) {
     	final String s = "javascript:" + query;
         waffle_activity.handler.post(new Runnable() {
@@ -507,8 +587,4 @@ public class WaffleObj
         // log(query);
     }
 
-    // menu selected
-	public void onMenuItemSelected(int itemId) {
-		callJsEvent(menu_item_callback_funcname + "(" + itemId + ")");
-	}
 }
