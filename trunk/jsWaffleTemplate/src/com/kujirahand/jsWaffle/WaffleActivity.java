@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -180,6 +181,14 @@ public class WaffleActivity extends Activity {
 		return true;
 	}
 	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		waffle_obj.onActivityResult(requestCode, resultCode, intent);
+	}
+	
+	
+	/*
+	// example fullscreen
 	protected void updateFullscreenStatus(boolean bUseFullscreen)
 	{   
 	   if(bUseFullscreen)
@@ -194,6 +203,7 @@ public class WaffleActivity extends Activity {
 	    }
 	    root.requestLayout();
 	}
+	*/
 	
 	//-------------------------------------------------------------------
 	//WebViewClient

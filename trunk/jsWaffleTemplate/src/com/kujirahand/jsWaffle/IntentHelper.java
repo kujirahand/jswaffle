@@ -18,7 +18,7 @@ public class IntentHelper {
 		// 各種  Intent の起動方法メモ
 		// http://d.hatena.ne.jp/unagi_brandnew/20100309/1268115942
 		// とても参考になる、今後追加すると良い
-		if (url.startsWith("http://") || url.startsWith("https://"))
+		if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("market://"))
 		{
 			Intent browse = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 			appContext.startActivity(browse);

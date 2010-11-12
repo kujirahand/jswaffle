@@ -3,7 +3,7 @@ package com.kujirahand.jsWaffle;
 import android.content.Intent;
 import android.os.Bundle;
 
-public class SubWaffleActivity extends WaffleActivity {
+public class WaffleActivitySub extends WaffleActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
