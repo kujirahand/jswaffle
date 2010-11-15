@@ -23,6 +23,7 @@ public class GeoListener implements LocationListener{
 	public float min_dist = 1f;  // 1m
 	private long report_count = 0;
 	public Boolean flagLive = false;
+	private boolean accuracy_fine = true;
 	
 	public GeoListener(Context context, WaffleObj waffle_ogj, long report_count) {
 		this.context = context;
@@ -35,9 +36,18 @@ public class GeoListener implements LocationListener{
 	}
 	
 	public void start() {
+		this.start(accuracy_fine);
+	}
+	
+	public void start(boolean accuracy_fine) {
+		this.accuracy_fine = accuracy_fine;
 		// provider
 		Criteria crit = new Criteria();
-		crit.setAccuracy(Criteria.ACCURACY_FINE);
+		if (accuracy_fine) {
+			crit.setAccuracy(Criteria.ACCURACY_FINE); // More accurate GPS
+		} else {
+			crit.setAccuracy(Criteria.ACCURACY_COARSE); // Faster, no GPS fix
+		}
 		String providerName = locationMan.getBestProvider(crit, true);
 		
 		LocationProvider p = null;
