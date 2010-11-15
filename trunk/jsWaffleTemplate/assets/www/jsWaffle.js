@@ -10,24 +10,37 @@
  * jsWaffle Default Instance
  * @type {jsWaffle}
  */
-var droid = (function(){
-	if (typeof(jsWaffle) != 'undefined') return;
+var droid = (function(self){
+	if (typeof(self.jsWaffle) != 'undefined') return;
 	// helper
-	if (typeof($) == 'undefined') {
-		$ = function (id) { return document.getElementById(id); }
+	if (typeof(self.$) == 'undefined') {
+		self.$ = function (id) { return document.getElementById(id); }
 	}
 	// support for none android device
-	if (typeof(_DroidWaffle) == 'undefined') {
+	if (typeof(self._DroidWaffle) == 'undefined') {
 		// return dummy action
-		_DroidWaffle = _DroidWaffle_getDummyFunctionsn();
+		self._DroidWaffle = _DroidWaffle_getDummyFunctions();
 	}
 	// global temporary object
-	DroidWaffle = {
-		x:0, y:0, z:0,
-		_shake_fn_user : null,
-		_menu_item_fn : []
+	var DroidWaffle = self.DroidWaffle = {
+		x:0, y:0, z:0, // for accel
+		_shake_fn_user : null, // for shake
+		_menu_item_fn : [], // for menu
+		// for callback function list
+		_callback_list : [], 
+		getCallbackId : function () {
+			return this._callback_list.length;
+		},
+		setCallback : function (id, callback) {
+			this._callback_list[id] = callback;
+		},
+		getCallback : function (id) {
+			var f = this._callback_list[id];
+			return f;
+		},
+		___ : 0
 	};
-	// _DroidWaffle shortcut
+	// local _DroidWaffle shortcut
 	var _w = _DroidWaffle;
 	/**
 	 * jsWaffle Class
@@ -37,7 +50,7 @@ var droid = (function(){
 	 * @type {Object}
 	 * @constructor
 	 */
-	jsWaffle = function () {};
+	var jsWaffle = self.jsWaffle = function () {};
 	/**
 	 * get version info
 	 * @memberOf jsWaffle
@@ -116,16 +129,19 @@ var droid = (function(){
 	 * get current position (GPS)
 	 * @param {Function} onSuccess
 	 * @param {Function} onError
+	 * @param {boolean} accuracy_fine
 	 * @return {Integer} watchId
 	 */
-	jsWaffle.prototype.getCurrentPosition = function (onSuccess, onError) {
+	jsWaffle.prototype.getCurrentPosition = function (onSuccess, onError, accuracy_fine) {
 		// set user event
 		DroidWaffle._geolocation_fn_ok_user = onSuccess;
 		DroidWaffle._geolocation_fn_ng_user = onError;
+		if (accuracy_fine == undefined) accuracy_fine = true;
 		// register callback function
 		return _w.geolocation_getCurrentPosition(
 			"DroidWaffle._geolocation_fn_ok",
-			"DroidWaffle._geolocation_fn_ng"
+			"DroidWaffle._geolocation_fn_ng",
+			accuracy_fine
 		);
 	};
 	/**
@@ -133,12 +149,18 @@ var droid = (function(){
 	 * @alias DroidWaffle.geolocation.watchPosition
 	 * @param {Function} onSuccess
 	 * @param {Function} onError
+	 * @param {boolean} accuracy_fine
 	 * @return {Integer} watchId
 	 */
-	jsWaffle.prototype.watchPosition = function (onSuccess, onError) {
+	jsWaffle.prototype.watchPosition = function (onSuccess, onError, accuracy_fine) {
+		// set user event
+		DroidWaffle._geolocation_fn_ok_user = onSuccess;
+		DroidWaffle._geolocation_fn_ng_user = onError;
+		if (accuracy_fine == undefined) accuracy_fine = true;
 		return _w.geolocation_watchPosition(
 			"DroidWaffle._geolocation_fn_ok",
-			"DroidWaffle._geolocation_fn_ng"
+			"DroidWaffle._geolocation_fn_ng",
+			accuracy_fine
 		);
 	};
 	/**
@@ -151,15 +173,6 @@ var droid = (function(){
 	};
 	// for getPosition/watchPosition/clearPosition
 	DroidWaffle._geolocation_fn_ok = function (lat, lon, alt) {
-		/*
-		var position = {
-			"coords" : {
-				"latitude"	: lat, 
-				"longitude"	: lon,
-				"altitude"	: alt
-			}
-		};
-		*/
 		if (DroidWaffle._geolocation_fn_ok_user) {
 			DroidWaffle._geolocation_fn_ok_user(lat, lon, alt);
 		}
@@ -169,6 +182,56 @@ var droid = (function(){
 			DroidWaffle._geolocation_fn_ng_user(err);
 		}
 	};
+	DroidWaffle._geolocation_fn_ok_gokan = function (lat, lon, alt) { // for HTML5 geolocation event
+		var position = {
+			"coords" : {
+				"latitude"	: lat, 
+				"longitude"	: lon,
+				"altitude"	: alt
+			}
+		};
+		if (DroidWaffle._geolocation_fn_ok_user) {
+			DroidWaffle._geolocation_fn_ok_user(position);
+		}
+	};
+	// emulate HTML5 geolocation (for Android 1.6)
+	if (typeof(navigator.geolocation) == "undefined") {
+		navigator.geolocation = {
+			getCurrentPosition : function (ok_f, ng_f, opt) {
+				// set user event
+				DroidWaffle._geolocation_fn_ok_user = ok_f;
+				DroidWaffle._geolocation_fn_ng_user = ng_f;
+				var accuracy_fine = true;
+				if (typeof(opt) == "object") {
+					accuracy_fine = opt.enableHighAccuracy;
+				}
+				// register callback function
+				return _w.geolocation_getCurrentPosition(
+					"DroidWaffle._geolocation_fn_ok_gokan",
+					"DroidWaffle._geolocation_fn_ng",
+					accuracy_fine
+				);
+			},
+			watchPosition : function (ok_f, ng_f, opt) {
+				// set user event
+				DroidWaffle._geolocation_fn_ok_user = ok_f;
+				DroidWaffle._geolocation_fn_ng_user = ng_f;
+				var accuracy_fine = true;
+				if (typeof(opt) == "object") {
+					accuracy_fine = opt.enableHighAccuracy;
+				}
+				// register callback function
+				return _w.geolocation_watchPosition(
+					"DroidWaffle._geolocation_fn_ok_gokan",
+					"DroidWaffle._geolocation_fn_ng",
+					accuracy_fine
+				);
+			},
+			clearWatch : function (watchid) {
+				_w.geolocation_clearWatch(watchid);
+			}
+		};
+	}
 	/**
 	 * save text file
 	 * @param {String} filename
@@ -194,6 +257,41 @@ var droid = (function(){
 		var s = _w.fileList(path);
 		return s.split(";");
 	};
+	/**
+	 * storage set
+	 * @param {String} key
+	 * @param {String} value
+	 */
+	jsWaffle.prototype.pref_set = function (key, value) { _w.preferencePut(key, value); };
+	/**
+	 * storage get
+	 * @param {String} key
+	 * @param {String} defValue
+	 */
+	jsWaffle.prototype.pref_get = function (key, defValue) { return _w.preferenceGet(key, defValue); };
+	/**
+	 * storage remove
+	 * @param {String} key
+	 */
+	jsWaffle.prototype.pref_remove = function (key) { return _w.preferenceRemove(key, defValue); };
+	/**
+	 * storage clear
+	 */
+	jsWaffle.prototype.pref_clear = function () { return _w.preferenceClear(); };
+	
+	// emurate localStorage for Android 1.6
+	if (typeof(window.localStorage) == "undefined") {
+		window.localStorage = {
+			getItem    : function (key, defvalue) {
+				if (defvalue == undefined) defvalue = null;
+				return _w.localStorage_get(key, defvalue);
+			},
+			setItem    : function (key, value) { return _w.localStorage_put(key, value); },
+			removeItem : function (key) { return _w.localStorage_remove(key, defValue); },
+			clear      : function () { _w.localStorage_clear(); },
+			___ : 0
+		};
+	}
 	/**
 	 * sound play
 	 * @param {String} filename
@@ -337,12 +435,93 @@ var droid = (function(){
 			f();
 		}
 	};
+	/**
+	 * Dialog Yes or No
+	 * @param {String} caption
+	 * @param {String} message
+	 * @param {Function} callback
+	 */
+	jsWaffle.prototype.dialogYesNo = function(caption, message, callback_fn){
+		var tag = DroidWaffle.getCallbackId();
+		_w.dialogYesNo(caption, message, "DroidWaffle._dialogYesNo_callback", tag);
+		DroidWaffle.setCallback(tag, callback_fn);
+	};
+	DroidWaffle._dialogYesNo_callback = function(answer, tag) {
+		var f = DroidWaffle.getCallback(tag);
+		if (is_function(f)) { f(answer); }
+	};
+	/**
+	 * Select dialog
+	 * @param {String} caption
+	 * @param {Array} items
+	 * @param {Function} callback
+	 */
+	jsWaffle.prototype.selectList = function(caption, items, callback_fn){
+		var tag = DroidWaffle.getCallbackId();
+		_w.selectList(caption, items.join(";;;"), "DroidWaffle._selectList_callback", tag);
+		DroidWaffle.setCallback(tag, callback_fn);
+	};
+	DroidWaffle._selectList_callback = function(answer, tag) {
+		var f = DroidWaffle.getCallback(tag);
+		if (is_function(f)) { f(answer); }
+	};
+	
+	/**
+	 * activity event
+	 * @param {Function} callback_fn
+	 */
+	jsWaffle.prototype.registerActivityOnStart = function(callback_fn) {
+		DroidWaffle._registerActivityOnStart_user = callback_fn;
+		_w.registerActivityOnStart("DroidWaffle._registerActivityOnStart_callback");
+	};
+	DroidWaffle._registerActivityOnStart_callback = function() {
+		if(is_function(DroidWaffle._registerActivityOnStart_user)) {
+			DroidWaffle._registerActivityOnStart_user();
+		}
+	};
+	jsWaffle.prototype.registerActivityOnStop = function(callback_fn) {
+		DroidWaffle._registerActivityOnStop_user = callback_fn;
+		_w.registerActivityOnStop("DroidWaffle._registerActivityOnStop_callback");
+	};
+	DroidWaffle._registerActivityOnStop_callback = function() {
+		if(is_function(DroidWaffle._registerActivityOnStop_user)) {
+			DroidWaffle._registerActivityOnStop_user();
+		}
+	};
+	jsWaffle.prototype.registerActivityOnResume = function(callback_fn) {
+		DroidWaffle._registerActivityOnResume_user = callback_fn;
+		_w.registerActivityOnResume("DroidWaffle._registerActivityOnResume_callback");
+	};
+	DroidWaffle._registerActivityOnResume_callback = function() {
+		if(is_function(DroidWaffle._registerActivityOnResume_user)) {
+			DroidWaffle._registerActivityOnResume_user();
+		}
+	};
+	
+	/**
+	 * write DDMS log console
+	 * @param {String} msg
+	 */
+	jsWaffle.prototype.log = function(msg){
+		_w.log(msg);
+	};
+	jsWaffle.prototype.log_error = function(msg){
+		_w.log_error(msg);
+	};
+	jsWaffle.prototype.log_warn = function(msg){
+		_w.log_warn(msg);
+	};
+	
 	return (new jsWaffle());
+	
+	function is_function(f) {
+		return (typeof(f) == "function");
+	}
 	
 	//-----------------------------------
 	// dummy function for PC Browser
 	//-----------------------------------
-	function _DroidWaffle_getDummyFunctionsn() {
+	function _DroidWaffle_getDummyFunctions() {
 		return {
 			getWaffleVersion : function () { return 0; },
 			log : function (msg) { console.log(msg); },
@@ -354,9 +533,9 @@ var droid = (function(){
 			_timerId : 0,
 			setAccelCallback : function(fn){
 				if (fn == "") {
-					clearInterval(_timerId);
+					clearInterval(this._timerId);
 				} else {
-					_timerId = setInterval(function(){
+					this._timerId = setInterval(function(){
 						var x = Math.random() * 2 -2;
 						var y = Math.random() * 2 -2;
 						var z = Math.random() * 2 -2;
@@ -365,7 +544,7 @@ var droid = (function(){
 				}
 			},
 			setShakeCallback : function(fn, freq){
-				_timerId = setInterval(function(){
+				this._timerId = setInterval(function(){
 					eval(fn+"()");
 				},1000);
 			},
@@ -387,7 +566,13 @@ var droid = (function(){
 			startIntent : function(){},
 			openDatabase : function(){ return {} },
 			executeSql : function(db, sql, ok, ng) { if(typeof(ok)=="function") { ok(); } },
+			setMenuItem : function(){},
+			setMenuItemCallback : function(){},
+			scanBarcode : function(){},
+			dialogYesNo:function(msg, f, tag){ var a = confirm(msg); f(a,tag); },
 			___ : 0
 		};
 	}
-})();
+})(this);
+
+

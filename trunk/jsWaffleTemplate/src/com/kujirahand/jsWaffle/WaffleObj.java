@@ -9,8 +9,13 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.AssetFileDescriptor;
@@ -32,7 +37,7 @@ import android.widget.Toast;
  */
 public class WaffleObj
 {
-	public static double WAFFLE_VERSON = 0.3;
+	public static double WAFFLE_VERSON = 1.04;
 	//
 	public static int ACTIVITY_REQUEST_CODE_BARCODE = 0xFF0001;
 	//
@@ -42,6 +47,9 @@ public class WaffleObj
 	public static float accelX = 0;
 	public static float accelY = 0;
 	public static float accelZ = 0;
+	public static String event_onStart = null;
+	public static String event_onStop = null;
+	public static String event_onResume = null;
 	//
 	private WebView webview;
 	
@@ -119,12 +127,12 @@ public class WaffleObj
 	/**
 	 * geolocation_getCurrentPosition
 	 */
-	public int geolocation_getCurrentPosition(String callback_ok, String callback_ng) {
+	public int geolocation_getCurrentPosition(String callback_ok, String callback_ng, boolean accuracy_fine) {
 		GeoListener geo_listener = new GeoListener(waffle_activity, this, 1);
 		geo_listener.callback_success = callback_ok;
 		geo_listener.callback_failed = callback_ng;
 		geo_listener.flagLive = true;
-		geo_listener.start();
+		geo_listener.start(accuracy_fine);
 		geolocation_listeners.add(geo_listener);
 		return geolocation_listeners.size();
 	}
@@ -135,12 +143,12 @@ public class WaffleObj
 	 * @param callback_ng
 	 * @return watchId
 	 */
-	public int geolocation_watchPosition(String callback_ok, String callback_ng) {
+	public int geolocation_watchPosition(String callback_ok, String callback_ng, boolean accuracy_fine) {
 		GeoListener geo_listener = new GeoListener(waffle_activity, this, 0);
 		geo_listener.callback_success = callback_ok;
 		geo_listener.callback_failed = callback_ng;
 		geo_listener.flagLive = true;
-		geo_listener.start();
+		geo_listener.start(accuracy_fine);
 		geolocation_listeners.add(geo_listener);
 		return geolocation_listeners.size();
 	}
@@ -308,6 +316,114 @@ public class WaffleObj
 		}
 		return r;
 	}
+	//---------------------------------------------------------------
+	// preference method
+	//---------------------------------------------------------------
+	/**
+	 * get public preference
+	 * @return
+	 */
+	private SharedPreferences getPublicPreference() {
+		String pref_name = waffle_activity.getPackageName() + ".public";
+		SharedPreferences pref = waffle_activity.getSharedPreferences(
+				pref_name, Activity.MODE_WORLD_READABLE | Activity.MODE_WORLD_WRITEABLE);
+		return pref;
+	}
+	/**
+	 * Preference put
+	 * @param key
+	 * @param value
+	 */
+	public void preferencePut(String key, String value) {
+		Editor e = getPublicPreference().edit();
+		e.putString(key, value);
+		e.commit();
+	}
+	/**
+	 * Preferece get
+	 * @param key
+	 * @param defaultValue
+	 * @return
+	 */
+	public String preferenceGet(String key, String defaultValue) {
+		return getPublicPreference().getString(key, defaultValue);
+	}
+	/**
+	 * Preference exists key
+	 * @param key
+	 * @return
+	 */
+	public boolean preferenceExists(String key) {
+		return getPublicPreference().contains(key);
+	}
+	/**
+	 * Preference clear
+	 */
+	public void preferenceClear() {
+		Editor e = getPublicPreference().edit();
+		e.clear();
+		e.commit();
+	}
+	/**
+	 * Preference remove
+	 */
+	public void preferenceRemove(String key) {
+		Editor e = getPublicPreference().edit();
+		e.remove(key);
+		e.commit();
+	}
+	//---------------------------------------------------------------
+	/**
+	 * get private preference
+	 * @return
+	 */
+	private SharedPreferences getPrivatePreference() {
+		String pref_name = waffle_activity.getPackageName() + ".private";
+		SharedPreferences pref = waffle_activity.getSharedPreferences(
+				pref_name, Activity.MODE_PRIVATE);
+		return pref;
+	}
+	/**
+	 * local storage : Preference put
+	 * @param key
+	 * @param value
+	 */
+	public void localStorage_put(String key, String value) {
+		Editor e = getPrivatePreference().edit();
+		e.putString(key, value);
+		e.commit();
+	}
+	/**
+	 * local storage : Preferece get
+	 * @param key
+	 * @param defaultValue
+	 * @return
+	 */
+	public String localStorage_get(String key, String defaultValue) {
+		return getPrivatePreference().getString(key, defaultValue);
+	}
+	/**
+	 * local storage : Preference exists key
+	 * @param key
+	 * @return
+	 */
+	public boolean localStorage_exists(String key) {
+		return getPrivatePreference().contains(key);
+	}
+	/**
+	 * local storage : Preference clear
+	 */
+	public void localStorage_clear() {
+		Editor e = getPrivatePreference().edit();
+		e.clear();
+		e.commit();
+	}
+	public void localStorage_remove(String key) {
+		Editor e = getPublicPreference().edit();
+		e.remove(key);
+		e.commit();
+	}
+	
 	/**
 	 * open database
 	 * @param dbname
@@ -517,10 +633,66 @@ public class WaffleObj
 		menu_item_callback_funcname = callback_fn;
 	}
 	
+	/**
+	 * Dialog
+	 */
+	public void dialogYesNo(String caption, String msg, final String callback_fn, final int tag) {
+		final WaffleObj wobj = this;
+		new AlertDialog.Builder(waffle_activity)
+		.setIcon(android.R.drawable.ic_menu_help)
+		.setTitle(caption)
+		.setMessage(msg)
+		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+		    public void onClick(DialogInterface dialog, int whichButton) {
+		    	wobj.callJsEvent(String.format("%s(%s,%d)", callback_fn, "true", tag));
+		    }
+		})
+		.setNegativeButton("No", new DialogInterface.OnClickListener() {
+		    public void onClick(DialogInterface dialog, int whichButton) {
+		    	wobj.callJsEvent(String.format("%s(%s,%d)", callback_fn, "false", tag));
+		    }
+		})
+		.show();
+	}
+	public void selectList(String caption, String items, final String callback_fn, final int tag) {
+		// items split
+		final String[] str_items = items.split(";;;");
+		//
+		final WaffleObj wobj = this;
+		new AlertDialog.Builder(waffle_activity)
+		.setTitle(caption)
+		.setItems(str_items, new DialogInterface.OnClickListener(){
+			public void onClick(DialogInterface dialog, int which) {
+				String ans = str_items[which];
+				ans = ans.replaceAll("\"", "''");
+		    	wobj.callJsEvent(String.format("%s(\"%s\",%d)", 
+		    			callback_fn, 
+		    			ans, 
+		    			tag));
+			}
+		})
+		.show();
+	}
+	// event callback
+	public void registerActivityOnStart(String callback_fn) {
+		event_onStart = callback_fn;
+	}
+	public void registerActivityOnStop(String callback_fn) {
+		event_onStop = callback_fn;
+	}
+	public void registerActivityOnResume(String callback_fn) {
+		event_onResume = callback_fn;
+	}
 	
 	//---------------------------------------------------------------
 	// Event Wrapper
 	//---------------------------------------------------------------
+	public void onStat() {
+		if (event_onStart != null) {
+			callJsEvent(event_onStart + "()");
+		}
+	}
+	
 	public void onStop() {
 		if (flag_sensor) stopSensor();
 		// geolocation_listeners
@@ -528,6 +700,9 @@ public class WaffleObj
 			GeoListener g = geolocation_listeners.get(i);
 			if (g == null) continue;
 			g.stop();
+		}
+		if (event_onStop != null) {
+			callJsEvent(event_onStop + "()");
 		}
 	}
 	
@@ -538,6 +713,9 @@ public class WaffleObj
 			GeoListener g = geolocation_listeners.get(i);
 			if (g == null) continue;
 			if (g.flagLive) g.start();
+		}
+		if (event_onResume != null) {
+			callJsEvent(event_onResume + "()");
 		}
 	}
     

@@ -94,6 +94,12 @@ public class WaffleActivity extends Activity {
     }
     
     @Override
+    protected void onStart() {
+    	super.onStart();
+    	waffle_obj.onStat();
+    }
+    
+    @Override
     protected void onStop() {
     	super.onStop();
     	waffle_obj.onStop();
