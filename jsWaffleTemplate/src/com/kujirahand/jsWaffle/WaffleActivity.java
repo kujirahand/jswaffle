@@ -30,7 +30,7 @@ public class WaffleActivity extends Activity {
 	
 	public WebView webview;
 	public WaffleObj waffle_obj;
-	public static String LOG_TAG = "DroidWaffle";
+	public static String LOG_TAG = "jsWaffle";
 	protected LinearLayout root;
 	protected Handler handler = new Handler();
 	
@@ -306,6 +306,7 @@ public class WaffleActivity extends Activity {
 			final LinearLayout layout = new LinearLayout(appContext);
 			final EditText edtInput = new EditText(appContext);
 			final TextView txtView = new TextView(appContext);
+			txtView.setPadding(10,10,10,10);
 			
 			layout.setOrientation(LinearLayout.VERTICAL);
 			layout.addView(txtView);
