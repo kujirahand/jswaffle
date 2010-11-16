@@ -37,7 +37,7 @@ import android.widget.Toast;
  */
 public class WaffleObj
 {
-	public static double WAFFLE_VERSON = 1.04;
+	public static double WAFFLE_VERSON = 1.05;
 	//
 	public static int ACTIVITY_REQUEST_CODE_BARCODE = 0xFF0001;
 	//
