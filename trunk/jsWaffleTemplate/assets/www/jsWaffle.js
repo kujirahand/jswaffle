@@ -106,13 +106,17 @@ var droid = (function(self){
 	};
 	/**
 	 * watch Shake device
-	 * @param {Function} callback_fn
-	 * @param {double} freq
+	 * @param {Function} shake_begin_callback_fn
+	 * @param {Function} shake_end_callback_fn
+	 * @param {double} shake_begin_freq (default = 20)
+	 * @param {double} shake_end_freq (default = 8)
 	 */
-	jsWaffle.prototype.watchShake = function (callback_fn, freq) {
-		if (freq == undefined) { freq = 20; }
-		DroidWaffle._shake_fn_user = callback_fn;
-		_w.setShakeCallback("DroidWaffle._shake_fn", freq);
+	jsWaffle.prototype.watchShake = function (shake_begin_callback_fn, shake_end_callback_fn, shake_begin_freq, shake_end_freq) {
+		if (shake_begin_freq == undefined) shake_begin_freq = 20;
+		if (shake_end_freq == undefined) shake_end_freq = 8;
+		DroidWaffle._shake_fn_user = shake_begin_callback_fn;
+		DroidWaffle._shake_end_fn_user = shake_end_callback_fn;
+		_w.setShakeCallback("DroidWaffle._shake_callback", "DroidWaffle._shake_end_callback", shake_begin_freq, shake_end_freq);
 	};
 	// for sensor
 	DroidWaffle._watchSensor = function (accelX, accelY, accelZ) {
@@ -121,8 +125,11 @@ var droid = (function(self){
 		DroidWaffle.z = accelZ;
 		DroidWaffle._accel_fn(accelX, accelY, accelZ);
 	};
-	DroidWaffle._shake_fn = function () {
+	DroidWaffle._shake_callback = function () {
 		if (DroidWaffle._shake_fn_user) DroidWaffle._shake_fn_user();
+	};
+	DroidWaffle._shake_end_callback = function () {
+		if (DroidWaffle._shake_end_fn_user) DroidWaffle._shake_end_fn_user();
 	};
 	
 	/**

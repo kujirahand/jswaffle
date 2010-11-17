@@ -16,9 +16,15 @@ public class AccelListener implements SensorEventListener {
 	WaffleObj waffle_obj;
 	public Boolean isLive = false;
 	
+	public static final int SHAKE_STATUS_READY = 0;
+	public static final int SHAKE_STATUS_SHAKING = 1;
+	
 	public String sensour_callback_funcname = null;
 	public String shake_callback_funcname = null;
+	public String shake_end_callback_funcname = null;
 	public double shake_freq = 20.0f;
+	public double shake_end_freq = 8.0f;
+	public int shake_status = SHAKE_STATUS_READY;
 	
 	public AccelListener(Context context, WaffleObj waffle_obj) {
 		this.context = context;
@@ -32,6 +38,7 @@ public class AccelListener implements SensorEventListener {
 			Sensor se = sensors.get(0);
 			isLive = sensorMan.registerListener(this, se, SensorManager.SENSOR_DELAY_GAME);
 		}
+		shake_status = SHAKE_STATUS_READY;
 	}
 	
 	public void stop() {
@@ -80,11 +87,23 @@ public class AccelListener implements SensorEventListener {
             	currentAccelerationValues[2] = 0;
             	*/
             	//振ったときの処理
-            	waffle_obj.callJsEvent(shake_callback_funcname + "()");
+            	if (shake_status == SHAKE_STATUS_READY) {
+            		if (shake_callback_funcname != null) {
+            			waffle_obj.callJsEvent(shake_callback_funcname + "()");
+            			shake_status = SHAKE_STATUS_SHAKING;
+            		}
+            	}
             }
-            else if(targetValue < 10.0f) {
-            	//TODO:振ってないときの処理
+            else if(targetValue < shake_end_freq) {
+            	// 振ってないときの処理
+            	if (shake_status == SHAKE_STATUS_SHAKING) {
+            		if (shake_end_callback_funcname != null) {
+            			waffle_obj.callJsEvent(shake_end_callback_funcname + "()");
+            			shake_status = SHAKE_STATUS_READY;
+            		}
+            	}
             }
+            /*
             // 傾きは？３つの絶対値（あるいは２乗の平方根）のうちどれがいちばんでかいか？
             if(Math.abs(currentOrientationValues[0]) > 7.0f) {
                 //orientation.setText("横");
@@ -95,6 +114,7 @@ public class AccelListener implements SensorEventListener {
             } else {
                 //orientation.setText("");
             }
+            */
             break;
         default:
         }
@@ -111,5 +131,5 @@ public class AccelListener implements SensorEventListener {
         }
 	}
 	
-
 }
+
