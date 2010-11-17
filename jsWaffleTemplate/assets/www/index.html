@@ -140,23 +140,28 @@
 		
 		<h2>Shake !!</h2>
 		<div class="buttons">
-			<button class="func" id="btnShake" onclick="watchShake()">Watch Shake</button>
-			<button class="func" onclick="clearShake()">Stop</button>
+			<button class="func" id="btnShake" onclick="TestWatchShake()">Watch Shake</button>
+			<button class="func" onclick="TestClearShake()">Stop</button>
 		</div>
 		<div class="disp">
 			<div id="shake">shake : 0 times</div>
 		</div>
 		<script>
 			var shake_count = 0;
-			function watchShake() {
+			function TestWatchShake() {
 				$("btnShake").disabled = true;
 				droid.watchShake(function(){
+					// shake begin
+					droid.vibrate();
+					$("shake").innerHTML = "(* shaking *)";
+				}, function(){
+					// shake end
 					droid.beep();
 					shake_count++;
 					$("shake").innerHTML = "shake : " + shake_count + " times";
 				});
 			}
-			function clearShake(){
+			function TestClearShake(){
 				shake_count = 0;
 				droid.clearAccel();
 				droid.beep();

@@ -4,12 +4,15 @@
       android:versionName="1.0"
       package="com.kujirahand.template">
 
-	<!-- permission 1 -->
+	<!-- バイブ機能を使うとき -->
 	<uses-permission android:name="android.permission.VIBRATE"/>
-	<!-- permission 2 -->
+	<!-- インターネットへのアクセスを使う時 -->
 	<uses-permission android:name="android.permission.INTERNET" />
+	<!-- GPSを使う時 -->
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+	<!-- SDカードなどへ書き込みを行う時 -->
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<!-- 
 		<uses-permission android:name="android.permission.CALL_PHONE" />
 		<uses-permission android:name="android.permission.CAMERA" />

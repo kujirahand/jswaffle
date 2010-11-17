@@ -37,7 +37,7 @@ import android.widget.Toast;
  */
 public class WaffleObj
 {
-	public static double WAFFLE_VERSON = 1.05;
+	public static double WAFFLE_VERSON = 1.06;
 	//
 	public static int ACTIVITY_REQUEST_CODE_BARCODE = 0xFF0001;
 	//
@@ -107,17 +107,22 @@ public class WaffleObj
 	/**
 	 * Set Shake Event callback
 	 */
-	public void setShakeCallback(String funcname, double freq) {
+	public void setShakeCallback(String shake_callback_fn, String shake_end_callback_fn, double shake_freq, double shake_end_freq ) {
 		if (accel_listener == null) {
 			accel_listener = new AccelListener(waffle_activity, this);
 		}
-		if (funcname == "") {
+		if (shake_callback_fn == "") {
 			stopSensor();
 			flag_sensor = false;
 			return;
 		}
-		accel_listener.shake_freq = freq;
-		accel_listener.shake_callback_funcname = funcname;
+		// shake
+		accel_listener.shake_callback_funcname = shake_callback_fn;
+		accel_listener.shake_freq = shake_freq;
+		// shake end
+		accel_listener.shake_end_callback_funcname = shake_end_callback_fn;
+		accel_listener.shake_end_freq = shake_end_freq;
+		// start
 		flag_sensor = true;
 		startSensor();
 	}
