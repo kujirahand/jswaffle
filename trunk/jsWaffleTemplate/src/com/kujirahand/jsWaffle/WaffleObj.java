@@ -25,10 +25,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.WindowManager;
-import android.view.MenuItem.OnMenuItemClickListener;
 import android.webkit.WebView;
 import android.widget.Toast;
 
@@ -290,17 +286,29 @@ public class WaffleObj
 	 * @param filename
 	 * @return true or false
 	 */
-	public Boolean fileExists(String filename) {
+	public boolean fileExists(String filename) {
 		File file = null;
 		Uri uri = Uri.parse(filename);
 		if (uri.getScheme() == null) {
-			file = waffle_activity.getFileStreamPath(filename);
+			if (filename.startsWith("/sdcard/") || filename.startsWith("/data/")) {
+				file = new File(filename);
+			} else {
+				file = waffle_activity.getFileStreamPath(filename);
+			}
 		}
 		else { // file
 			file = new File(uri.getPath());
 		}
 		return file.exists();
 	}
+	
+	public boolean copyAssetsFile(String assetsName, String savepath) {
+		return WaffleUtils.copyAssetsFile(waffle_activity, assetsName, savepath);
+	}
+	public boolean mergeSeparatedAssetsFile(String assetsName, String savepath) {
+		return WaffleUtils.mergeSeparatedAssetsFile(waffle_activity, assetsName, savepath);
+	}
+	
 	/**
 	 * get file list
 	 * @param path
@@ -626,7 +634,7 @@ public class WaffleObj
 	public void finish() {
 		waffle_activity.finish();
 	}
-	
+		
 	/**
 	 * Add menu
 	 */
