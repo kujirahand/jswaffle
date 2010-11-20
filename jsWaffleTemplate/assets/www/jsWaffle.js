@@ -265,6 +265,29 @@ var droid = (function(self){
 		return s.split(";");
 	};
 	/**
+	 * check file exists
+	 * @param {String} path
+	 */
+	jsWaffle.prototype.fileExists = function (path) {
+		return _w.fileExists(path);
+	};
+	/**
+	 * copy file from assets to sdcard
+	 * @param {String} assetsName
+	 * @param {String} savepath
+	 */
+	jsWaffle.prototype.copyAssetsFile = function (assetsName, savepath) {
+		return _w.copyAssetsFile(assetsName, savepath);
+	};
+	/**
+	 * copy separated file from assets to sdcard
+	 * @param {String} assetsName
+	 * @param {String} savepath
+	 */
+	jsWaffle.prototype.mergeSeparatedAssetsFile = function (assetsName, savepath) {
+		return _w.mergeSeparatedAssetsFile(assetsName, savepath);
+	};
+	/**
 	 * storage set
 	 * @param {String} key
 	 * @param {String} value
