@@ -36,16 +36,33 @@ public class DBHelper {
 		// sd file?
 		Uri uri = Uri.parse(dbname);
 		File dbFile = null;
-		String scheme = uri.getScheme();
-		if (scheme == null) {
-			dbFile = context.getDatabasePath(dbname);
-		} else if (scheme.equals("file")) {
-			dbFile = new File(uri.getPath());
-		}
-		else {
+		try {
+			String scheme = uri.getScheme();
+			if (scheme == null) {
+				if (dbname.startsWith("/sdcard/") || dbname.startsWith("/data/")) {
+					dbFile = new File(dbname);
+				} else {
+					dbFile = context.getDatabasePath(dbname);
+				}
+			} else if (scheme.equals("file")) {
+				dbFile = new File(uri.getPath());
+			}
+			else {
+				return false;
+			}
+		} catch (Exception e) {
+			Log.e(WaffleActivity.LOG_TAG, "DBOpenError: file path problem in " + dbname + ":" + e.getMessage());
 			return false;
 		}
-		myDb = SQLiteDatabase.openOrCreateDatabase(dbFile, null);
+		
+		try {
+			myDb = SQLiteDatabase.openOrCreateDatabase(dbFile, null);
+		} catch (Exception e) {
+			Log.e(WaffleActivity.LOG_TAG, "DBOpenError: db problem in " + dbname + ":" + e.getMessage());
+			return false;
+		}
+		// SQLiteDatabase.OPEN_READWRITE + SQLiteDatabase.CREATE_IF_NECESSARY);
+		
 		if (myDb == null) return false;
 		return true;
 	}
