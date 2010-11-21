@@ -27,7 +27,7 @@ public class WaffleUtils {
 		try {
 			File f = new File(savepath);
 			File parent = f.getParentFile();
-			if (parent != null && parent.canWrite()) { parent.mkdirs(); }
+			if (parent != null) { parent.mkdirs(); }
 			fo = new FileOutputStream(f);
 		} catch (IOException e) {
 			Log.e(WaffleActivity.LOG_TAG, "copyAssetsFile() savepath could not open:" + e.getMessage() + ",file=" + savepath);
@@ -62,7 +62,9 @@ public class WaffleUtils {
 		try {
 			File f = new File(savepath);
 			File parent = f.getParentFile();
-			if (parent != null && parent.canWrite()) { parent.mkdirs(); }
+			if (parent != null) { 
+				parent.mkdirs();
+			}
 			fo = new FileOutputStream(f);
 		} catch (IOException e) {
 			Log.e(WaffleActivity.LOG_TAG, "mergeSeparatedAssetsFile() savepath could not open:" + e.getMessage() + ",file=" + savepath);

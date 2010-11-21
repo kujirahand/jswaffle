@@ -185,9 +185,10 @@ public class WaffleObj
 				beep_tone = RingtoneManager.getRingtone(waffle_activity, ringtone);
 			}
 		}
-		if (beep_tone.isPlaying()) return;
-		beep_tone.play();
-
+		if (beep_tone != null) {
+			if (beep_tone.isPlaying()) return;
+			beep_tone.play();
+		}
 	}
 	Ringtone beep_tone = null;
 	/**
@@ -437,25 +438,29 @@ public class WaffleObj
 		e.commit();
 	}
 	
+	
+	ArrayList<DBHelper> dblist = null;
 	/**
 	 * open database
 	 * @param dbname
 	 * @return DBHelper object
 	 */
 	public DBHelper openDatabase(String dbname) {
+		if (dblist == null) { dblist = new ArrayList<DBHelper>(); }
 		DBHelper db = new DBHelper(waffle_activity, this);
 		boolean b = db.openDatabase(dbname);
 		if (!b) return null;
+		dblist.add(db);
 		return db;
 	}
-	public void executeSql(DBHelper db, String sql, String fn_ok, String fn_ng) {
+	public void executeSql(DBHelper db, String sql, String fn_ok, String fn_ng, String tag) {
 		if (!(db instanceof DBHelper)) {
 			log_error("executeSql : db is not DBHelper instance!!");
 			return;
 		}
 		db.callback_result = fn_ok;
 		db.callback_error = fn_ng;
-		db.executeSql(sql, null, null);
+		db.executeSql(sql, null, tag);
 	}
 	/**
 	 * play media file
@@ -717,6 +722,14 @@ public class WaffleObj
 		if (event_onStop != null) {
 			callJsEvent(event_onStop + "()");
 		}
+		// database
+		if (dblist != null) {
+			if (dblist.size() > 0) {
+				for (int i = 0; i < dblist.size(); i++) {
+					dblist.get(i).closeDatabase();
+				}
+			}
+		}
 	}
 	
 	public void onResume() {
@@ -729,6 +742,14 @@ public class WaffleObj
 		}
 		if (event_onResume != null) {
 			callJsEvent(event_onResume + "()");
+		}
+		// database
+		if (dblist != null) {
+			if (dblist.size() > 0) {
+				for (int i = 0; i < dblist.size(); i++) {
+					dblist.get(i).reopenDatabase();
+				}
+			}
 		}
 	}
     
@@ -775,7 +796,7 @@ public class WaffleObj
 				webview.loadUrl(s);
 			}
 		});
-        // log(query);
+        log(query);
     }
 
 }
