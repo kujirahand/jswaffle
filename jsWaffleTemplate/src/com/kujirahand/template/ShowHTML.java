@@ -9,5 +9,9 @@ public class ShowHTML extends WaffleActivity {
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
     	this.showPage("file:///android_asset/www/index.html");
+    	
+    	// example
+    	//this.showPage("http://192.168.100.2/test/a.html?r=" + Math.random()); // localhost test
+    	//this.showPage("file:///android_asset/www/test/database.html"); // assets
     }
 }

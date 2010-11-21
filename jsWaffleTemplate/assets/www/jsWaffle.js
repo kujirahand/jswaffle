@@ -27,9 +27,11 @@ var droid = (function(self){
 		_shake_fn_user : null, // for shake
 		_menu_item_fn : [], // for menu
 		// for callback function list
+		_callback_id   : 0,
 		_callback_list : [], 
 		getCallbackId : function () {
-			return this._callback_list.length;
+			this._callback_id++;
+			return this._callback_id;
 		},
 		setCallback : function (id, callback) {
 			this._callback_list[id] = callback;
@@ -356,17 +358,21 @@ var droid = (function(self){
 	 * @param {Function}fn_ng
 	 */
 	jsWaffle.prototype.executeSql = function (db, sql, fn_ok, fn_ng) {
-		var o = DroidWaffle._db = {};
-		o.fn_ok = fn_ok;
-		o.fn_ng = fn_ng;
-		o.ok = function (result) {
-			if(typeof(o.fn_ok) == "function") { o.fn_ok(result); }
-		};
-		o.ng = function (err) {
-			if(typeof(o.fn_ng) == "function") { o.fn_ng(err); }
-		};
-		_w.executeSql(db, sql, "DroidWaffle._db.ok", "DroidWaffle._db.ng");
+		var tag = DroidWaffle.getCallbackId();
+		DroidWaffle.setCallback("executeSql_ok" + tag, fn_ok);
+		DroidWaffle.setCallback("executeSql_ng" + tag, fn_ng);
+		_w.executeSql(db, sql, "DroidWaffle._db.ok", "DroidWaffle._db.ng", tag);
 	};
+	DroidWaffle._db = {};
+	DroidWaffle._db.ok = function (result, tag) {
+		var f = DroidWaffle.getCallback("executeSql_ok" + tag);
+		f(result);
+	};
+	DroidWaffle._db.ng = function (err, tag) {
+		var f = DroidWaffle.getCallback("executeSql_ng" + tag);
+		f(err);
+	};
+	
 	/**
 	 * Start Intent (ex) mailto:hoge@example.com?subject=xxx&body=xxx
 	 * @param {String}url (http/https/market/tel/sms/geo/mailto/file/camera/video)

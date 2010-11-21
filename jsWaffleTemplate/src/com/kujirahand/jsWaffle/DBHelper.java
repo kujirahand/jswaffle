@@ -13,9 +13,9 @@ public class DBHelper {
 
 	SQLiteDatabase myDb;
 	String path;
-	String txid = "";
 	Context context;
 	WaffleObj waffle_obj;
+	String dbname;
 	
 	public String callback_error = null;
 	public String callback_result = null;
@@ -31,8 +31,19 @@ public class DBHelper {
 		return "/data/data/" + packageName + "/databases/";
 	}
 	
+	public void closeDatabase() {
+		if (myDb != null) {
+			myDb.close();
+		}
+	}
+	
+	public void reopenDatabase() {
+		openDatabase(dbname);
+	}
+	
 	public boolean openDatabase(String dbname)
 	{
+		this.dbname = dbname;
 		// sd file?
 		Uri uri = Uri.parse(dbname);
 		File dbFile = null;
@@ -67,12 +78,12 @@ public class DBHelper {
 		return true;
 	}
 	
-	public void executeSql(String query, String[] params, String tx_id)
+	public void executeSql(String query, String[] params, String tag)
 	{
 			try{
-				txid = tx_id;
+				Log.d(WaffleActivity.LOG_TAG, "SQL:" + query);
 				Cursor myCursor = myDb.rawQuery(query, params);			
-				processResults(myCursor);
+				processResults(myCursor, tag);
 			}
 			catch (SQLiteException ex)
 			{
@@ -80,39 +91,46 @@ public class DBHelper {
 				err = err.replace("\"", "\\\"");
 				Log.d(WaffleActivity.LOG_TAG, "DBError:" + err);
 				
-				String q = callback_error + "(\"" + err + "\")";
+				String q = callback_error + "(\"" + err + "\",\"" + tag + "\")";
 				waffle_obj.callJsEvent(q);
 				
 			}
 	}
 	
-	public void processResults(Cursor cur)
+	public void processResults(Cursor cur, String tag)
 	{		
 		String key = "";
 		String value = "";
 		String resultString = "";
 		if (cur.moveToFirst()) {
-			 int colCount = cur.getColumnCount();
-			 do {
-				 resultString += "{";
-				 for(int i = 0; i < colCount; ++i)
-				 {
+			int colCount = cur.getColumnCount();
+			do {
+				resultString += "{";
+				for(int i = 0; i < colCount; ++i)
+				{
 					 key  = cur.getColumnName(i);
 					 value = cur.getString(i);
+					 value = value.replace("\\", "\\\\");
 					 value = value.replace("\"", "\\\"");
-					 resultString += " \"" + key + "\":\"" + value + "\"";
-					 if (i != (colCount - 1))
-						 resultString += ",";
-				 }
-				 resultString += "},";
-			 } while (cur.moveToNext());
-			 if (resultString != "") {
-				 resultString = resultString.substring(0, resultString.length() - 1);
-			 }
-			 resultString = "[" + resultString + "]";
-			 // myDb.close();
+					 value = value.replace("\r", "\\r");
+					 value = value.replace("\n", "\\n");
+					 value = value.replace("\t", "\\t");
+					 resultString += "\"" + key + "\":\"" + value + "\"";
+					 //resultString += "\"" + key + "\":\"" + value + "\"";
+					 if (i != (colCount - 1)) resultString += ",";
+				}
+				resultString += "},";
+			} while (cur.moveToNext());
+			if (resultString != "") {
+				resultString = resultString.substring(0, resultString.length() - 1);
+			}
+			resultString = "[" + resultString + "]";
+			cur.close();
+			//resultString = java.net.URLEncoder.encode(resultString);
+		} else {
+			resultString = "null";
 		}
-		String q = callback_result + "(" + resultString + ")";
+		String q = callback_result + "("+resultString+","+tag+")";
 		waffle_obj.callJsEvent(q);
 	}
 	
