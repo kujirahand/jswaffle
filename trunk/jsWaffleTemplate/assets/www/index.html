@@ -35,6 +35,13 @@
 						if (b) droid.finish();
 					}
 				);
+				// test - getResString()
+				droid.setMenuItem(
+					2, true, "Test", "ic_menu_info_details",
+					function(){
+						alert("test:" + droid.getResString("test"));
+					}
+				);
 			}
 		</script>
 	</head>
