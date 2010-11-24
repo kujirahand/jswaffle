@@ -451,6 +451,16 @@ var droid = (function(self){
 	};
 	
 	/**
+	 * Get Res Strings
+	 * 国際化のためのリソース文字列(values-xx/strings.xml)の値を取得する
+	 * @param {String} id
+	 * @return {String} Get String from resource
+	 */
+	jsWaffle.prototype.getResString = function (id) {
+		return _w.getResString(id);
+	};
+	
+	/**
 	 * Set MenuItem
 	 * (ex) iconName =ic_menu_edit/ic_menu_gallery/ic_menu_help/ic_menu_info_details/ic_menu_manage/ic_menu_preferences
 	 * @see http://www.taosoftware.co.jp/blog/2008/11/android_5.html

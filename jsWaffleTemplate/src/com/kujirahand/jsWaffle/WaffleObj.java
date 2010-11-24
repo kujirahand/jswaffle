@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -33,7 +34,7 @@ import android.widget.Toast;
  */
 public class WaffleObj
 {
-	public static double WAFFLE_VERSON = 1.06;
+	public static double WAFFLE_VERSON = 1.07;
 	//
 	public static int ACTIVITY_REQUEST_CODE_BARCODE = 0xFF0001;
 	//
@@ -74,12 +75,25 @@ public class WaffleObj
 	public void log_warn(String msg) {
 		Log.w(WaffleActivity.LOG_TAG, msg);
 	}
-	/***
+	/**
 	 * Get Waffle Version Info
 	 * @return version string
 	 */
 	public double getWaffleVersion() {
 		return WAFFLE_VERSON;
+	}
+	
+	/**
+	 * Get android resource string
+	 * @return resource string
+	 */
+	public String getResString(String name) {
+		int id = waffle_activity.getResources().getIdentifier(name, "string", 
+				waffle_activity.getPackageName());
+		if (id == 0) {
+			return "";
+		}
+		return waffle_activity.getResources().getString(id);
 	}
 	
 	/**
