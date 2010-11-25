@@ -511,6 +511,49 @@ var droid = (function(self){
 		var f = DroidWaffle.getCallback(tag);
 		if (is_function(f)) { f(answer); }
 	};
+	/**
+	 * Multi Select dialog
+	 * @param {String} caption
+	 * @param {Array} items
+	 * @param {Function} callback
+	 * (ex)
+	 * ans = droid.multiSelectList("Select Colors",["red","blue","green"],
+	 *     function (items) { alert( "select:" + items.join(",") ); });
+	 */
+	jsWaffle.prototype.multiSelectList = function(caption, items, callback_fn){
+		var tag = DroidWaffle.getCallbackId();
+		_w.multiSelectList(caption, items.join(";;;"), "DroidWaffle._multiSelectList_callback", tag);
+		DroidWaffle.setCallback(tag, callback_fn);
+	};
+	DroidWaffle._multiSelectList_callback = function(answer, tag) {
+		var results = answer.split(";;;");
+		var f = DroidWaffle.getCallback(tag);
+		if (is_function(f)) { f(results); }
+	};
+	/**
+	 * Date picker dialog
+	 */
+	jsWaffle.prototype.datePickerDialog = function(callback_fn){
+		var tag = DroidWaffle.getCallbackId();
+		_w.datePickerDialog("DroidWaffle._datePickerDialog_callback", tag);
+		DroidWaffle.setCallback(tag, callback_fn);
+	};
+	DroidWaffle._datePickerDialog_callback = function(y, m, d, tag) {
+		var f = DroidWaffle.getCallback(tag);
+		if (is_function(f)) { f(y,m,d); }
+	};
+	/**
+	 * Time picker dialog
+	 */
+	jsWaffle.prototype.timePickerDialog = function(callback_fn){
+		var tag = DroidWaffle.getCallbackId();
+		_w.timePickerDialog("DroidWaffle._timePickerDialog_callback", tag);
+		DroidWaffle.setCallback(tag, callback_fn);
+	};
+	DroidWaffle._timePickerDialog_callback = function(hour, minute, tag) {
+		var f = DroidWaffle.getCallback(tag);
+		if (is_function(f)) { f(hour, minute); }
+	};
 	
 	/**
 	 * activity event

@@ -9,11 +9,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.R;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -668,43 +665,32 @@ public class WaffleObj
 	/**
 	 * Dialog
 	 */
-	public void dialogYesNo(String caption, String msg, final String callback_fn, final int tag) {
-		final WaffleObj wobj = this;
-		new AlertDialog.Builder(waffle_activity)
-		.setIcon(android.R.drawable.ic_menu_help)
-		.setTitle(caption)
-		.setMessage(msg)
-		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int whichButton) {
-		    	wobj.callJsEvent(String.format("%s(%s,%d)", callback_fn, "true", tag));
-		    }
-		})
-		.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int whichButton) {
-		    	wobj.callJsEvent(String.format("%s(%s,%d)", callback_fn, "false", tag));
-		    }
-		})
-		.show();
+	public void dialogYesNo(String caption, String msg, final String callback_fn, final String tag) {
+		DialogHelper.waffle_activity = waffle_activity;
+		DialogHelper.waffle_obj = this;
+		DialogHelper.dialogYesNo(caption, msg, callback_fn, tag);
 	}
-	public void selectList(String caption, String items, final String callback_fn, final int tag) {
-		// items split
-		final String[] str_items = items.split(";;;");
-		//
-		final WaffleObj wobj = this;
-		new AlertDialog.Builder(waffle_activity)
-		.setTitle(caption)
-		.setItems(str_items, new DialogInterface.OnClickListener(){
-			public void onClick(DialogInterface dialog, int which) {
-				String ans = str_items[which];
-				ans = ans.replaceAll("\"", "''");
-		    	wobj.callJsEvent(String.format("%s(\"%s\",%d)", 
-		    			callback_fn, 
-		    			ans, 
-		    			tag));
-			}
-		})
-		.show();
+	public void selectList(String caption, String items, final String callback_fn, final String tag) {
+		DialogHelper.waffle_activity = waffle_activity;
+		DialogHelper.waffle_obj = this;
+		DialogHelper.selectList(caption, items, callback_fn, tag);
 	}
+	public void multiSelectList(String caption, String items, final String callback_fn, final String tag) {
+		DialogHelper.waffle_activity = waffle_activity;
+		DialogHelper.waffle_obj = this;
+		DialogHelper.multiSelectList(caption, items, callback_fn, tag);
+	}
+	public void datePickerDialog(final String callback_fn, final String tag) {
+		DialogHelper.waffle_activity = waffle_activity;
+		DialogHelper.waffle_obj = this;
+		DialogHelper.datePickerDialog(callback_fn, tag);
+	}
+	public void timePickerDialog(final String callback_fn, final String tag) {
+		DialogHelper.waffle_activity = waffle_activity;
+		DialogHelper.waffle_obj = this;
+		DialogHelper.timePickerDialog(callback_fn, tag);
+	}
+	
 	// event callback
 	public void registerActivityOnStart(String callback_fn) {
 		event_onStart = callback_fn;
