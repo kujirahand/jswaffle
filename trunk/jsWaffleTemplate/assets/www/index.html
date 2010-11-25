@@ -330,7 +330,7 @@
 			<button class="func" onclick="TestSelectDialog()">selectList</button>
 			<button class="func" onclick="TestMultiSelectDialog()">multiSelectList</button>
 			<button class="func" onclick="TestDatePickerDialog()">datePickerDialog</button>
-			<button class="func" onclick="TestTimePickerDialog()">timePickerDialog</button>
+			<button class="func" onclick="TestTimePickerDialog()" id="time_btn">timePickerDialog</button>
 		</div>
 		<script>
 			function TestYesNoDialog() {
@@ -359,14 +359,18 @@
 					});
 			}
 			function TestDatePickerDialog() {
-				droid.datePickerDialog(function(y, m, d){
-					alert("select:" + new Date(y,m,d).toLocaleString());
-				});
+				var d = new Date();
+				droid.datePickerDialog(d.getFullYear(), d.getMonth(), d.getDate(),
+					function(y, m, d){
+						alert("select:" + new Date(y,m,d).toString());
+					});
 			}
 			function TestTimePickerDialog() {
-				droid.timePickerDialog(function(hour, minute){
+				droid.timePickerDialog(0,0, function(hour, minute){
 					alert("select:" + hour + ":" + minute);
+					$("time_btn").disabled = false;
 				});
+				$("time_btn").disabled = true;
 			}
 		</script>
 		
