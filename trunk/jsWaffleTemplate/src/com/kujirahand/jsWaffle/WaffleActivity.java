@@ -22,9 +22,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebSettings.LayoutAlgorithm;
-import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 public class WaffleActivity extends Activity {
 	
@@ -304,43 +302,34 @@ public class WaffleActivity extends Activity {
 		@Override
 		public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, final JsPromptResult result)
 		{
-			final LinearLayout layout = new LinearLayout(appContext);
-			final EditText edtInput = new EditText(appContext);
-			final TextView txtView = new TextView(appContext);
-			txtView.setPadding(10,10,10,10);
-			
-			layout.setOrientation(LinearLayout.VERTICAL);
-			layout.addView(txtView);
-			layout.addView(edtInput);
-			
-			txtView.setText(message);
-			edtInput.setText(defaultValue);
-			
-			new AlertDialog.Builder(appContext)
-                .setTitle("Prompt")
-                .setView(layout)
-                .setPositiveButton(android.R.string.ok,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                String value = edtInput.getText().toString();
-                                result.confirm(value);
-                            }
-                        })
-                .setNegativeButton(android.R.string.cancel,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                result.cancel();
-                            }
-                        })
-                .setOnCancelListener(
-                        new DialogInterface.OnCancelListener() {
-                            public void onCancel(DialogInterface dialog) {
-                                result.cancel();
-                            }
-                        })
-                .show();
-            
-            return true;
+			// prompt() を拡張して様々な用途のダイアログを表示する
+			DialogHelper.waffle_activity = WaffleObj.waffle_activity;
+			DialogHelper.waffle_obj = waffle_obj;
+			boolean r = true;
+			switch (WaffleObj.dialogType) {
+			case WaffleObj.DIALOG_TYPE_DEFAULT:
+				r = DialogHelper.inputDialog("Prompt", message, defaultValue, result);
+				break;
+			case WaffleObj.DIALOG_TYPE_YESNO:
+				r = DialogHelper.dialogYesNo(WaffleObj.dialogTitle, message, defaultValue, result);
+				break;
+			case WaffleObj.DIALOG_TYPE_SELECT_LIST:
+				r = DialogHelper.selectList(WaffleObj.dialogTitle, message, defaultValue, result);
+				break;
+			case WaffleObj.DIALOG_TYPE_CHECKBOX_LIST:
+				r = DialogHelper.checkboxList(WaffleObj.dialogTitle, message, defaultValue, result);
+				break;
+			case WaffleObj.DIALOG_TYPE_DATE:
+				r = DialogHelper.datePickerDialog(WaffleObj.dialogTitle, message, defaultValue, result);
+				break;
+			case WaffleObj.DIALOG_TYPE_TIME:
+				r = DialogHelper.timePickerDialog(WaffleObj.dialogTitle, message, defaultValue, result);
+				break;
+			case WaffleObj.DIALOG_TYPE_PROGRESS:
+				r = DialogHelper.seekbarDialog(WaffleObj.dialogTitle, message, defaultValue, result);
+				break;
+			}
+			return r;
 		}
 		
 	}
