@@ -483,83 +483,85 @@ var droid = (function(self){
 	};
 	/**
 	 * Dialog Yes or No
-	 * @param {String} caption
+	 * @param {String} title
 	 * @param {String} message
-	 * @param {Function} callback
+	 * @return {Boolean}
 	 */
-	jsWaffle.prototype.dialogYesNo = function(caption, message, callback_fn){
-		var tag = DroidWaffle.getCallbackId();
-		_w.dialogYesNo(caption, message, "DroidWaffle._dialogYesNo_callback", tag);
-		DroidWaffle.setCallback(tag, callback_fn);
-	};
-	DroidWaffle._dialogYesNo_callback = function(answer, tag) {
-		var f = DroidWaffle.getCallback(tag);
-		if (is_function(f)) { f(answer); }
+	jsWaffle.prototype.dialogYesNo = function(title, message){
+		_w.setPromptType(0x10, title);
+		var r = prompt(message);
+		_w.setPromptType(0, "prompt");
+		return (r == "true");
 	};
 	/**
-	 * Select dialog
-	 * @param {String} caption
+	 * list dialog
+	 * @param {String} title
 	 * @param {Array} items
-	 * @param {Function} callback
+	 * @return {String} selected item
 	 */
-	jsWaffle.prototype.selectList = function(caption, items, callback_fn){
-		var tag = DroidWaffle.getCallbackId();
-		_w.selectList(caption, items.join(";;;"), "DroidWaffle._selectList_callback", tag);
-		DroidWaffle.setCallback(tag, callback_fn);
-	};
-	DroidWaffle._selectList_callback = function(answer, tag) {
-		var f = DroidWaffle.getCallback(tag);
-		if (is_function(f)) { f(answer); }
+	jsWaffle.prototype.dialogList = function(title, items){
+		_w.setPromptType(0x11, title);
+		var r = prompt("", items.join(";;;"));
+		_w.setPromptType(0, "prompt");
+		return r;
 	};
 	/**
-	 * Multi Select dialog
-	 * @param {String} caption
+	 * Checkbox list dialog
+	 * @param {String} title
 	 * @param {Array} items
-	 * @param {Function} callback
-	 * (ex)
-	 * ans = droid.multiSelectList("Select Colors",["red","blue","green"],
-	 *     function (items) { alert( "select:" + items.join(",") ); });
+	 * @return {Array} selected item
 	 */
-	jsWaffle.prototype.multiSelectList = function(caption, items, callback_fn){
-		var tag = DroidWaffle.getCallbackId();
-		_w.multiSelectList(caption, items.join(";;;"), "DroidWaffle._multiSelectList_callback", tag);
-		DroidWaffle.setCallback(tag, callback_fn);
-	};
-	DroidWaffle._multiSelectList_callback = function(answer, tag) {
-		var results = answer.split(";;;");
-		var f = DroidWaffle.getCallback(tag);
-		if (is_function(f)) { f(results); }
+	jsWaffle.prototype.dialogCheckboxList = function(title, items){
+		_w.setPromptType(0x12, title);
+		var r = prompt("", items.join(";;;"));
+		_w.setPromptType(0, "prompt");
+		return r.split(";;;");
 	};
 	/**
 	 * Date picker dialog
-	 * @param {Integer} year
-	 * @param {Integer} month
-	 * @param {Integer} date
-	 * @param {Function} callback_fn
+	 * @param {Date} defaultDate
+	 * @return {Date}
 	 */
-	jsWaffle.prototype.datePickerDialog = function(year, month, date, callback_fn){
-		var tag = DroidWaffle.getCallbackId();
-		_w.datePickerDialog(year, month, date, "DroidWaffle._datePickerDialog_callback", tag);
-		DroidWaffle.setCallback(tag, callback_fn);
-	};
-	DroidWaffle._datePickerDialog_callback = function(y, m, d, tag) {
-		var f = DroidWaffle.getCallback(tag);
-		if (is_function(f)) { f(y,m,d); }
+	jsWaffle.prototype.dialogDatePicker = function(defaultDate){
+		_w.setPromptType(0x13, "");
+		if (typeof(defaultDate) != "object") {
+			defaultDate = new Date();
+		}
+		var d = defaultDate;
+		var r = prompt("", new Array(d.getFullYear(), d.getMonth(), d.getDate()).join(","));
+		var a = r.split(",");
+		d = new Date(a[0], a[1], a[2]);
+		_w.setPromptType(0, "prompt");
+		return d;
 	};
 	/**
 	 * Time picker dialog
 	 * @param {Integer} hour
 	 * @param {Integer} minute
-	 * @param {Function} callback_fn
+	 * @return {String} time format "hh:nn"
 	 */
-	jsWaffle.prototype.timePickerDialog = function(hour, minute, callback_fn){
-		var tag = DroidWaffle.getCallbackId();
-		_w.timePickerDialog(hour, minute, "DroidWaffle._timePickerDialog_callback", tag);
-		DroidWaffle.setCallback(tag, callback_fn);
+	jsWaffle.prototype.dialogTimePicker = function(hour, minute){
+		_w.setPromptType(0x14, "");
+		var r = prompt("", hour + ":" + minute);
+		_w.setPromptType(0, "prompt");
+		return r;
 	};
-	DroidWaffle._timePickerDialog_callback = function(hour, minute, tag) {
-		var f = DroidWaffle.getCallback(tag);
-		if (is_function(f)) { f(hour, minute); }
+	/**
+	 * Seekbar dialog
+	 * @param {String} title
+	 * @param {Integer} min
+	 * @param {Integer} max
+	 * @param {Integer} defaltValue
+	 * @return {Integer} value
+	 */
+	jsWaffle.prototype.dialogSeekbar = function(title,min,max,defaltValue){
+		if (typeof(min) != "number") min = 0;
+		if (typeof(max) != "number") max = 100;
+		if (typeof(defaltValue) != "number") defaltValue = Math.floor((max - min) / 2);
+		_w.setPromptType(0x15, title);
+		var r = prompt("", min + "," + max + "," + defaltValue);
+		_w.setPromptType(0, "prompt");
+		return parseInt(r);
 	};
 	
 	/**

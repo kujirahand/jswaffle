@@ -31,7 +31,7 @@ import android.widget.Toast;
  */
 public class WaffleObj
 {
-	public static double WAFFLE_VERSON = 1.07;
+	public static double WAFFLE_VERSON = 1.10;
 	//
 	public static int ACTIVITY_REQUEST_CODE_BARCODE = 0xFF0001;
 	//
@@ -44,6 +44,16 @@ public class WaffleObj
 	public static String event_onStart = null;
 	public static String event_onStop = null;
 	public static String event_onResume = null;
+	//
+	public final static int DIALOG_TYPE_DEFAULT = 0;
+	public final static int DIALOG_TYPE_YESNO = 0x10;
+	public final static int DIALOG_TYPE_SELECT_LIST = 0x11;
+	public final static int DIALOG_TYPE_CHECKBOX_LIST = 0x12;
+	public final static int DIALOG_TYPE_DATE = 0x13;
+	public final static int DIALOG_TYPE_TIME = 0x14;
+	public final static int DIALOG_TYPE_PROGRESS = 0x15;
+	public static int dialogType = DIALOG_TYPE_DEFAULT;
+	public static String dialogTitle = null;
 	//
 	private WebView webview;
 	
@@ -665,30 +675,9 @@ public class WaffleObj
 	/**
 	 * Dialog
 	 */
-	public void dialogYesNo(String caption, String msg, final String callback_fn, final String tag) {
-		DialogHelper.waffle_activity = waffle_activity;
-		DialogHelper.waffle_obj = this;
-		DialogHelper.dialogYesNo(caption, msg, callback_fn, tag);
-	}
-	public void selectList(String caption, String items, final String callback_fn, final String tag) {
-		DialogHelper.waffle_activity = waffle_activity;
-		DialogHelper.waffle_obj = this;
-		DialogHelper.selectList(caption, items, callback_fn, tag);
-	}
-	public void multiSelectList(String caption, String items, final String callback_fn, final String tag) {
-		DialogHelper.waffle_activity = waffle_activity;
-		DialogHelper.waffle_obj = this;
-		DialogHelper.multiSelectList(caption, items, callback_fn, tag);
-	}
-	public void datePickerDialog(int defYear, int month, int date, final String callback_fn, final String tag) {
-		DialogHelper.waffle_activity = waffle_activity;
-		DialogHelper.waffle_obj = this;
-		DialogHelper.datePickerDialog(defYear, month, date, callback_fn, tag);
-	}
-	public void timePickerDialog(int defHour, int defMin, final String callback_fn, final String tag) {
-		DialogHelper.waffle_activity = waffle_activity;
-		DialogHelper.waffle_obj = this;
-		DialogHelper.timePickerDialog(defHour, defMin, callback_fn, tag);
+	public void setPromptType(int no, String title) {
+		dialogType = no;
+		dialogTitle = title;
 	}
 	
 	// event callback
