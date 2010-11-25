@@ -1,0 +1,11 @@
+/** jsWaffle demo CSS */
+*  { padding:0; margin:0; }
+h1 { background-color: #990000; color: white; padding:8px; text-align: center; }
+h2 { background-color: #990000; color: white; padding:4px; }
+body { background-color: black; color: white; font-size:12px; }
+#func button { width: 150px; margin: 3px; padding:3px; }
+#disp div { height: 16px; padding: 1px; }
+div.buttons { padding: 9px; text-align:center; font-size:18px; }
+.buttons > button { padding:6px; margin:3px; width: 300px; }
+div.disp { background-color:#FFCCCC; color:#009; font-size:16px; padding: 16px; margin: 16px;}
+a  { color:red; }

@@ -106,6 +106,11 @@ var droid = (function(self){
 	jsWaffle.prototype.clearAccel = function () {
 		_w.setAccelCallback("");
 	};
+	
+	if (typeof(window.ondevicemotion) == "undefined") {
+		// TODO: emulate safari ondevicemotion(?)
+	}
+	
 	/**
 	 * watch Shake device
 	 * @param {Function} shake_begin_callback_fn

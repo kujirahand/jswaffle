@@ -221,10 +221,9 @@ public class WaffleActivity extends Activity {
 		
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
-			// true を返すことで、WebView の標準を動きをオーバーライドすることができます。
 			boolean b = IntentHelper.run(appContext, url);
 		  	if (!b) {
-		  		view.loadUrl(url);
+		  		view.loadUrl(url); // browse url in waffle browser
 		  		return false;
 		  	}
 		  	return true;
