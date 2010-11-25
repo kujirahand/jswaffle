@@ -92,49 +92,10 @@ public class IntentHelper {
 	
 	private static boolean runFile(Context appContext, String url) {
 		Uri uriFile = Uri.parse(url);
-		String ctype = getContentType(url);
-		
-		/*
-		 * android_asset は別途処理することに
-		// Check In android_asset
-		String filepath = uriFile.getPath();
-		if (filepath.startsWith("/android_asset")) {
-			try {
-				filepath = filepath.substring(15);
-				InputStream ins = appContext.getAssets().open(filepath);
-				if (ins == null) {
-					throw new IOException("FileNotFound:" + url);
-				}
-				// copy to public area
-				String tmpname = filepath.replaceAll("/", "_");
-				File ext_dir = new File(Environment.getExternalStorageDirectory() + "/temp");
-				if (!ext_dir.isDirectory()) {
-					if (ext_dir.mkdir()) { // ここでエラーになる
-						log("mkdir:" + ext_dir.getAbsolutePath());
-					} else {
-						err("mkdir failed:" + ext_dir.getAbsolutePath());
-						return false;
-					}
-				}
-				File outfile = new File(ext_dir.getAbsolutePath() + "/" + tmpname);
-				try {
-					FileOutputStream fos = new FileOutputStream(outfile); // ここでエラーになる
-					copyFile(ins, fos);
-					uriFile = Uri.parse("file:///" + outfile.getAbsolutePath());
-				}
-				catch(IOException e) {
-					err("WriteError:" + outfile.getAbsolutePath() + ";" + e.getMessage());
-					return false;
-				}
-			} catch(SecurityException e) {
-				err("SecurityException:" + url + ";" + e.getMessage());
-				return false;
-			} catch(IOException e) {
-				err("FileNotFound:" + url + ";" + e.getMessage());
-				return false;
-			}
+		if (url.startsWith("file:///android_asset")) {
+			return false; // show in WaffleActivity
 		}
-		*/
+		String ctype = getContentType(url);
 		// run
 		File f = new File(uriFile.getPath());
 		if (f.exists()) {

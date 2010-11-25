@@ -2,46 +2,13 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<style>
-			*  { padding:0; margin:0; }
-			h1 { background-color: #990000; color: white; padding:8px; text-align: center; }
-			h2 { background-color: #990000; color: white; padding:4px; }
-			body { background-color: black; color: white; font-size:12px; }
-			#func button { width: 150px; margin: 3px; padding:3px; }
-			#disp div { height: 16px; padding: 1px; }
-			button.func { padding:6px; margin:3px; width: 300px; }
-			div.buttons { padding: 9px; text-align:center; font-size:18px; }
-			div.disp { background-color:#FFCCCC; color:#009; font-size:16px; padding: 16px; margin: 16px;}
-		</style>
+		<link rel="stylesheet" type="text/css" href="res/demo.css" />
 		<script type="text/javascript" src="jsWaffle.js"></script>
+		<script type="text/javascript" src="res/demo-common.js"></script>
 		<script type="text/javascript">
 			function init() {
 				$("ver").innerHTML = droid.getWaffleVersion();
 				setMyMenuItem();
-			}
-			function setMyMenuItem() {
-				// info
-				droid.setMenuItem(
-					0, true, "About","ic_menu_info_details",
-					function(){
-						alert("jsWaffle for Android");
-					}
-				);
-				// quit
-				droid.setMenuItem(
-					1, true, "Quit", "ic_menu_close_clear_cancel",
-					function() {
-						var b = confirm("Quit?");
-						if (b) droid.finish();
-					}
-				);
-				// test - getResString()
-				droid.setMenuItem(
-					2, true, "Test", "ic_menu_info_details",
-					function(){
-						alert("test:" + droid.getResString("test"));
-					}
-				);
 			}
 		</script>
 	</head>
@@ -55,48 +22,10 @@
 		</div>
 		
 		<!-- *** sample *** -->
-		
 		<h2>Dialog Sample</h2>
 		<div class="buttons">
-			<button class="func" onclick="TestYesNoDialog()">dialogYesNo</button>
-			<button class="func" onclick="TestSelectDialog()">dialogList</button>
-			<button class="func" onclick="TestDialogCheckboxList()">dialogCheckboxList</button>
-			<button class="func" onclick="TestDatePickerDialog()">dialogDatePicker</button>
-			<button class="func" onclick="TestTimePickerDialog()">dialogTimePicker</button>
-			<button class="func" onclick="TestSeekbarDialog()">dialogSeekbar</button>
+			<button onclick="window.location='test/dialogs.html'">Dialog Sample</button>
 		</div>
-		<script>
-			function TestYesNoDialog() {
-				var answer = droid.dialogYesNo("Question", "Do you like sushi?");
-				if (answer) {
-					alert("You like Sushi!");
-				} else {
-					alert("You do not like Sushi!");
-				}
-			}
-			function TestSelectDialog() {
-				var selectedItem = droid.dialogList("Select Color", ["red","blue","green","white"]);
-				alert("color:" + selectedItem);
-			}
-			function TestDialogCheckboxList() {
-				var selectedItems = droid.dialogCheckboxList("Select Color", 
-						["black","white","red","green","blue"]);
-				alert("color:" + selectedItems.join(","));
-			}
-			function TestDatePickerDialog() {
-				var result = droid.dialogDatePicker(new Date());
-				alert(result.toString());
-			}
-			function TestTimePickerDialog() {
-				var result = droid.dialogTimePicker(0,0);
-				alert(result);
-			}
-			function TestSeekbarDialog() {
-				var value = droid.dialogSeekbar("Select value", 0, 100, 50);
-				alert("value="+ value);
-			}
-		</script>
-		
 		<h2>Beep/Ring/Vibrate</h2>
 		<div class="buttons">
 			<button class="func" onclick="droid.beep()">beep</button>
