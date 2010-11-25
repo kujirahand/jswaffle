@@ -1,7 +1,5 @@
 package com.kujirahand.jsWaffle;
 
-import java.util.Date;
-
 import android.R;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -112,7 +110,7 @@ public class DialogHelper {
 		.show();
 	}
 	
-	public static void datePickerDialog(final String callback_fn, final String tag) {
+	public static void datePickerDialog(int defYear, int month, int date, final String callback_fn, final String tag) {
 		DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {
 			@Override
 			public void onDateSet(DatePicker view, 
@@ -124,15 +122,12 @@ public class DialogHelper {
 						year,monthOfYear,dayOfMonth, tag));
 			}
 		};
-		Date date = new Date();
 		DatePickerDialog d = new DatePickerDialog(waffle_activity, mDateSetListener, 
-				date.getYear()+1900,
-				date.getMonth(),
-				date.getDate());
+				defYear, month, date);
 		d.show();
 	}
 	
-	public static void timePickerDialog(final String callback_fn, final String tag) {
+	public static void timePickerDialog(int defHour, int defMin, final String callback_fn, final String tag) {
 		TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
 			@Override
 			public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
@@ -142,8 +137,7 @@ public class DialogHelper {
 								hourOfDay, minute, tag));
 			}
 		};
-		Date date = new Date();
-		TimePickerDialog d = new TimePickerDialog(waffle_activity, mTimeSetListener, date.getHours(), date.getMinutes(), true);
+		TimePickerDialog d = new TimePickerDialog(waffle_activity, mTimeSetListener, defHour, defMin, true);
 		d.show();
 	}
 }

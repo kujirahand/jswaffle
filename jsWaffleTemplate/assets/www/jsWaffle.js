@@ -532,10 +532,14 @@ var droid = (function(self){
 	};
 	/**
 	 * Date picker dialog
+	 * @param {Integer} year
+	 * @param {Integer} month
+	 * @param {Integer} date
+	 * @param {Function} callback_fn
 	 */
-	jsWaffle.prototype.datePickerDialog = function(callback_fn){
+	jsWaffle.prototype.datePickerDialog = function(year, month, date, callback_fn){
 		var tag = DroidWaffle.getCallbackId();
-		_w.datePickerDialog("DroidWaffle._datePickerDialog_callback", tag);
+		_w.datePickerDialog(year, month, date, "DroidWaffle._datePickerDialog_callback", tag);
 		DroidWaffle.setCallback(tag, callback_fn);
 	};
 	DroidWaffle._datePickerDialog_callback = function(y, m, d, tag) {
@@ -544,10 +548,13 @@ var droid = (function(self){
 	};
 	/**
 	 * Time picker dialog
+	 * @param {Integer} hour
+	 * @param {Integer} minute
+	 * @param {Function} callback_fn
 	 */
-	jsWaffle.prototype.timePickerDialog = function(callback_fn){
+	jsWaffle.prototype.timePickerDialog = function(hour, minute, callback_fn){
 		var tag = DroidWaffle.getCallbackId();
-		_w.timePickerDialog("DroidWaffle._timePickerDialog_callback", tag);
+		_w.timePickerDialog(hour, minute, "DroidWaffle._timePickerDialog_callback", tag);
 		DroidWaffle.setCallback(tag, callback_fn);
 	};
 	DroidWaffle._timePickerDialog_callback = function(hour, minute, tag) {

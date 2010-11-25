@@ -680,15 +680,15 @@ public class WaffleObj
 		DialogHelper.waffle_obj = this;
 		DialogHelper.multiSelectList(caption, items, callback_fn, tag);
 	}
-	public void datePickerDialog(final String callback_fn, final String tag) {
+	public void datePickerDialog(int defYear, int month, int date, final String callback_fn, final String tag) {
 		DialogHelper.waffle_activity = waffle_activity;
 		DialogHelper.waffle_obj = this;
-		DialogHelper.datePickerDialog(callback_fn, tag);
+		DialogHelper.datePickerDialog(defYear, month, date, callback_fn, tag);
 	}
-	public void timePickerDialog(final String callback_fn, final String tag) {
+	public void timePickerDialog(int defHour, int defMin, final String callback_fn, final String tag) {
 		DialogHelper.waffle_activity = waffle_activity;
 		DialogHelper.waffle_obj = this;
-		DialogHelper.timePickerDialog(callback_fn, tag);
+		DialogHelper.timePickerDialog(defHour, defMin, callback_fn, tag);
 	}
 	
 	// event callback
