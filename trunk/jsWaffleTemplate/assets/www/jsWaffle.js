@@ -279,6 +279,13 @@ var droid = (function(self){
 		return _w.fileExists(path);
 	};
 	/**
+	 * create directories
+	 * @param {String} path
+	 */
+	jsWaffle.prototype.mkdir = function (path) {
+		return _w.mkdir(path);
+	};
+	/**
 	 * copy file from assets to sdcard
 	 * @param {String} assetsName
 	 * @param {String} savepath
@@ -541,13 +548,18 @@ var droid = (function(self){
 	};
 	/**
 	 * Time picker dialog
-	 * @param {Integer} hour
-	 * @param {Integer} minute
+	 * @param {Integer} hours
+	 * @param {Integer} minutes
 	 * @return {String} time format "hh:nn"
 	 */
-	jsWaffle.prototype.dialogTimePicker = function(hour, minute){
+	jsWaffle.prototype.dialogTimePicker = function(hours, minutes){
+		if (hours == undefined || minutes == undefined) {
+			var d = new Date();
+			hours = d.getHours();
+			minutes = d.getMinutes();
+		}
 		_w.setPromptType(0x14, "");
-		var r = prompt("", hour + ":" + minute);
+		var r = prompt("", hours + ":" + minutes);
 		_w.setPromptType(0, "prompt");
 		return r;
 	};
@@ -626,7 +638,7 @@ var droid = (function(self){
 	//-----------------------------------
 	function _DroidWaffle_getDummyFunctions() {
 		return {
-			getWaffleVersion : function () { return 0; },
+			getWaffleVersion : function () { return "x.xx"; },
 			log : function (msg) { console.log(msg); },
 			beep : function() {},
 			vibrate : function() {},
@@ -667,12 +679,45 @@ var droid = (function(self){
 			saveText : function (){},
 			loadText : function() {},
 			startIntent : function(){},
-			openDatabase : function(){ return {} },
-			executeSql : function(db, sql, ok, ng) { if(typeof(ok)=="function") { ok(); } },
+			openDatabase : function(fname){
+				// for webkit
+				if (typeof(window.openDatabase) == "function") {
+					var db = window.openDatabase(fname, "","emu db", 1024*1024*8);
+					return db;
+				} else {
+					return {};
+				}
+			},
+			executeSql : function(db, sql, ok_str, ng_str, tag) {
+				var ok = eval(ok_str);
+				var ng = eval(ng_str);
+				if (typeof(ng) !== "function") { ng = function(){}; }
+				// for webkit
+				if (typeof(window.openDatabase) == "function") {
+					db.transaction(function(tx){
+						tx.executeSql(sql, [],
+								function(tx,res){
+									var r = [];
+									for (var i = 0; i < res.rows.length; i++) {
+										r.push(res.rows.item(i));
+									}
+									ok(r, tag);
+								},
+								function(tx,err){ ng(err, tag);}
+						);
+					});
+				} else {
+					if (typeof(ok) == "function") { ok(); }
+				}
+			},
 			setMenuItem : function(){},
 			setMenuItemCallback : function(){},
 			scanBarcode : function(){},
 			dialogYesNo:function(msg, f, tag){ var a = confirm(msg); f(a,tag); },
+			fileExists : function(){ return false; },
+			mkdir : function () { return true; },
+			setPromptType : function () {},
+			getResString: function(name) { return name; },
 			___ : 0
 		};
 	}
