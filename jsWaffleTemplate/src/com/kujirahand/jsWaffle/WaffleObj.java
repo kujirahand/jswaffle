@@ -31,7 +31,7 @@ import android.widget.Toast;
  */
 public class WaffleObj
 {
-	public static double WAFFLE_VERSON = 1.10;
+	public static double WAFFLE_VERSON = 1.12;
 	//
 	public static int ACTIVITY_REQUEST_CODE_BARCODE = 0xFF0001;
 	//
@@ -324,6 +324,33 @@ public class WaffleObj
 		return file.exists();
 	}
 	
+	/**
+	 * make directories
+	 * @param path
+	 * @return
+	 */
+	public boolean mkdir(String path) {
+		File file = null;
+		Uri uri = Uri.parse(path);
+		if (uri.getScheme() == null) {
+			if (path.startsWith("/sdcard/") || path.startsWith("/data/")) {
+				file = new File(path);
+			} else {
+				file = waffle_activity.getFileStreamPath(path);
+			}
+		}
+		else { // file
+			file = new File(uri.getPath());
+		}
+		return file.mkdirs();
+	}
+	
+	/**
+	 * copy asset file
+	 * @param assetsName
+	 * @param savepath
+	 * @return
+	 */
 	public boolean copyAssetsFile(String assetsName, String savepath) {
 		return WaffleUtils.copyAssetsFile(waffle_activity, assetsName, savepath);
 	}

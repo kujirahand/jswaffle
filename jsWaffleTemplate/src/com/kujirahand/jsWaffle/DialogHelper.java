@@ -134,10 +134,15 @@ public class DialogHelper {
 	
 	public static boolean datePickerDialog(String title, String message, String defValue, final JsPromptResult result) {
 		String[] a = defValue.split(",");
-		int defYear = Integer.valueOf(a[0]);
-		int defMon  = Integer.valueOf(a[1]); // 1月が0に相当する月番号を指定
-		int defDate = Integer.valueOf(a[2]);
-		
+		int defYear = 2011; // 適当
+		int defMon  = 0;
+		int defDate = 1;
+		try {
+			defYear = Integer.valueOf(a[0]);
+			defMon  = Integer.valueOf(a[1]); // 1月が0に相当する月番号を指定
+			defDate = Integer.valueOf(a[2]);
+		}catch (Exception e) {
+		}
 		DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {
 			@Override
 			public void onDateSet(DatePicker view, 
@@ -156,8 +161,13 @@ public class DialogHelper {
 	
 	public static boolean timePickerDialog(String title, String message, String defValue, final JsPromptResult result) {
 		String[] a = defValue.split(":");
-		int defHour = Integer.valueOf(a[0]);
-		int defMin  = Integer.valueOf(a[1]);
+		int defHour = 0;
+		int defMin  = 0;
+		try {
+			defHour = Integer.valueOf(a[0]);
+			defMin  = Integer.valueOf(a[1]);
+		} catch(Exception e) {
+		}
 		TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
 			@Override
 			public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
