@@ -40,7 +40,7 @@ public class WaffleActivity extends Activity {
         w.setFlags(
         		WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN,
         		WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-        // * Full Screen
+       // * Full Screen
         // w.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         // * Keep Screen (Not Sleep)
         // w.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);

@@ -1,11 +1,13 @@
 package com.kujirahand.jsWaffle;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +19,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.AssetFileDescriptor;
+import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -251,19 +254,8 @@ public class WaffleObj
 	 */
 	public boolean saveText(String filename, String text) {
 		try {
-			FileOutputStream output = null;
-			Uri uri = Uri.parse(filename);
-			String scheme = uri.getScheme();
-			if (scheme == null) {
-				output = waffle_activity.openFileOutput(filename, Context.MODE_PRIVATE);
-			}
-			else if (scheme.equals("file")) {
-				File f = new File(uri.getPath());
-				output = new FileOutputStream(f);
-			}
-			else {
-				return false;
-			}
+			FileOutputStream output = WaffleUtils.getOutputStream(filename, waffle_activity);
+			if (output == null) return false;
 			output.write(text.getBytes());
 			output.close();
 			return true;
@@ -278,19 +270,8 @@ public class WaffleObj
 	 */
 	public String loadText(String filename) {
 		try {
-			FileInputStream input = null;
-			Uri uri = Uri.parse(filename);
-			String scheme = uri.getScheme();
-			if (scheme == null) {
-				input = waffle_activity.openFileInput(filename);
-			}
-			else if (scheme.equals("file")) {
-				File f = new File(uri.getPath());
-				input = new FileInputStream(f);
-			}
-			else {
-				return null;
-			}
+			FileInputStream input = WaffleUtils.getInputStream(filename, waffle_activity);
+			if (input == null) return null;
 			BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 			StringBuffer buf = new StringBuffer();
 			String line;
@@ -718,6 +699,51 @@ public class WaffleObj
 		event_onResume = callback_fn;
 	}
 	
+	/**
+	 * capture screen and save to file
+	 * @param filename
+	 * @param format png or jpeg
+	 * @return
+	 */
+	public boolean snapshotToFile(String filename, String format) {
+        webview.setDrawingCacheEnabled(true);
+		Bitmap bmp = webview.getDrawingCache();
+		if (bmp == null) {
+			log_error("snapshot failed: bmp = null");
+			return false;
+		}
+		// save to file
+		Bitmap.CompressFormat fmt = Bitmap.CompressFormat.PNG;
+		format = format.toLowerCase();
+		if (format == "jpeg" || format == "image/jpeg") {
+			fmt = Bitmap.CompressFormat.JPEG;
+		}
+		try {
+			byte[] w = bmp2data(bmp, fmt, 80/*middle*/);
+			writeDataFile(filename, w);
+			return true;
+		} catch (Exception e) {
+			log_error("snapshot failed:" + e.getMessage());
+			return false;
+		}
+	}
+	 private static byte[] bmp2data(Bitmap src, Bitmap.CompressFormat format, int quality) {
+		 ByteArrayOutputStream os=new ByteArrayOutputStream();
+		 src.compress(format,quality,os);
+		 return os.toByteArray();
+	 }
+	 private boolean writeDataFile(String filename, byte[] w) throws Exception {
+		 OutputStream out = WaffleUtils.getOutputStream(filename, waffle_activity);
+		 if (out == null) throw new Exception("FileOpenError:" + filename);
+		 try {
+			 out.write(w, 0, w.length);
+			 out.close();
+			 return true;
+		 } catch (Exception e) {
+			 out.close();
+		 }
+		 return false;
+	 }
 	//---------------------------------------------------------------
 	// Event Wrapper
 	//---------------------------------------------------------------
