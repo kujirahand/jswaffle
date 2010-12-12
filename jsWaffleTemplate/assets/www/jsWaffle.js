@@ -463,6 +463,16 @@ var droid = (function(self){
 	};
 	
 	/**
+	 * save screen capture 
+	 * @param {String} filename
+	 * @param {String} format (png or jpeg)
+	 */
+	jsWaffle.prototype.snapshotToFile = function (filename, format) {
+		if (format == undefined) { format = "png"; }
+		return _w.snapshotToFile(filename, format);
+	};
+	
+	/**
 	 * Get Res Strings
 	 * 国際化のためのリソース文字列(values-xx/strings.xml)の値を取得する
 	 * @param {String} id
@@ -718,6 +728,7 @@ var droid = (function(self){
 			mkdir : function () { return true; },
 			setPromptType : function () {},
 			getResString: function(name) { return name; },
+			snapshotToFile: function(fname) { return false; },
 			___ : 0
 		};
 	}

@@ -41,6 +41,18 @@
 		}
 	</script>
 	
+	<h2>Snapshot</h2>
+	<div class="buttons">
+		<button onclick="showSnapshot()">Snapshot!!</button>
+	</div>
+	<script>
+		function showSnapshot() {
+			var path = "file:/sdcard/test.png";
+			droid.snapshotToFile(path, "png");
+			droid.startIntent(path);
+		}
+	</script>
+	
 	<h2>Sound/Video</h2>	
 	<div class="buttons">
 		<button onclick="droid.playSound('res/beep.mp3')">Play MP3 in asset</button>
