@@ -53,6 +53,17 @@
 		}
 	</script>
 	
+	<h2>HTTP</h2>
+	<div class="buttons">
+		<button onclick="testHTTP()">httpGet</button>
+	</div>
+	<script>
+		function testHTTP() {
+			var s = droid.httpGet("http://api.aoikujira.com/ip/json");
+			alert(s);
+		}
+	</script>
+	
 	<h2>Sound/Video</h2>	
 	<div class="buttons">
 		<button onclick="droid.playSound('res/beep.mp3')">Play MP3 in asset</button>

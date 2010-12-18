@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -12,6 +13,8 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 public class IntentHelper {
+	
+	public static int request_code = 0;
 	
 	public static boolean run(Context appContext, String url) {
 		//TODO:URIの独自スキーマの定義
@@ -81,7 +84,8 @@ public class IntentHelper {
 			Intent intent = new Intent();
 			intent.setAction(mediaType);
 			intent.putExtra(MediaStore.EXTRA_OUTPUT, saveUri);
-			appContext.startActivity(intent);
+			Activity app = (Activity)(appContext);
+			app.startActivityForResult(intent, request_code);
 			return true;
 		} catch (Exception e) {
 			err("camera error:" + e.getMessage());

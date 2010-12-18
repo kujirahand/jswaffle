@@ -40,6 +40,11 @@ var droid = (function(self){
 			var f = this._callback_list[id];
 			return f;
 		},
+		onPageFinished : function(url){
+			if (typeof(droid.onPageFinished) == "function") {
+				droid.onPageFinished(url);
+			}
+		},
 		___ : 0
 	};
 	// local _DroidWaffle shortcut
@@ -394,6 +399,24 @@ var droid = (function(self){
 		return _w.startIntent(url);
 	};
 	/**
+	 * Start Intent for Result
+	 * @param {String} url
+	 * @param {Function} callback
+	 */
+	jsWaffle.prototype.startIntentForResult = function (url, callback) {
+		// register user function
+		var id = DroidWaffle.getCallbackId();
+		DroidWaffle.setCallback(id, callback);
+		// set proxy function
+		DroidWaffle._startIntentForResult_callback = function (request_code, result_code) {
+			var f = DroidWaffle.getCallback(request_code);
+			if (typeof(f) == "function") {
+				f(result_code);
+			}
+		};
+		return _w.startIntentForResult(url, "DroidWaffle._startIntentForResult_callback", id);
+	};
+	/**
 	 * Start Intent with FullScreen
 	 * @param {Object} url (ex) file:///assets/www/full.html
 	 */
@@ -470,6 +493,24 @@ var droid = (function(self){
 	jsWaffle.prototype.snapshotToFile = function (filename, format) {
 		if (format == undefined) { format = "png"; }
 		return _w.snapshotToFile(filename, format);
+	};
+	
+	/**
+	 * http get
+	 * @param {String} url
+	 * @return {String} get data
+	 */
+	jsWaffle.prototype.httpGet = function (url) {
+		return _w.httpGet(url);
+	};
+	/**
+	 * http post
+	 * @param {String} url
+	 * @param {String} json
+	 * @return {String} result
+	 */
+	jsWaffle.prototype.httpPostJSON = function (url, json) {
+		return _w.httpPostJSON(url, json);
 	};
 	
 	/**
@@ -729,6 +770,8 @@ var droid = (function(self){
 			setPromptType : function () {},
 			getResString: function(name) { return name; },
 			snapshotToFile: function(fname) { return false; },
+			httpGet: function(){ return "hoge"; },
+			httpPostJSON: function(){ return "hoge"; },
 			___ : 0
 		};
 	}

@@ -36,10 +36,18 @@
 	</div>
 	<script>
 		function TestCamera() {
-			droid.startIntent("camera:///sdcard/hoge.jpg");
+			droid.startIntentForResult(
+				"camera:/sdcard/hoge.jpg",
+				function(code){
+					droid.startIntent("file:/sdcard/hoge.jpg");
+				});
 		}
 		function TestVideo() {
-			droid.startIntent("video:///sdcard/hoge.mpg");
+			droid.startIntentForResult(
+				"video:/sdcard/hoge.mpg",
+				function(code){
+					droid.startIntent("file:/sdcard/hoge.mpg");
+				});
 		}
 	</script>
 	
