@@ -552,6 +552,12 @@ public class WaffleObj
 	 * @param url
 	 */
 	public boolean startIntent(String url) {
+		IntentHelper.request_code = -1;
+		return _startIntent(url, false);
+	}
+	public boolean startIntentForResult(String url, String callback, int requestCode) {
+		IntentHelper.request_code = requestCode;
+		this.intent_startActivity_callback = callback;
 		return _startIntent(url, false);
 	}
 	/**
@@ -744,6 +750,17 @@ public class WaffleObj
 		 }
 		 return false;
 	 }
+	 
+	 /**
+	  * get data from url
+	  */
+	 public String httpGet(String url) {
+		 return WaffleUtils.httpGet(url);
+	 }
+	 public String httpPostJSON(String url, String json) {
+		 return WaffleUtils.httpPostJSON(url, json);
+	 }
+	 
 	//---------------------------------------------------------------
 	// Event Wrapper
 	//---------------------------------------------------------------
