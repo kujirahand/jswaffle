@@ -20,6 +20,8 @@ public class DBHelper {
 	public String callback_error = null;
 	public String callback_result = null;
 	
+	public String lastError = null;
+	
 	public DBHelper(Context context, WaffleObj waffle_obj)
 	{    	
 		this.context = context;
@@ -83,11 +85,12 @@ public class DBHelper {
 			try{
 				Log.d(WaffleActivity.LOG_TAG, "SQL:" + query);
 				Cursor myCursor = myDb.rawQuery(query, params);			
-				processResults(myCursor, tag);
+				processResults(myCursor, tag, true);
 			}
 			catch (SQLiteException ex)
 			{
 				String err = ex.getMessage();
+				lastError = err;
 				err = err.replace("\"", "\\\"");
 				Log.d(WaffleActivity.LOG_TAG, "DBError:" + err);
 				
@@ -97,7 +100,18 @@ public class DBHelper {
 			}
 	}
 	
-	public void processResults(Cursor cur, String tag)
+	public String executeSqlSync(String query, String[] params)
+	{
+		try {
+			Cursor myCursor = myDb.rawQuery(query, params);			
+			return processResults(myCursor, "", false);
+		} catch (SQLiteException ex) {
+			lastError = ex.getMessage();
+			return null;
+		}
+	}
+	
+	public String processResults(Cursor cur, String tag, boolean flagCallJS)
 	{		
 		String key = "";
 		String value = "";
@@ -129,9 +143,13 @@ public class DBHelper {
 			//resultString = java.net.URLEncoder.encode(resultString);
 		} else {
 			resultString = "null";
+			cur.close();
 		}
-		String q = callback_result + "("+resultString+","+tag+")";
-		waffle_obj.callJsEvent(q);
+		if (flagCallJS) {
+			String q = callback_result + "("+resultString+","+tag+")";
+			waffle_obj.callJsEvent(q);
+		}
+		return resultString;
 	}
 	
 	

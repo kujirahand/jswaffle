@@ -29,7 +29,8 @@ import android.util.Log;
 
 public class WaffleUtils {
 	
-	private static int BUFFSIZE = 1024 * 16;
+	private static int BUFFSIZE = 1024 * 32;
+	public static int http_timeout = 2000;
 	
 	/**
 	 * copy assets to external file 
@@ -114,11 +115,40 @@ public class WaffleUtils {
 		}
 	}
 	
+	public static File detectFile(String filename, Activity app) {
+		File result = null;
+		try {
+			Uri uri = Uri.parse(filename);
+			String path = uri.getPath();
+			if (path.startsWith("/sdcard/")||path.startsWith("/data/")) {
+				uri = Uri.parse("file://" + filename);
+			}
+			String scheme = uri.getScheme();
+			path = uri.getPath();
+			if (scheme == null) {
+				result = app.getFileStreamPath(filename);
+			}
+			else if (scheme.equals("file")) {
+				result = new File(uri.getPath());
+			}
+			else {
+				// error
+			}
+		} catch (Exception e) {
+		}
+		return result;
+	}
+	
 	public static FileOutputStream getOutputStream(String filename, Activity activity) {
 		FileOutputStream output = null;
 		try {
 			Uri uri = Uri.parse(filename);
+			String path = uri.getPath();
+			if (path.startsWith("/sdcard")||path.startsWith("/data/")) {
+				uri = Uri.parse("file://" + filename);
+			}
 			String scheme = uri.getScheme();
+			path = uri.getPath();
 			if (scheme == null) {
 				output = activity.openFileOutput(filename, Context.MODE_PRIVATE);
 			}
@@ -161,8 +191,8 @@ public class WaffleUtils {
 	public static String httpGet(String url) {
 		HttpClient objHttp = new DefaultHttpClient();
 		HttpParams params = objHttp.getParams();
-		HttpConnectionParams.setConnectionTimeout(params, 1000); //接続のタイムアウト
-		HttpConnectionParams.setSoTimeout(params, 1000); //データ取得のタイムアウト
+		HttpConnectionParams.setConnectionTimeout(params, http_timeout); //接続のタイムアウト
+		HttpConnectionParams.setSoTimeout(params, http_timeout); //データ取得のタイムアウト
 		String sReturn = "";
 	    try {
 	    	HttpGet objGet   = new HttpGet(url);
@@ -183,6 +213,41 @@ public class WaffleUtils {
 	    	return null;
 	    }	
 	    return sReturn;
+	}
+	
+	/**
+	 * http download
+	 * @param url
+	 * @param filename
+	 * @return
+	 */
+	public static boolean httpDownloadToFile(String url, String filename, Activity app) {
+		// 保存先をセット
+		FileOutputStream outStream = getOutputStream(filename, app);
+		if (outStream == null) return false;
+		// ダウンロード
+		HttpClient objHttp = new DefaultHttpClient();
+		HttpParams params = objHttp.getParams();
+		HttpConnectionParams.setConnectionTimeout(params, http_timeout); //接続のタイムアウト
+		HttpConnectionParams.setSoTimeout(params, http_timeout); //データ取得のタイムアウト
+	    try {
+	    	byte[] buf = new byte[BUFFSIZE];
+	    	HttpGet objGet   = new HttpGet(url);
+	        HttpResponse objResponse = objHttp.execute(objGet);
+	        if (objResponse.getStatusLine().getStatusCode() < 400){
+	            InputStream objStream = objResponse.getEntity().getContent();
+	            int retCount = 0;
+	            while ((retCount = objStream.read(buf)) > 0) {
+	            	outStream.write(buf, 0, retCount);
+	            }
+	            objStream.close();
+		        outStream.close();
+	        }
+	        return true;
+	    } catch (IOException e) {
+	    	Log.e(WaffleActivity.LOG_TAG, "httpDownload.failed:" + e.getMessage());
+	    	return false;
+	    }
 	}
 	
 	/**
