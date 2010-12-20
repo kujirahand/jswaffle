@@ -1,6 +1,7 @@
-package com.kujirahand.jsWaffle;
+package com.kujirahand.jsWaffle.plugins;
 
 import java.util.List;
+import java.util.Vector;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -9,11 +10,97 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.SystemClock;
 
-public class AccelListener implements SensorEventListener {
+import com.kujirahand.jsWaffle.WaffleActivity;
+import com.kujirahand.jsWaffle.plugin.WafflePlugin;
 
+public class AccelPlugin extends WafflePlugin {
+
+	Vector<AccelListener> listeners = new Vector<AccelListener>();
+	
+	// javascript interfalce
+	/**
+	 * Set Sensor event callback
+	 * @param funcname
+	 */
+	public int setAccelCallback(String funcname) {
+		AccelListener ac = new AccelListener(waffle_activity);
+		listeners.add(ac);
+		ac.sensour_callback_funcname = funcname;
+		ac.start();
+		return listeners.size();
+	}
+	
+	public void clearAccelAll() {
+		for (int i = 0; i < listeners.size(); i++) {
+			clearAccel(i + 1);
+		}
+	}
+	
+	public void clearAccel(int watchId) {
+		int index = watchId - 1;
+		if (listeners.size() <= 0) return;
+		if (!(0 <= index && index < listeners.size())) {
+			return;
+		}
+		AccelListener ac = listeners.get(index);
+		if (ac == null) return;
+		if (ac.isLive) {
+			try {
+				ac.stop();
+			} 
+			catch (Exception e) {
+				waffle_activity.log_error("[Accel Error] clearAccel Error");
+			}
+		}
+		listeners.set(index, null);
+	}
+	
+	/**
+	 * Set Shake Event callback
+	 */
+	public void setShakeCallback(String shake_callback_fn, String shake_end_callback_fn, double shake_freq, double shake_end_freq ) {
+		AccelListener ac = new AccelListener(waffle_activity);
+		listeners.add(ac);
+		// shake
+		ac.shake_callback_funcname = shake_callback_fn;
+		ac.shake_freq = shake_freq;
+		// shake end
+		ac.shake_end_callback_funcname = shake_end_callback_fn;
+		ac.shake_end_freq = shake_end_freq;
+		ac.start();
+	}
+	
+	public void onPause() {
+		for (AccelListener ac : listeners) {
+			if (ac != null) {
+				ac.stop();
+			}
+		}
+	}
+	
+	public void onResume() {
+		for (AccelListener ac : listeners) {
+			if (ac != null) {
+				ac.start();
+			}
+		}
+	}
+	
+	public void onPageStarted() {
+		clearAccelAll();
+		listeners.clear();
+	}
+	
+	public void onDestroy() {
+		clearAccelAll();
+		listeners.clear();
+	}
+}
+
+class AccelListener implements SensorEventListener
+{
 	SensorManager sensorMan;
-	Context context;
-	WaffleObj waffle_obj;
+	WaffleActivity context;
 	public Boolean isLive = false;
 	
 	public static final int SHAKE_STATUS_READY = 0;
@@ -26,9 +113,8 @@ public class AccelListener implements SensorEventListener {
 	public double shake_end_freq = 8.0f;
 	public int shake_status = SHAKE_STATUS_READY;
 	
-	public AccelListener(Context context, WaffleObj waffle_obj) {
+	public AccelListener(WaffleActivity context) {
 		this.context = context;
-		this.waffle_obj = waffle_obj;
 		sensorMan = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
 	}
 	
@@ -58,11 +144,11 @@ public class AccelListener implements SensorEventListener {
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
+    	float accelX = event.values[0];
+    	float accelY = event.values[1];
+    	float accelZ = event.values[2];
         switch(event.sensor.getType()) {
         case Sensor.TYPE_ACCELEROMETER:
-        	WaffleObj.accelX = event.values[0];
-        	WaffleObj.accelY = event.values[1];
-        	WaffleObj.accelZ = event.values[2];
             // 傾き（ハイカット）
             currentOrientationValues[0] = event.values[0] * 0.1f + currentOrientationValues[0] * (1.0f - 0.1f);
             currentOrientationValues[1] = event.values[1] * 0.1f + currentOrientationValues[1] * (1.0f - 0.1f);
@@ -89,7 +175,7 @@ public class AccelListener implements SensorEventListener {
             	//振ったときの処理
             	if (shake_status == SHAKE_STATUS_READY) {
             		if (shake_callback_funcname != null) {
-            			waffle_obj.callJsEvent(shake_callback_funcname + "()");
+            			context.callJsEvent(shake_callback_funcname + "()");
             			shake_status = SHAKE_STATUS_SHAKING;
             		}
             	}
@@ -98,7 +184,7 @@ public class AccelListener implements SensorEventListener {
             	// 振ってないときの処理
             	if (shake_status == SHAKE_STATUS_SHAKING) {
             		if (shake_end_callback_funcname != null) {
-            			waffle_obj.callJsEvent(shake_end_callback_funcname + "()");
+            			context.callJsEvent(shake_end_callback_funcname + "()");
             			shake_status = SHAKE_STATUS_READY;
             		}
             	}
@@ -122,14 +208,12 @@ public class AccelListener implements SensorEventListener {
         if (sensour_callback_funcname == null || sensour_callback_funcname == "") return;
         long now = SystemClock.uptimeMillis();
         long diff = now - lastTime;
-        if (diff > 500) {
-			String accel_str = sensour_callback_funcname + "(" + 
-				WaffleObj.accelX + "," + WaffleObj.accelY + "," +
-				WaffleObj.accelZ + ")";
-			waffle_obj.callJsEvent(accel_str);
+        if (diff > 100) {
+			String accel_str = sensour_callback_funcname + 
+				"(" + accelX + "," + accelY + "," + accelZ + ")";
+			context.callJsEvent(accel_str);
 			lastTime = now;
         }
 	}
-	
-}
 
+}

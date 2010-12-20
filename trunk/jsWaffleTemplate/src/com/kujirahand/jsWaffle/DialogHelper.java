@@ -15,7 +15,6 @@ import android.widget.TimePicker;
 
 public class DialogHelper {
 	public static WaffleActivity waffle_activity;
-	public static WaffleObj waffle_obj;
 	
 	public static boolean inputDialog(String title, String message, String defaultValue, final JsPromptResult result) {
 		final LinearLayout layout = new LinearLayout(waffle_activity);
