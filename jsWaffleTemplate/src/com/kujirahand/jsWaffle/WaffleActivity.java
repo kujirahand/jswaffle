@@ -1,5 +1,11 @@
 package com.kujirahand.jsWaffle;
 
+import com.kujirahand.jsWaffle.plugin.IWafflePlugin;
+import com.kujirahand.jsWaffle.plugin.WafflePluginManager;
+import com.kujirahand.jsWaffle.plugins.AccelPlugin;
+import com.kujirahand.jsWaffle.plugins.DatabasePlugin;
+import com.kujirahand.jsWaffle.plugins.GPSPlugin;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -27,15 +33,40 @@ import android.widget.LinearLayout;
 
 public class WaffleActivity extends Activity {
 	
+	public WaffleActivity activity_instance = this;
 	public WebView webview;
 	public WaffleObj waffle_obj;
 	public static String LOG_TAG = "jsWaffle";
 	protected LinearLayout root;
 	protected Handler handler = new Handler();
 	
-	//----------------------------------------------------------------
-	// Set Window Flags
-	//----------------------------------------------------------------
+	public WafflePluginManager pluginManager;
+	
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+    	super.onCreate(savedInstanceState);
+    	
+    	// Initialize Window
+    	onSetWindowFlags(getWindow());
+    	
+    	// Create WebView
+    	buildMainView();
+        
+    	// Set WebView Param
+        setWebViewParams();
+        
+        // Set Plugins
+        pluginManager = new WafflePluginManager();
+        onAddPlugins();
+        
+        // Set WebView to Main View
+        setContentView(root);
+    }
+   
+    /**
+     * set Window Flags
+     * @param w
+     */
 	public void onSetWindowFlags(Window w) {
         w.requestFeature(Window.FEATURE_NO_TITLE);
         w.setFlags(
@@ -47,19 +78,44 @@ public class WaffleActivity extends Activity {
         // w.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 	}
 	
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-    	super.onCreate(savedInstanceState);
-    	
-    	// Windowの初期化処理
-        onSetWindowFlags(getWindow());
-        
-    	// 動的に作った WebView を View として登録する処理
-        LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, 
-        		ViewGroup.LayoutParams.FILL_PARENT, 0.0F);
-        LinearLayout.LayoutParams webviewParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
-        		ViewGroup.LayoutParams.FILL_PARENT, 1.0F);
-        //
+    /**
+     * 必要ならここでプラグインを追加する
+     */
+    protected void onAddPlugins() {
+    	// main waffle object
+    	waffle_obj = (WaffleObj)addPlugin("_DroidWaffle", new WaffleObj());
+    	// plugins
+    	addPlugin("_gps", new GPSPlugin());
+    	addPlugin("_accel", new AccelPlugin());
+    	addPlugin("_db", new DatabasePlugin());
+    }
+    
+    protected IWafflePlugin addPlugin(String jsName, IWafflePlugin plugin) {
+    	// add interface
+        webview.addJavascriptInterface(plugin, jsName);
+        pluginManager.items.add(plugin);
+        // set parameters
+        plugin.setContext(this);
+        plugin.setWebView(webview);
+        return plugin;
+    }
+    
+    /**
+     * Create main view
+     */
+    protected void buildMainView() {
+    	// レイアウト用パラメータ
+        LinearLayout.LayoutParams containerParams = 
+        		new LinearLayout.LayoutParams(
+        				ViewGroup.LayoutParams.FILL_PARENT, 
+        				ViewGroup.LayoutParams.FILL_PARENT,
+        				0.0F);
+        LinearLayout.LayoutParams webviewParams = 
+        		new LinearLayout.LayoutParams(
+        				ViewGroup.LayoutParams.FILL_PARENT,
+        				ViewGroup.LayoutParams.FILL_PARENT, 
+        				1.0F);
+        // ルートにレイアウトを追加
         root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(Color.BLACK);
@@ -67,47 +123,75 @@ public class WaffleActivity extends Activity {
         //
         webview = new WebView(this);
         webview.setLayoutParams(webviewParams);
-        //
-        // WebView Setting
-        WebSettings setting = webview.getSettings();
-        webview.setWebChromeClient(new jsWaffleChromeClient(this));
+        root.addView(webview);
+    }
+    
+    protected void setWebViewParams() {
+    	webview.setWebChromeClient(new jsWaffleChromeClient(this));
         webview.setWebViewClient(new jsWaffleWebViewClient(this));
         webview.setInitialScale(100);
         webview.setVerticalScrollBarEnabled(false);
+        
+    	WebSettings setting = webview.getSettings();
         setting.setJavaScriptEnabled(true);
         setting.setJavaScriptCanOpenWindowsAutomatically(true);
         setting.setLayoutAlgorithm(LayoutAlgorithm.NORMAL);
-        // register special object
-        waffle_obj = new WaffleObj(this);
-        //
-        Log.i(LOG_TAG, "Register Waffle to webview:" + waffle_obj);
-        webview.addJavascriptInterface(waffle_obj, "_DroidWaffle");
-        //
-        root.addView(webview);
-        setContentView(root);
     }
        
     public void showPage(String uri) {
     	webview.loadUrl(uri);
         webview.requestFocus();
     }
-    
+
+	public void log(String msg) {
+		Log.d(WaffleActivity.LOG_TAG, msg);
+	}
+	public void log_error(String msg) {
+		Log.e(WaffleActivity.LOG_TAG, msg);
+	}
+	public void log_warn(String msg) {
+		Log.w(WaffleActivity.LOG_TAG, msg);
+	}
+	
+    public void callJsEvent(final String query) {
+    	final String s = "javascript:" + query;
+        handler.post(new Runnable() {
+			@Override
+			public void run() {
+		        log(query);
+				webview.loadUrl(s);
+			}
+		});
+    }
+
     @Override
     protected void onStart() {
     	super.onStart();
-    	waffle_obj.onStat();
     }
     
     @Override
     protected void onStop() {
     	super.onStop();
-    	waffle_obj.onStop();
+    }
+    
+    @Override
+    protected void onPause() {
+    	super.onStop();
+    	pluginManager.onPause();
     }
     
     @Override
     protected void onResume() {
     	super.onResume();
-    	waffle_obj.onResume();
+    	pluginManager.onResume();
+    }
+    
+    @Override
+    public void onDestroy() {
+    	super.onDestroy();
+    	// call onunload event (for Android 2.x)
+    	webview.loadUrl("about:blank");
+    	pluginManager.onDestroy();
     }
     
 	@Override
@@ -188,7 +272,7 @@ public class WaffleActivity extends Activity {
 	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		waffle_obj.onActivityResult(requestCode, resultCode, intent);
+		pluginManager.onActivityResult(requestCode, resultCode, intent);
 	}
 	
 	
@@ -232,11 +316,15 @@ public class WaffleActivity extends Activity {
 		
 		@Override
 		public void onPageStarted(WebView view, String url, Bitmap favicon) {
+			pluginManager.onPageStarted(url);
 		}
+		
 		@Override
 		public void onPageFinished(WebView view, String url) {
-			waffle_obj.callJsEvent("DroidWaffle.onPageFinished('" + url + "')");
+			pluginManager.onPageFinished(url);
 		}
+		
+		
 	}
 
 	//-------------------------------------------------------------------
@@ -311,8 +399,7 @@ public class WaffleActivity extends Activity {
 		public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, final JsPromptResult result)
 		{
 			// prompt() を拡張して様々な用途のダイアログを表示する
-			DialogHelper.waffle_activity = WaffleObj.waffle_activity;
-			DialogHelper.waffle_obj = waffle_obj;
+			DialogHelper.waffle_activity = activity_instance;
 			boolean r = true;
 			switch (WaffleObj.dialogType) {
 			case WaffleObj.DIALOG_TYPE_DEFAULT:
@@ -340,6 +427,13 @@ public class WaffleActivity extends Activity {
 			return r;
 		}
 		
+		//Android 1.6 not supported
+		@Override
+		public boolean onJsBeforeUnload(android.webkit.WebView view, java.lang.String url, java.lang.String message, android.webkit.JsResult result)
+		{
+			log("[onJsBeforeUnload]");
+			return false;
+		}
 	}
 }
 

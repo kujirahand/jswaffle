@@ -1,20 +1,104 @@
-package com.kujirahand.jsWaffle;
+package com.kujirahand.jsWaffle.plugins;
 
 import java.io.File;
+import java.util.ArrayList;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
-import android.util.Log;
 
-public class DBHelper {
+import com.kujirahand.jsWaffle.WaffleActivity;
+import com.kujirahand.jsWaffle.plugin.WafflePlugin;
 
+public class DatabasePlugin extends WafflePlugin {
+	ArrayList<DBHelper> dblist = null;
+	/**
+	 * open database
+	 * @param dbname
+	 * @return DBHelper object
+	 */
+	public DBHelper openDatabase(String dbname) {
+		if (dblist == null) { dblist = new ArrayList<DBHelper>(); }
+		DBHelper db = new DBHelper(waffle_activity);
+		boolean b = db.openDatabase(dbname);
+		if (!b) return null;
+		dblist.add(db);
+		return db;
+	}
+	public void executeSql(final DBHelper db, final String sql, String fn_ok, String fn_ng, final String tag) {
+		if (!(db instanceof DBHelper)) {
+			waffle_activity.log_error("executeSql : db is not DBHelper instance!!");
+			return;
+		}
+		db.callback_result = fn_ok;
+		db.callback_error = fn_ng;
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				db.executeSql(sql, null, tag);
+			}
+		}).start();
+	}
+	public String executeSqlSync(DBHelper db, String sql) {
+		if (!(db instanceof DBHelper)) {
+			waffle_activity.log_error("executeSql : db is not DBHelper instance!!");
+			return null;
+		}
+		String json = db.executeSqlSync(sql, null);
+		if (json == null || json == "null") {
+			return null;
+		}
+		return json;
+	}
+	public String getDatabaseError(DBHelper db) {
+		if (!(db instanceof DBHelper)) {
+			waffle_activity.log_error("executeSql : db is not DBHelper instance!!");
+			return null;
+		}
+		return db.lastError;
+	}
+	public void closeAll() {
+		if (dblist == null) return;
+		if (dblist.size() > 0) {
+			for (int i = 0; i < dblist.size(); i++) {
+				dblist.get(i).closeDatabase();
+			}
+		}
+	}
+
+	public void onResume() {
+		if (dblist == null) return;
+		if (dblist.size() > 0) {
+			for (int i = 0; i < dblist.size(); i++) {
+				dblist.get(i).reopenDatabase();
+			}
+		}
+	}
+	
+	public void onPause() {
+		closeAll();
+	}
+	
+	public void onPageStarted() {
+		if (dblist == null) return;
+		closeAll();
+		dblist.clear();
+	}
+	
+	public void onDestroy() {
+		if (dblist == null) return;
+		closeAll();
+		dblist.clear();
+	}
+}
+
+
+class DBHelper
+{
 	SQLiteDatabase myDb;
 	String path;
-	Context context;
-	WaffleObj waffle_obj;
+	WaffleActivity context;
 	String dbname;
 	
 	public String callback_error = null;
@@ -22,10 +106,9 @@ public class DBHelper {
 	
 	public String lastError = null;
 	
-	public DBHelper(Context context, WaffleObj waffle_obj)
+	public DBHelper(WaffleActivity context)
 	{    	
 		this.context = context;
-		this.waffle_obj = waffle_obj;
 	}
 	
 	public String getDBDir(String packageName)
@@ -64,14 +147,14 @@ public class DBHelper {
 				return false;
 			}
 		} catch (Exception e) {
-			Log.e(WaffleActivity.LOG_TAG, "DBOpenError: file path problem in " + dbname + ":" + e.getMessage());
+			context.log_error("[DBOpenError] file path problem in " + dbname + ":" + e.getMessage());
 			return false;
 		}
 		
 		try {
 			myDb = SQLiteDatabase.openOrCreateDatabase(dbFile, null);
 		} catch (Exception e) {
-			Log.e(WaffleActivity.LOG_TAG, "DBOpenError: db problem in " + dbname + ":" + e.getMessage());
+			context.log_error("[DBOpenError] db problem in " + dbname + ":" + e.getMessage());
 			return false;
 		}
 		// SQLiteDatabase.OPEN_READWRITE + SQLiteDatabase.CREATE_IF_NECESSARY);
@@ -83,7 +166,6 @@ public class DBHelper {
 	public void executeSql(String query, String[] params, String tag)
 	{
 			try{
-				Log.d(WaffleActivity.LOG_TAG, "SQL:" + query);
 				Cursor myCursor = myDb.rawQuery(query, params);			
 				processResults(myCursor, tag, true);
 			}
@@ -92,10 +174,10 @@ public class DBHelper {
 				String err = ex.getMessage();
 				lastError = err;
 				err = err.replace("\"", "\\\"");
-				Log.d(WaffleActivity.LOG_TAG, "DBError:" + err);
+				context.log_error("[DBError]" + err);
 				
 				String q = callback_error + "(\"" + err + "\",\"" + tag + "\")";
-				waffle_obj.callJsEvent(q);
+				context.callJsEvent(q);
 				
 			}
 	}
@@ -147,10 +229,8 @@ public class DBHelper {
 		}
 		if (flagCallJS) {
 			String q = callback_result + "("+resultString+","+tag+")";
-			waffle_obj.callJsEvent(q);
+			context.callJsEvent(q);
 		}
 		return resultString;
 	}
-	
-	
 }

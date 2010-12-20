@@ -26,13 +26,59 @@ var droid = (function(self){
 		}
 	}
 	// support for none android device
+	var dummy_fn = function() { return false; };
 	if (typeof(self._DroidWaffle) == 'undefined') {
 		// return dummy action
 		self._DroidWaffle = _DroidWaffle_getDummyFunctions();
 	}
+	// local _DroidWaffle shortcut
+	var _w = _DroidWaffle;
+	
+	if (typeof(self._gps) == 'undefined') {
+		self._gps = { "watchPosition":dummy_fn, "getCurrentPosition":dummy_fn, "clearWatch":dummy_fn };
+		self._gps = {
+			watchId : 0,
+			watchPosition : function(fnOK, fnNG){
+				return watchId = setInterval(function(){
+					eval(fnOK+"(0,0,0)");
+				}, 1000);
+			},
+			clearWatch : function(watchId){
+				clearInterval(watchId);
+			},
+			getCurrentPosition : function(fnOK, fnNG){
+				watchId = setInterval(function(){
+					clearInterval(watchId);
+					eval(fnOK+"(0,0,0)");
+				}, 1000);
+			}
+		};
+	}
+	if (typeof(self._accel) == 'undefined') {
+		self._accel = {
+			_timerId : 0,
+			setAccelCallback : function(fn){
+				if (fn == "") {
+					clearInterval(this._timerId);
+				} else {
+					this._timerId = setInterval(function(){
+						var x = Math.random() * 2 -2;
+						var y = Math.random() * 2 -2;
+						var z = Math.random() * 2 -2;
+						eval(fn+"("+x+","+y+","+z+")");
+					},1000);
+				}
+			},
+			setShakeCallback : function(fn, freq){
+				this._timerId = setInterval(function(){
+					eval(fn+"()");
+				},1000);
+			}
+		};
+	}
+	
 	// global temporary object
 	var DroidWaffle = self.DroidWaffle = {
-		x:0, y:0, z:0, // for accel
 		_shake_fn_user : null, // for shake
 		_menu_item_fn : [], // for menu
 		// for callback function list
@@ -56,8 +102,6 @@ var droid = (function(self){
 		},
 		___ : 0
 	};
-	// local _DroidWaffle shortcut
-	var _w = _DroidWaffle;
 	/**
 	 * jsWaffle Class
 	 * 
@@ -109,16 +153,26 @@ var droid = (function(self){
 	/**
 	 * watch ACCELEROMETER
 	 * @param {Function} callback_fn
+	 * @return {Number} watchId
 	 */
 	jsWaffle.prototype.watchAccel = function (callback_fn) {
 		DroidWaffle._accel_fn = callback_fn;
-		_w.setAccelCallback("DroidWaffle._watchSensor");
+		if (callback_fn == undefined || callback_fn == "" || callback_fn == null) {
+			clearAccel();
+			return -1;
+		}
+		return _accel.setAccelCallback("DroidWaffle._watchSensor");
 	};
 	/**
 	 * clear sensor
+	 * @param {Number} watchId
 	 */
-	jsWaffle.prototype.clearAccel = function () {
-		_w.setAccelCallback("");
+	jsWaffle.prototype.clearAccel = function (watchId) {
+		if (watchId == undefined) {
+			_accel.clearAccelAll();
+			return;
+		}
+		_accel.clearAccel(watchId);
 	};
 	
 	if (typeof(window.ondevicemotion) == "undefined") {
@@ -129,21 +183,23 @@ var droid = (function(self){
 	 * watch Shake device
 	 * @param {Function} shake_begin_callback_fn
 	 * @param {Function} shake_end_callback_fn
-	 * @param {double} shake_begin_freq (default = 20)
-	 * @param {double} shake_end_freq (default = 8)
+	 * @param {Number} shake_begin_freq (default = 20)
+	 * @param {Number} shake_end_freq (default = 8)
+	 * @return {Number} watchId
 	 */
 	jsWaffle.prototype.watchShake = function (shake_begin_callback_fn, shake_end_callback_fn, shake_begin_freq, shake_end_freq) {
 		if (shake_begin_freq == undefined) shake_begin_freq = 20;
 		if (shake_end_freq == undefined) shake_end_freq = 8;
+		if (shake_begin_callback_fn == null || shake_begin_callback_fn == undefined || shake_begin_callback_fn == '') {
+			_accel.clearAccelAll();
+			return;
+		}
 		DroidWaffle._shake_fn_user = shake_begin_callback_fn;
 		DroidWaffle._shake_end_fn_user = shake_end_callback_fn;
-		_w.setShakeCallback("DroidWaffle._shake_callback", "DroidWaffle._shake_end_callback", shake_begin_freq, shake_end_freq);
+		_accel.setShakeCallback("DroidWaffle._shake_callback", "DroidWaffle._shake_end_callback", shake_begin_freq, shake_end_freq);
 	};
 	// for sensor
 	DroidWaffle._watchSensor = function (accelX, accelY, accelZ) {
-		DroidWaffle.x = accelX;
-		DroidWaffle.y = accelY;
-		DroidWaffle.z = accelZ;
 		DroidWaffle._accel_fn(accelX, accelY, accelZ);
 	};
 	DroidWaffle._shake_callback = function () {
@@ -166,7 +222,7 @@ var droid = (function(self){
 		DroidWaffle._geolocation_fn_ng_user = onError;
 		if (accuracy_fine == undefined) accuracy_fine = true;
 		// register callback function
-		return _w.geolocation_getCurrentPosition(
+		return _gps.getCurrentPosition(
 			"DroidWaffle._geolocation_fn_ok",
 			"DroidWaffle._geolocation_fn_ng",
 			accuracy_fine
@@ -185,7 +241,7 @@ var droid = (function(self){
 		DroidWaffle._geolocation_fn_ok_user = onSuccess;
 		DroidWaffle._geolocation_fn_ng_user = onError;
 		if (accuracy_fine == undefined) accuracy_fine = true;
-		return _w.geolocation_watchPosition(
+		return _gps.watchPosition(
 			"DroidWaffle._geolocation_fn_ok",
 			"DroidWaffle._geolocation_fn_ng",
 			accuracy_fine
@@ -197,7 +253,7 @@ var droid = (function(self){
 	 * @param {Integer} watchid
 	 */
 	jsWaffle.prototype.clearWatchPosition = function (watchid) {
-		_w.geolocation_clearWatch(watchid);
+		_gps.clearWatch(watchid);
 	};
 	// for getPosition/watchPosition/clearPosition
 	DroidWaffle._geolocation_fn_ok = function (lat, lon, alt) {
@@ -234,7 +290,7 @@ var droid = (function(self){
 					accuracy_fine = opt.enableHighAccuracy;
 				}
 				// register callback function
-				return _w.geolocation_getCurrentPosition(
+				return _gps.getCurrentPosition(
 					"DroidWaffle._geolocation_fn_ok_gokan",
 					"DroidWaffle._geolocation_fn_ng",
 					accuracy_fine
@@ -249,14 +305,14 @@ var droid = (function(self){
 					accuracy_fine = opt.enableHighAccuracy;
 				}
 				// register callback function
-				return _w.geolocation_watchPosition(
+				return _gps.watchPosition(
 					"DroidWaffle._geolocation_fn_ok_gokan",
 					"DroidWaffle._geolocation_fn_ng",
 					accuracy_fine
 				);
 			},
 			clearWatch : function (watchid) {
-				_w.geolocation_clearWatch(watchid);
+				_gps.clearWatch(watchid);
 			}
 		};
 	}
@@ -387,7 +443,7 @@ var droid = (function(self){
 	 * @return {Object}dbObj
 	 */
 	jsWaffle.prototype.openDatabase = function (dbname) {
-		var db = _w.openDatabase(dbname);
+		var db = _db.openDatabase(dbname);
 		return db;
 	};
 	/**
@@ -401,7 +457,7 @@ var droid = (function(self){
 		var tag = DroidWaffle.getCallbackId();
 		DroidWaffle.setCallback("executeSql_ok" + tag, fn_ok);
 		DroidWaffle.setCallback("executeSql_ng" + tag, fn_ng);
-		_w.executeSql(db, sql, "DroidWaffle._db.ok", "DroidWaffle._db.ng", tag);
+		_db.executeSql(db, sql, "DroidWaffle._db.ok", "DroidWaffle._db.ng", tag);
 	};
 	DroidWaffle._db = {};
 	DroidWaffle._db.ok = function (result, tag) {
@@ -419,14 +475,14 @@ var droid = (function(self){
 	 * @return {Array}query result
 	 */
 	jsWaffle.prototype.executeSqlSync = function (db, sql) {
-		var r = _w.executeSqlSync(db, sql);
+		var r = _db.executeSqlSync(db, sql);
 		if (r != null) {
 			return eval("("+r+")");
 		}
 		return r;
 	};
 	jsWaffle.prototype.getDatabaseError = function(db){
-		var r = _w.getDatabaseError(db, sql);
+		var r = _db.getDatabaseError(db, sql);
 	};
 	/**
 	 * Start Intent (ex) mailto:hoge@example.com?subject=xxx&body=xxx
@@ -685,38 +741,6 @@ var droid = (function(self){
 	};
 	
 	/**
-	 * activity event
-	 * @param {Function} callback_fn
-	 */
-	jsWaffle.prototype.registerActivityOnStart = function(callback_fn) {
-		DroidWaffle._registerActivityOnStart_user = callback_fn;
-		_w.registerActivityOnStart("DroidWaffle._registerActivityOnStart_callback");
-	};
-	DroidWaffle._registerActivityOnStart_callback = function() {
-		if(is_function(DroidWaffle._registerActivityOnStart_user)) {
-			DroidWaffle._registerActivityOnStart_user();
-		}
-	};
-	jsWaffle.prototype.registerActivityOnStop = function(callback_fn) {
-		DroidWaffle._registerActivityOnStop_user = callback_fn;
-		_w.registerActivityOnStop("DroidWaffle._registerActivityOnStop_callback");
-	};
-	DroidWaffle._registerActivityOnStop_callback = function() {
-		if(is_function(DroidWaffle._registerActivityOnStop_user)) {
-			DroidWaffle._registerActivityOnStop_user();
-		}
-	};
-	jsWaffle.prototype.registerActivityOnResume = function(callback_fn) {
-		DroidWaffle._registerActivityOnResume_user = callback_fn;
-		_w.registerActivityOnResume("DroidWaffle._registerActivityOnResume_callback");
-	};
-	DroidWaffle._registerActivityOnResume_callback = function() {
-		if(is_function(DroidWaffle._registerActivityOnResume_user)) {
-			DroidWaffle._registerActivityOnResume_user();
-		}
-	};
-	
-	/**
 	 * write DDMS log console
 	 * @param {String} msg
 	 */
@@ -748,37 +772,6 @@ var droid = (function(self){
 			ring : function(){},
 			makeToast : function(){},
 			createPlayer : function(){ return {start:function(){}}; },
-			_timerId : 0,
-			setAccelCallback : function(fn){
-				if (fn == "") {
-					clearInterval(this._timerId);
-				} else {
-					this._timerId = setInterval(function(){
-						var x = Math.random() * 2 -2;
-						var y = Math.random() * 2 -2;
-						var z = Math.random() * 2 -2;
-						eval(fn+"("+x+","+y+","+z+")");
-					},1000);
-				}
-			},
-			setShakeCallback : function(fn, freq){
-				this._timerId = setInterval(function(){
-					eval(fn+"()");
-				},1000);
-			},
-			geolocation_watchPosition : function(fnOK, fnNG){
-				return setInterval(function(){
-					eval(fnOK+"(0,0,0)");
-				}, 1000);
-			},
-			geolocation_clearWatch : function(watchId){
-				clearInterval(watchId);
-			},
-			geolocation_getCurrentPosition : function(fnOK, fnNG){
-				setTimeout(function(){
-					eval(fnOK+"(0,0,0)");
-				}, 1000);
-			},
 			saveText : function (){},
 			loadText : function() {},
 			startIntent : function(){},

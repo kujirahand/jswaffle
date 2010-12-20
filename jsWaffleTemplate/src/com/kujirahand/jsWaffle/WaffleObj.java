@@ -8,8 +8,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
+
+import com.kujirahand.jsWaffle.plugin.WafflePlugin;
 
 import android.app.Activity;
 import android.content.Context;
@@ -26,27 +27,16 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.util.Log;
-import android.webkit.WebView;
 import android.widget.Toast;
 
 /*
  * Javaクラスのメソッドのみが登録される
  */
-public class WaffleObj
+public class WaffleObj extends WafflePlugin
 {
 	public static double WAFFLE_VERSON = 1.13;
 	//
 	public static int ACTIVITY_REQUEST_CODE_BARCODE = 0xFF0001;
-	//
-	public static WaffleActivity waffle_activity = null;
-	public static boolean flag_sensor = false;
-	public AccelListener accel_listener = null;
-	public static float accelX = 0;
-	public static float accelY = 0;
-	public static float accelZ = 0;
-	public static String event_onStart = null;
-	public static String event_onStop = null;
-	public static String event_onResume = null;
 	//
 	public final static int DIALOG_TYPE_DEFAULT = 0;
 	public final static int DIALOG_TYPE_YESNO = 0x10;
@@ -57,18 +47,10 @@ public class WaffleObj
 	public final static int DIALOG_TYPE_PROGRESS = 0x15;
 	public static int dialogType = DIALOG_TYPE_DEFAULT;
 	public static String dialogTitle = null;
-	//
-	private WebView webview;
 	
 	// callback string
 	private String intent_startActivity_callback = null;
 	private String intent_startActivity_callback_barcode = null;
-	
-	// constructor
-	public WaffleObj(WaffleActivity activity) {
-		waffle_activity = activity;
-		webview = waffle_activity.webview;
-	}
 	
 	//---------------------------------------------------------------
 	// Interface
@@ -85,6 +67,21 @@ public class WaffleObj
 	public void log_warn(String msg) {
 		Log.w(WaffleActivity.LOG_TAG, msg);
 	}
+	
+	public void test(Object obj) {
+		if (obj == null) {
+			log("[test] null");
+		} else {
+			log("[test]"+obj.toString());
+		}
+	}
+	public void testInt(int v) {
+		log("[testInt]"+v);
+	}
+	public void testStr(String v) {
+		log("[testStr]"+v);
+	}
+	
 	/**
 	 * Get Waffle Version Info
 	 * @return version string
@@ -106,95 +103,6 @@ public class WaffleObj
 		return waffle_activity.getResources().getString(id);
 	}
 	
-	/**
-	 * Set Sensor event callback
-	 * @param funcname
-	 */
-	public void setAccelCallback(String funcname) {
-		if (accel_listener == null) {
-			accel_listener = new AccelListener(waffle_activity, this);
-		}
-		accel_listener.sensour_callback_funcname = funcname;
-		if (funcname == "") {
-			stopSensor();
-			flag_sensor = false;
-			return;
-		}
-        startSensor();
-		flag_sensor = true;
-	}
-	
-	/**
-	 * Set Shake Event callback
-	 */
-	public void setShakeCallback(String shake_callback_fn, String shake_end_callback_fn, double shake_freq, double shake_end_freq ) {
-		if (accel_listener == null) {
-			accel_listener = new AccelListener(waffle_activity, this);
-		}
-		if (shake_callback_fn == "") {
-			stopSensor();
-			flag_sensor = false;
-			return;
-		}
-		// shake
-		accel_listener.shake_callback_funcname = shake_callback_fn;
-		accel_listener.shake_freq = shake_freq;
-		// shake end
-		accel_listener.shake_end_callback_funcname = shake_end_callback_fn;
-		accel_listener.shake_end_freq = shake_end_freq;
-		// start
-		flag_sensor = true;
-		startSensor();
-	}
-	
-	private ArrayList<GeoListener> geolocation_listeners = new ArrayList<GeoListener>();
-	
-	/**
-	 * geolocation_getCurrentPosition
-	 */
-	public int geolocation_getCurrentPosition(String callback_ok, String callback_ng, boolean accuracy_fine) {
-		GeoListener geo_listener = new GeoListener(waffle_activity, this, 1);
-		geo_listener.callback_success = callback_ok;
-		geo_listener.callback_failed = callback_ng;
-		geo_listener.flagLive = true;
-		geo_listener.start(accuracy_fine);
-		geolocation_listeners.add(geo_listener);
-		return geolocation_listeners.size();
-	}
-	
-	/**
-	 * geolocation_watchPosition
-	 * @param callback_ok
-	 * @param callback_ng
-	 * @return watchId
-	 */
-	public int geolocation_watchPosition(String callback_ok, String callback_ng, boolean accuracy_fine) {
-		GeoListener geo_listener = new GeoListener(waffle_activity, this, 0);
-		geo_listener.callback_success = callback_ok;
-		geo_listener.callback_failed = callback_ng;
-		geo_listener.flagLive = true;
-		geo_listener.start(accuracy_fine);
-		geolocation_listeners.add(geo_listener);
-		return geolocation_listeners.size();
-	}
-	
-	/**
-	 * geolocation_clearWatch
-	 * @param watchId
-	 */
-	public void geolocation_clearWatch(int watchId) {
-		try {
-			int index = watchId - 1;
-			if (geolocation_listeners.size() <= index) return;
-			GeoListener i = geolocation_listeners.get(index);
-			if (i == null) return;
-			i.flagLive = false;
-			i.stop();
-			geolocation_listeners.set(index, null);
-		} catch (Exception e) {
-			log_error("geolocation_clearWatch:" + e.getMessage());
-		}
-	}
 	
 	
 	/**
@@ -478,52 +386,6 @@ public class WaffleObj
 	}
 	
 	
-	ArrayList<DBHelper> dblist = null;
-	/**
-	 * open database
-	 * @param dbname
-	 * @return DBHelper object
-	 */
-	public DBHelper openDatabase(String dbname) {
-		if (dblist == null) { dblist = new ArrayList<DBHelper>(); }
-		DBHelper db = new DBHelper(waffle_activity, this);
-		boolean b = db.openDatabase(dbname);
-		if (!b) return null;
-		dblist.add(db);
-		return db;
-	}
-	public void executeSql(final DBHelper db, final String sql, String fn_ok, String fn_ng, final String tag) {
-		if (!(db instanceof DBHelper)) {
-			log_error("executeSql : db is not DBHelper instance!!");
-			return;
-		}
-		db.callback_result = fn_ok;
-		db.callback_error = fn_ng;
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				db.executeSql(sql, null, tag);
-			}
-		}).start();
-	}
-	public String executeSqlSync(DBHelper db, String sql) {
-		if (!(db instanceof DBHelper)) {
-			log_error("executeSql : db is not DBHelper instance!!");
-			return null;
-		}
-		String json = db.executeSqlSync(sql, null);
-		if (json == null || json == "null") {
-			return null;
-		}
-		return json;
-	}
-	public String getDatabaseError(DBHelper db) {
-		if (!(db instanceof DBHelper)) {
-			log_error("executeSql : db is not DBHelper instance!!");
-			return null;
-		}
-		return db.lastError;
-	}
 	/**
 	 * play media file
 	 * @param filename
@@ -727,17 +589,6 @@ public class WaffleObj
 		dialogTitle = title;
 	}
 	
-	// event callback
-	public void registerActivityOnStart(String callback_fn) {
-		event_onStart = callback_fn;
-	}
-	public void registerActivityOnStop(String callback_fn) {
-		event_onStop = callback_fn;
-	}
-	public void registerActivityOnResume(String callback_fn) {
-		event_onResume = callback_fn;
-	}
-	
 	/**
 	 * capture screen and save to file
 	 * @param filename
@@ -807,54 +658,6 @@ public class WaffleObj
 	//---------------------------------------------------------------
 	// Event Wrapper
 	//---------------------------------------------------------------
-	public void onStat() {
-		if (event_onStart != null) {
-			callJsEvent(event_onStart + "()");
-		}
-	}
-	
-	public void onStop() {
-		if (flag_sensor) stopSensor();
-		// geolocation_listeners
-		for (int i = 0; i < geolocation_listeners.size(); i++) {
-			GeoListener g = geolocation_listeners.get(i);
-			if (g == null) continue;
-			g.stop();
-		}
-		if (event_onStop != null) {
-			callJsEvent(event_onStop + "()");
-		}
-		// database
-		if (dblist != null) {
-			if (dblist.size() > 0) {
-				for (int i = 0; i < dblist.size(); i++) {
-					dblist.get(i).closeDatabase();
-				}
-			}
-		}
-	}
-	
-	public void onResume() {
-		if (flag_sensor) startSensor();
-		// geolocation_listeners
-		for (int i = 0; i < geolocation_listeners.size(); i++) {
-			GeoListener g = geolocation_listeners.get(i);
-			if (g == null) continue;
-			if (g.flagLive) g.start();
-		}
-		if (event_onResume != null) {
-			callJsEvent(event_onResume + "()");
-		}
-		// database
-		if (dblist != null) {
-			if (dblist.size() > 0) {
-				for (int i = 0; i < dblist.size(); i++) {
-					dblist.get(i).reopenDatabase();
-				}
-			}
-		}
-	}
-    
 	// @see intent_startActivityForResult
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		String param;
@@ -882,23 +685,8 @@ public class WaffleObj
 	//---------------------------------------------------------------
 	// Private method
 	//---------------------------------------------------------------
-	protected void stopSensor() {
-		if (accel_listener != null) accel_listener.stop();
-	}
-	
-	protected void startSensor() {
-		if (accel_listener != null) accel_listener.start();
-	}
-	
     public void callJsEvent(String query) {
-    	final String s = "javascript:" + query;
-        waffle_activity.handler.post(new Runnable() {
-			@Override
-			public void run() {
-				webview.loadUrl(s);
-			}
-		});
-        log(query);
+        waffle_activity.callJsEvent(query);
     }
 
 }
