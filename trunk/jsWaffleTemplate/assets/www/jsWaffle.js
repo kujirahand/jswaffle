@@ -14,7 +14,16 @@ var droid = (function(self){
 	if (typeof(self.jsWaffle) != 'undefined') return;
 	// helper
 	if (typeof(self.$) == 'undefined') {
-		self.$ = function (id) { return document.getElementById(id); }
+		self.$ = function (id) {
+			var dom = document.getElementById(id);
+			dom.hide = function() {
+				this.style.display = "none";
+			};
+			dom.show = function() {
+				this.style.display = "block";
+			};
+			return dom;
+		}
 	}
 	// support for none android device
 	if (typeof(self._DroidWaffle) == 'undefined') {
@@ -291,6 +300,20 @@ var droid = (function(self){
 		return _w.mkdir(path);
 	};
 	/**
+	 * delete file
+	 * @param {String} path
+	 */
+	jsWaffle.prototype.deleteFile = function (path) {
+		return _w.deleteFile(path);
+	};
+	/**
+	 * fileSize
+	 * @param {String} path
+	 */
+	jsWaffle.prototype.fileSize = function (path) {
+		return _w.fileSize(path);
+	};
+	/**
 	 * copy file from assets to sdcard
 	 * @param {String} assetsName
 	 * @param {String} savepath
@@ -389,7 +412,22 @@ var droid = (function(self){
 		var f = DroidWaffle.getCallback("executeSql_ng" + tag);
 		f(err);
 	};
-	
+	/**
+	 * executeSqlSync
+	 * @param {DBHelper}db
+	 * @param {String}sql
+	 * @return {Array}query result
+	 */
+	jsWaffle.prototype.executeSqlSync = function (db, sql) {
+		var r = _w.executeSqlSync(db, sql);
+		if (r != null) {
+			return eval("("+r+")");
+		}
+		return r;
+	};
+	jsWaffle.prototype.getDatabaseError = function(db){
+		var r = _w.getDatabaseError(db, sql);
+	};
 	/**
 	 * Start Intent (ex) mailto:hoge@example.com?subject=xxx&body=xxx
 	 * @param {String}url (http/https/market/tel/sms/geo/mailto/file/camera/video)
@@ -511,6 +549,20 @@ var droid = (function(self){
 	 */
 	jsWaffle.prototype.httpPostJSON = function (url, json) {
 		return _w.httpPostJSON(url, json);
+	};
+	/**
+	 * http download
+	 * @param {String} url
+	 * @param {String} filename
+	 * @param {Function} callback
+	 */
+	jsWaffle.prototype.httpDownload = function (url, filename, callback) {
+		DroidWaffle._httpDownload = function(ok) {
+			if(typeof(callback) == "function") {
+				callback(ok);
+			}
+		};
+		_w.httpDownload(url, filename, "DroidWaffle._httpDownload");
 	};
 	
 	/**
@@ -761,14 +813,19 @@ var droid = (function(self){
 					if (typeof(ok) == "function") { ok(); }
 				}
 			},
+			executeSqlSync : function (db, sql) {
+				return null;
+			},
 			setMenuItem : function(){},
 			setMenuItemCallback : function(){},
 			scanBarcode : function(){},
 			dialogYesNo:function(msg, f, tag){ var a = confirm(msg); f(a,tag); },
 			fileExists : function(){ return false; },
 			mkdir : function () { return true; },
+			deleteFile : function() { return true; },
 			setPromptType : function () {},
 			getResString: function(name) { return name; },
+			mergeSeparatedAssetsFile : function() { return false; },
 			snapshotToFile: function(fname) { return false; },
 			httpGet: function(){ return "hoge"; },
 			httpPostJSON: function(){ return "hoge"; },

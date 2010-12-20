@@ -34,7 +34,7 @@ import android.widget.Toast;
  */
 public class WaffleObj
 {
-	public static double WAFFLE_VERSON = 1.12;
+	public static double WAFFLE_VERSON = 1.13;
 	//
 	public static int ACTIVITY_REQUEST_CODE_BARCODE = 0xFF0001;
 	//
@@ -306,23 +306,34 @@ public class WaffleObj
 	}
 	
 	/**
-	 * make directories
-	 * @param path
+	 * delete file
+	 * @param filename
+	 * @return boolean
+	 */
+	public boolean deleteFile(String filename) {
+		File file = WaffleUtils.detectFile(filename, waffle_activity);
+		if (file == null) return false;
+		return file.delete();
+	}
+	/**
+	 * get file size
+	 * @param filename
 	 * @return
 	 */
+	public long fileSize(String filename) {
+		File file = WaffleUtils.detectFile(filename, waffle_activity);
+		if (file == null) return 0;
+		return file.length();
+	}
+	
+	/**
+	 * make directories
+	 * @param path
+	 * @return boolean
+	 */
 	public boolean mkdir(String path) {
-		File file = null;
-		Uri uri = Uri.parse(path);
-		if (uri.getScheme() == null) {
-			if (path.startsWith("/sdcard/") || path.startsWith("/data/")) {
-				file = new File(path);
-			} else {
-				file = waffle_activity.getFileStreamPath(path);
-			}
-		}
-		else { // file
-			file = new File(uri.getPath());
-		}
+		File file = WaffleUtils.detectFile(path, waffle_activity);
+		if (file == null) return false;
 		return file.mkdirs();
 	}
 	
@@ -345,8 +356,7 @@ public class WaffleObj
 	 * @return filenames (splitter ";")
 	 */
 	public String fileList(String path) {
-		//TODO: fileList with file scheme
-		File dir = waffle_activity.getFilesDir();
+		File dir = WaffleUtils.detectFile(path, waffle_activity);
 		File[] files = dir.listFiles();
 		String r = "";
 		for (int i = 0; i < files.length; i++) {
@@ -482,14 +492,37 @@ public class WaffleObj
 		dblist.add(db);
 		return db;
 	}
-	public void executeSql(DBHelper db, String sql, String fn_ok, String fn_ng, String tag) {
+	public void executeSql(final DBHelper db, final String sql, String fn_ok, String fn_ng, final String tag) {
 		if (!(db instanceof DBHelper)) {
 			log_error("executeSql : db is not DBHelper instance!!");
 			return;
 		}
 		db.callback_result = fn_ok;
 		db.callback_error = fn_ng;
-		db.executeSql(sql, null, tag);
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				db.executeSql(sql, null, tag);
+			}
+		}).start();
+	}
+	public String executeSqlSync(DBHelper db, String sql) {
+		if (!(db instanceof DBHelper)) {
+			log_error("executeSql : db is not DBHelper instance!!");
+			return null;
+		}
+		String json = db.executeSqlSync(sql, null);
+		if (json == null || json == "null") {
+			return null;
+		}
+		return json;
+	}
+	public String getDatabaseError(DBHelper db) {
+		if (!(db instanceof DBHelper)) {
+			log_error("executeSql : db is not DBHelper instance!!");
+			return null;
+		}
+		return db.lastError;
 	}
 	/**
 	 * play media file
@@ -752,13 +785,23 @@ public class WaffleObj
 	 }
 	 
 	 /**
-	  * get data from url
+	  * get data from url sync
 	  */
 	 public String httpGet(String url) {
 		 return WaffleUtils.httpGet(url);
 	 }
 	 public String httpPostJSON(String url, String json) {
 		 return WaffleUtils.httpPostJSON(url, json);
+	 }
+	 public void httpDownload(final String url, final String filename, final String callback) {
+		 new Thread(new Runnable() {
+			@Override
+			public void run() {
+				boolean b = WaffleUtils.httpDownloadToFile(url, filename, waffle_activity);
+				String query = callback + "(" + (b ? "true" : "false") + ")";
+				callJsEvent(query);
+			}
+		 }).start();
 	 }
 	 
 	//---------------------------------------------------------------
