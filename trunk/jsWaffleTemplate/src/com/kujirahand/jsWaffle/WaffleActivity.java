@@ -1,10 +1,14 @@
 package com.kujirahand.jsWaffle;
 
-import com.kujirahand.jsWaffle.plugin.IWafflePlugin;
-import com.kujirahand.jsWaffle.plugin.WafflePluginManager;
+import com.kujirahand.jsWaffle.model.IWafflePlugin;
+import com.kujirahand.jsWaffle.model.WafflePluginManager;
 import com.kujirahand.jsWaffle.plugins.AccelPlugin;
 import com.kujirahand.jsWaffle.plugins.DatabasePlugin;
 import com.kujirahand.jsWaffle.plugins.GPSPlugin;
+import com.kujirahand.jsWaffle.plugins.ABasicPlugin;
+import com.kujirahand.jsWaffle.plugins.StoragePlugin;
+import com.kujirahand.jsWaffle.utils.DialogHelper;
+import com.kujirahand.jsWaffle.utils.IntentHelper;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -35,7 +39,6 @@ public class WaffleActivity extends Activity {
 	
 	public WaffleActivity activity_instance = this;
 	public WebView webview;
-	public WaffleObj waffle_obj;
 	public static String LOG_TAG = "jsWaffle";
 	protected LinearLayout root;
 	protected Handler handler = new Handler();
@@ -83,11 +86,12 @@ public class WaffleActivity extends Activity {
      */
     protected void onAddPlugins() {
     	// main waffle object
-    	waffle_obj = (WaffleObj)addPlugin("_DroidWaffle", new WaffleObj());
+    	addPlugin("_DroidWaffle", new ABasicPlugin());
     	// plugins
-    	addPlugin("_gps", new GPSPlugin());
     	addPlugin("_accel", new AccelPlugin());
     	addPlugin("_db", new DatabasePlugin());
+    	addPlugin("_gps", new GPSPlugin());
+    	addPlugin("_storage", new StoragePlugin());
     }
     
     protected IWafflePlugin addPlugin(String jsName, IWafflePlugin plugin) {
@@ -143,6 +147,10 @@ public class WaffleActivity extends Activity {
         webview.requestFocus();
     }
 
+    /**
+     * show log to DDMS LogCat
+     * @param msg
+     */
 	public void log(String msg) {
 		Log.d(WaffleActivity.LOG_TAG, msg);
 	}
@@ -153,6 +161,10 @@ public class WaffleActivity extends Activity {
 		Log.w(WaffleActivity.LOG_TAG, msg);
 	}
 	
+	/**
+	 * call JavaScript Event
+	 * @param query
+	 */
     public void callJsEvent(final String query) {
     	final String s = "javascript:" + query;
         handler.post(new Runnable() {
@@ -163,7 +175,10 @@ public class WaffleActivity extends Activity {
 			}
 		});
     }
-
+    
+    //-----------------------------------------------------------------
+    // Activity Event
+    //-----------------------------------------------------------------
     @Override
     protected void onStart() {
     	super.onStart();
@@ -266,7 +281,8 @@ public class WaffleActivity extends Activity {
 	}
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		waffle_obj.onMenuItemSelected(item.getItemId());
+		int itemId = item.getItemId();
+		callJsEvent(ABasicPlugin.menu_item_callback_funcname + "(" + itemId + ")");
 		return true;
 	}
 	
@@ -401,27 +417,27 @@ public class WaffleActivity extends Activity {
 			// prompt() を拡張して様々な用途のダイアログを表示する
 			DialogHelper.waffle_activity = activity_instance;
 			boolean r = true;
-			switch (WaffleObj.dialogType) {
-			case WaffleObj.DIALOG_TYPE_DEFAULT:
+			switch (ABasicPlugin.dialogType) {
+			case ABasicPlugin.DIALOG_TYPE_DEFAULT:
 				r = DialogHelper.inputDialog("Prompt", message, defaultValue, result);
 				break;
-			case WaffleObj.DIALOG_TYPE_YESNO:
-				r = DialogHelper.dialogYesNo(WaffleObj.dialogTitle, message, defaultValue, result);
+			case ABasicPlugin.DIALOG_TYPE_YESNO:
+				r = DialogHelper.dialogYesNo(ABasicPlugin.dialogTitle, message, defaultValue, result);
 				break;
-			case WaffleObj.DIALOG_TYPE_SELECT_LIST:
-				r = DialogHelper.selectList(WaffleObj.dialogTitle, message, defaultValue, result);
+			case ABasicPlugin.DIALOG_TYPE_SELECT_LIST:
+				r = DialogHelper.selectList(ABasicPlugin.dialogTitle, message, defaultValue, result);
 				break;
-			case WaffleObj.DIALOG_TYPE_CHECKBOX_LIST:
-				r = DialogHelper.checkboxList(WaffleObj.dialogTitle, message, defaultValue, result);
+			case ABasicPlugin.DIALOG_TYPE_CHECKBOX_LIST:
+				r = DialogHelper.checkboxList(ABasicPlugin.dialogTitle, message, defaultValue, result);
 				break;
-			case WaffleObj.DIALOG_TYPE_DATE:
-				r = DialogHelper.datePickerDialog(WaffleObj.dialogTitle, message, defaultValue, result);
+			case ABasicPlugin.DIALOG_TYPE_DATE:
+				r = DialogHelper.datePickerDialog(ABasicPlugin.dialogTitle, message, defaultValue, result);
 				break;
-			case WaffleObj.DIALOG_TYPE_TIME:
-				r = DialogHelper.timePickerDialog(WaffleObj.dialogTitle, message, defaultValue, result);
+			case ABasicPlugin.DIALOG_TYPE_TIME:
+				r = DialogHelper.timePickerDialog(ABasicPlugin.dialogTitle, message, defaultValue, result);
 				break;
-			case WaffleObj.DIALOG_TYPE_PROGRESS:
-				r = DialogHelper.seekbarDialog(WaffleObj.dialogTitle, message, defaultValue, result);
+			case ABasicPlugin.DIALOG_TYPE_PROGRESS:
+				r = DialogHelper.seekbarDialog(ABasicPlugin.dialogTitle, message, defaultValue, result);
 				break;
 			}
 			return r;

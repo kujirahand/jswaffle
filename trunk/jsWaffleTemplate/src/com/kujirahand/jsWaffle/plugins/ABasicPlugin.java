@@ -1,4 +1,4 @@
-package com.kujirahand.jsWaffle;
+package com.kujirahand.jsWaffle.plugins;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -10,13 +10,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.List;
 
-import com.kujirahand.jsWaffle.plugin.WafflePlugin;
+import com.kujirahand.jsWaffle.WaffleActivity;
+import com.kujirahand.jsWaffle.WaffleActivityFullScreen;
+import com.kujirahand.jsWaffle.WaffleActivitySub;
+import com.kujirahand.jsWaffle.model.WafflePlugin;
+import com.kujirahand.jsWaffle.utils.IntentHelper;
+import com.kujirahand.jsWaffle.utils.WaffleUtils;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.AssetFileDescriptor;
@@ -32,7 +34,7 @@ import android.widget.Toast;
 /*
  * Javaクラスのメソッドのみが登録される
  */
-public class WaffleObj extends WafflePlugin
+public class ABasicPlugin extends WafflePlugin
 {
 	public static double WAFFLE_VERSON = 1.13;
 	//
@@ -56,6 +58,13 @@ public class WaffleObj extends WafflePlugin
 	// Interface
 	//---------------------------------------------------------------
 	/**
+	 * Get Waffle Version Info
+	 * @return version string
+	 */
+	public double getWaffleVersion() {
+		return WAFFLE_VERSON;
+	}
+	/**
 	 * Log
 	 */
 	public void log(String msg) {
@@ -67,29 +76,6 @@ public class WaffleObj extends WafflePlugin
 	public void log_warn(String msg) {
 		Log.w(WaffleActivity.LOG_TAG, msg);
 	}
-	
-	public void test(Object obj) {
-		if (obj == null) {
-			log("[test] null");
-		} else {
-			log("[test]"+obj.toString());
-		}
-	}
-	public void testInt(int v) {
-		log("[testInt]"+v);
-	}
-	public void testStr(String v) {
-		log("[testStr]"+v);
-	}
-	
-	/**
-	 * Get Waffle Version Info
-	 * @return version string
-	 */
-	public double getWaffleVersion() {
-		return WAFFLE_VERSON;
-	}
-	
 	/**
 	 * Get android resource string
 	 * @return resource string
@@ -276,113 +262,6 @@ public class WaffleObj extends WafflePlugin
 			r = r.substring(0, r.length() - 1);
 		}
 		return r;
-	}
-	//---------------------------------------------------------------
-	// preference method
-	//---------------------------------------------------------------
-	/**
-	 * get public preference
-	 * @return
-	 */
-	private SharedPreferences getPublicPreference() {
-		String pref_name = waffle_activity.getPackageName() + ".public";
-		SharedPreferences pref = waffle_activity.getSharedPreferences(
-				pref_name, Activity.MODE_WORLD_READABLE | Activity.MODE_WORLD_WRITEABLE);
-		return pref;
-	}
-	/**
-	 * Preference put
-	 * @param key
-	 * @param value
-	 */
-	public void preferencePut(String key, String value) {
-		Editor e = getPublicPreference().edit();
-		e.putString(key, value);
-		e.commit();
-	}
-	/**
-	 * Preferece get
-	 * @param key
-	 * @param defaultValue
-	 * @return
-	 */
-	public String preferenceGet(String key, String defaultValue) {
-		return getPublicPreference().getString(key, defaultValue);
-	}
-	/**
-	 * Preference exists key
-	 * @param key
-	 * @return
-	 */
-	public boolean preferenceExists(String key) {
-		return getPublicPreference().contains(key);
-	}
-	/**
-	 * Preference clear
-	 */
-	public void preferenceClear() {
-		Editor e = getPublicPreference().edit();
-		e.clear();
-		e.commit();
-	}
-	/**
-	 * Preference remove
-	 */
-	public void preferenceRemove(String key) {
-		Editor e = getPublicPreference().edit();
-		e.remove(key);
-		e.commit();
-	}
-	//---------------------------------------------------------------
-	/**
-	 * get private preference
-	 * @return
-	 */
-	private SharedPreferences getPrivatePreference() {
-		String pref_name = waffle_activity.getPackageName() + ".private";
-		SharedPreferences pref = waffle_activity.getSharedPreferences(
-				pref_name, Activity.MODE_PRIVATE);
-		return pref;
-	}
-	/**
-	 * local storage : Preference put
-	 * @param key
-	 * @param value
-	 */
-	public void localStorage_put(String key, String value) {
-		Editor e = getPrivatePreference().edit();
-		e.putString(key, value);
-		e.commit();
-	}
-	/**
-	 * local storage : Preferece get
-	 * @param key
-	 * @param defaultValue
-	 * @return
-	 */
-	public String localStorage_get(String key, String defaultValue) {
-		return getPrivatePreference().getString(key, defaultValue);
-	}
-	/**
-	 * local storage : Preference exists key
-	 * @param key
-	 * @return
-	 */
-	public boolean localStorage_exists(String key) {
-		return getPrivatePreference().contains(key);
-	}
-	/**
-	 * local storage : Preference clear
-	 */
-	public void localStorage_clear() {
-		Editor e = getPrivatePreference().edit();
-		e.clear();
-		e.commit();
-	}
-	public void localStorage_remove(String key) {
-		Editor e = getPublicPreference().edit();
-		e.remove(key);
-		e.commit();
 	}
 	
 	
@@ -676,12 +555,7 @@ public class WaffleObj extends WafflePlugin
 			callJsEvent(param);
 		}
 	}
-	
-    // menu selected
-	public void onMenuItemSelected(int itemId) {
-		callJsEvent(menu_item_callback_funcname + "(" + itemId + ")");
-	}
-	
+		
 	//---------------------------------------------------------------
 	// Private method
 	//---------------------------------------------------------------

@@ -11,7 +11,7 @@ import android.location.LocationProvider;
 import android.os.Bundle;
 
 import com.kujirahand.jsWaffle.WaffleActivity;
-import com.kujirahand.jsWaffle.plugin.WafflePlugin;
+import com.kujirahand.jsWaffle.model.WafflePlugin;
 
 public class GPSPlugin extends WafflePlugin
 {

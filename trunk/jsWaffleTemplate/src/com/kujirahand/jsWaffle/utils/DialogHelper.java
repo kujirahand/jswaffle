@@ -1,4 +1,6 @@
-package com.kujirahand.jsWaffle;
+package com.kujirahand.jsWaffle.utils;
+
+import com.kujirahand.jsWaffle.WaffleActivity;
 
 import android.R;
 import android.app.AlertDialog;
