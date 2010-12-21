@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 
 import com.kujirahand.jsWaffle.WaffleActivity;
-import com.kujirahand.jsWaffle.plugin.WafflePlugin;
+import com.kujirahand.jsWaffle.model.WafflePlugin;
 
 public class DatabasePlugin extends WafflePlugin {
 	ArrayList<DBHelper> dblist = null;

@@ -11,7 +11,7 @@ import android.hardware.SensorManager;
 import android.os.SystemClock;
 
 import com.kujirahand.jsWaffle.WaffleActivity;
-import com.kujirahand.jsWaffle.plugin.WafflePlugin;
+import com.kujirahand.jsWaffle.model.WafflePlugin;
 
 public class AccelPlugin extends WafflePlugin {
 

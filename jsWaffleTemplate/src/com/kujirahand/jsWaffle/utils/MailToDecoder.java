@@ -1,4 +1,4 @@
-package com.kujirahand.jsWaffle;
+package com.kujirahand.jsWaffle.utils;
 
 import java.net.URLDecoder;
 import java.util.Hashtable;

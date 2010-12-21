@@ -1,4 +1,4 @@
-package com.kujirahand.jsWaffle.plugin;
+package com.kujirahand.jsWaffle.model;
 
 import com.kujirahand.jsWaffle.WaffleActivity;
 import android.content.Intent;

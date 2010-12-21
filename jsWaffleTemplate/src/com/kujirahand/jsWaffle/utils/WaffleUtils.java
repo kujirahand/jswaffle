@@ -1,4 +1,4 @@
-package com.kujirahand.jsWaffle;
+package com.kujirahand.jsWaffle.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,6 +20,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+
+import com.kujirahand.jsWaffle.WaffleActivity;
 
 import android.app.Activity;
 import android.content.Context;

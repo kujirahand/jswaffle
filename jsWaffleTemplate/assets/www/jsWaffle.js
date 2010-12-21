@@ -77,6 +77,8 @@ var droid = (function(self){
 		};
 	}
 	
+	//todo: _storage object
+	
 	// global temporary object
 	var DroidWaffle = self.DroidWaffle = {
 		_shake_fn_user : null, // for shake
@@ -390,22 +392,22 @@ var droid = (function(self){
 	 * @param {String} key
 	 * @param {String} value
 	 */
-	jsWaffle.prototype.pref_set = function (key, value) { _w.preferencePut(key, value); };
+	jsWaffle.prototype.pref_set = function (key, value) { _storage.preferencePut(key, value); };
 	/**
 	 * storage get
 	 * @param {String} key
 	 * @param {String} defValue
 	 */
-	jsWaffle.prototype.pref_get = function (key, defValue) { return _w.preferenceGet(key, defValue); };
+	jsWaffle.prototype.pref_get = function (key, defValue) { return _storage.preferenceGet(key, defValue); };
 	/**
 	 * storage remove
 	 * @param {String} key
 	 */
-	jsWaffle.prototype.pref_remove = function (key) { return _w.preferenceRemove(key, defValue); };
+	jsWaffle.prototype.pref_remove = function (key) { return _storage.preferenceRemove(key, defValue); };
 	/**
 	 * storage clear
 	 */
-	jsWaffle.prototype.pref_clear = function () { return _w.preferenceClear(); };
+	jsWaffle.prototype.pref_clear = function () { return _storage.preferenceClear(); };
 	
 	// emurate localStorage for Android 1.6
 	if (typeof(window.localStorage) == "undefined") {
@@ -414,9 +416,9 @@ var droid = (function(self){
 				if (defvalue == undefined) defvalue = null;
 				return _w.localStorage_get(key, defvalue);
 			},
-			setItem    : function (key, value) { return _w.localStorage_put(key, value); },
-			removeItem : function (key) { return _w.localStorage_remove(key, defValue); },
-			clear      : function () { _w.localStorage_clear(); },
+			setItem    : function (key, value) { return _storage.localStorage_put(key, value); },
+			removeItem : function (key) { return _storage.localStorage_remove(key, defValue); },
+			clear      : function () { _storage.localStorage_clear(); },
 			___ : 0
 		};
 	}

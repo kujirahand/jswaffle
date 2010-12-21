@@ -1,9 +1,11 @@
-package com.kujirahand.jsWaffle;
+package com.kujirahand.jsWaffle.utils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import com.kujirahand.jsWaffle.WaffleActivity;
 
 import android.app.Activity;
 import android.content.Context;

@@ -1,4 +1,4 @@
-package com.kujirahand.jsWaffle.plugin;
+package com.kujirahand.jsWaffle.model;
 
 import java.util.Vector;
 
