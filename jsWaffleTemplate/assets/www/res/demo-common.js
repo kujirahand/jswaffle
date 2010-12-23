@@ -13,7 +13,7 @@ function setMyMenuItem() {
 		1, true, "Quit", "ic_menu_close_clear_cancel",
 		function() {
 			var b = confirm("Quit?");
-			if (b) droid.finish();
+			if (b) droid.quit();
 		}
 	);
 	// test - getResString()

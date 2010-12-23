@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.util.List;
 
 import com.kujirahand.jsWaffle.WaffleActivity;
@@ -36,8 +37,6 @@ import android.widget.Toast;
  */
 public class ABasicPlugin extends WafflePlugin
 {
-	public static double WAFFLE_VERSON = 1.13;
-	//
 	public static int ACTIVITY_REQUEST_CODE_BARCODE = 0xFF0001;
 	//
 	public final static int DIALOG_TYPE_DEFAULT = 0;
@@ -62,7 +61,7 @@ public class ABasicPlugin extends WafflePlugin
 	 * @return version string
 	 */
 	public double getWaffleVersion() {
-		return WAFFLE_VERSON;
+		return waffle_activity.WAFFLE_VERSON;
 	}
 	/**
 	 * Log
@@ -517,18 +516,48 @@ public class ABasicPlugin extends WafflePlugin
 	 /**
 	  * get data from url sync
 	  */
-	 public String httpGet(String url) {
-		 return WaffleUtils.httpGet(url);
+	 public boolean httpGet(final String url, final String callback_ok, final String callback_ng, final String tag) {
+		 new Thread(new Runnable() {
+				@Override
+				public void run() {
+					String result = WaffleUtils.httpGet(url);
+					String query = "";
+					if (result != null) {
+						result = URLEncoder.encode(result);
+						query = callback_ok + "('" + result + "'," + tag +  ")";
+					} else {
+						query = callback_ng + "('" + WaffleUtils.httpLastError + "'," + tag +  ")";
+					}
+					callJsEvent(query);
+				}
+			 }).start();
+		 return true;
 	 }
-	 public String httpPostJSON(String url, String json) {
-		 return WaffleUtils.httpPostJSON(url, json);
+	 
+	 public boolean httpPostJSON(final String url, final String json, final String callback, final int tag) {
+		 new Thread(new Runnable() {
+				@Override
+				public void run() {
+					String result = WaffleUtils.httpPostJSON(url, json);
+					String query = callback + "(" + (result) + "," + tag +  ")";
+					callJsEvent(query);
+				}
+			 }).start();
+		 return true;
 	 }
-	 public void httpDownload(final String url, final String filename, final String callback) {
+	 /**
+	  * download file
+	  * @param url
+	  * @param filename
+	  * @param callback
+	  * @param tag
+	  */
+	 public void httpDownload(final String url, final String filename, final String callback, final int tag) {
 		 new Thread(new Runnable() {
 			@Override
 			public void run() {
 				boolean b = WaffleUtils.httpDownloadToFile(url, filename, waffle_activity);
-				String query = callback + "(" + (b ? "true" : "false") + ")";
+				String query = callback + "(" + (b ? "true" : "false") + "," + tag +  ")";
 				callJsEvent(query);
 			}
 		 }).start();
@@ -542,12 +571,13 @@ public class ABasicPlugin extends WafflePlugin
 		String param;
 		if (requestCode == ACTIVITY_REQUEST_CODE_BARCODE && intent_startActivity_callback_barcode != null) {
 			String contents = "";
+			String format = "text";
 			if (intent != null) {
 				contents = intent.getStringExtra("SCAN_RESULT");
-		        // String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
-				if (contents != null) contents = contents.replace("'", "\'");
+		        format = intent.getStringExtra("SCAN_RESULT_FORMAT");
+				if (contents != null) contents = URLEncoder.encode(contents);
 			}
-	        param = intent_startActivity_callback_barcode + "('" + contents +"')";
+	        param = intent_startActivity_callback_barcode + "('" + contents + "','" + format + "')";
 			callJsEvent(param);
 		} else {
 			if (intent_startActivity_callback == null) return;

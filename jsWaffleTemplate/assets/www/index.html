@@ -55,12 +55,28 @@
 	
 	<h2>HTTP</h2>
 	<div class="buttons">
-		<button onclick="testHTTP()">httpGet</button>
+		<button id="httpget_btn" onclick="testHTTP()">httpGet:Get IP</button>
+		<button id="dl_btn" onclick="testHTTPDownload()">httpDownload:DL Image</button>
 	</div>
 	<script>
 		function testHTTP() {
-			var s = droid.httpGet("http://api.aoikujira.com/ip/json");
-			alert(s);
+			$("httpget_btn").disabled = true;
+			droid.httpGet("http://api.aoikujira.com/ip/json",
+				function(str){ alert(str); $("httpget_btn").disabled = false; }, 
+				function(err){ alert(err); $("httpget_btn").disabled = false; }
+			);
+		}
+		function testHTTPDownload() {
+			$("dl_btn").disabled = true;
+			droid.httpDownload(
+				"http://d.aoikujira.com/jsWaffle/img/jsWaffle-icon300.png",
+				"/sdcard/logo.png",
+				function (status) {
+					$("dl_btn").disabled = false;
+					if (!status) { alert('download error'); return; }
+					droid.startIntent("file:///sdcard/logo.png");
+				}
+			);
 		}
 	</script>
 	

@@ -18,9 +18,10 @@ public class GPSPlugin extends WafflePlugin
 	Vector<GeoListener> listeners = new Vector<GeoListener>();
 	
 	// javascript interface
-	public int getCurrentPosition(String callback_ok, String callback_ng, boolean accuracy_fine) {
+	public int getCurrentPosition(String callback_ok, String callback_ng, boolean accuracy_fine, int tag) {
 		GeoListener geo = new GeoListener(waffle_activity);
 		listeners.add(geo);
+		geo.tag = tag;
 		geo.callback_ok = callback_ok;
 		geo.callback_ng = callback_ng;
 		geo.report_count = 1;
@@ -28,9 +29,10 @@ public class GPSPlugin extends WafflePlugin
 		return listeners.size();
 	}
 	
-	public int watchPosition(String callback_ok, String callback_ng, boolean accuracy_fine) {
+	public int watchPosition(String callback_ok, String callback_ng, boolean accuracy_fine, int tag) {
 		GeoListener geo = new GeoListener(waffle_activity);
 		listeners.add(geo);
+		geo.tag = tag;
 		geo.callback_ok = callback_ok;
 		geo.callback_ng = callback_ng;
 		geo.report_count = 1;
@@ -46,6 +48,7 @@ public class GPSPlugin extends WafflePlugin
 			if (i == null) return;
 			i.flagLive = false;
 			i.stop();
+			waffle_activity.log("clearWatchPosition:" + watchId);
 			listeners.set(index, null);
 		} catch (Exception e) {
 			waffle_activity.log_error("[GPS ERROR]clearWatch:" + e.getMessage());
@@ -96,6 +99,7 @@ class GeoListener implements LocationListener
 	public String callback_ok = "DroidWaffle._geolocation_fn_ok";
 	public String callback_ng = "DroidWaffle._geolocation_fn_ng";
 	public WaffleActivity waffle_activity;
+	public int tag = -1;
 	
 	public GeoListener(WaffleActivity app) {
 		this.waffle_activity = app;
@@ -120,7 +124,7 @@ class GeoListener implements LocationListener
 		}
 		if (p == null) {
 			waffle_activity.log_error("[GPS] no provider");
-			waffle_activity.callJsEvent(callback_ng + "('no provider')");
+			waffle_activity.callJsEvent(callback_ng + "('no provider', "+tag+")");
 			return;
 		}
 		// register
@@ -150,7 +154,8 @@ class GeoListener implements LocationListener
 		String param = "" +
 		location.getLatitude() + "," +
 		location.getLongitude() + "," +
-		location.getAltitude();
+		location.getAltitude() + "," +
+		tag;
 		String q = callback_ok + "(" + param + ")";
 		waffle_activity.callJsEvent(q);
 	}
