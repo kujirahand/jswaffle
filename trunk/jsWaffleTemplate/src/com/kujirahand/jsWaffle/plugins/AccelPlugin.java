@@ -21,11 +21,13 @@ public class AccelPlugin extends WafflePlugin {
 	/**
 	 * Set Sensor event callback
 	 * @param funcname
+	 * @param requestCode
 	 */
-	public int setAccelCallback(String funcname) {
+	public int setAccelCallback(String funcname, int requestCode) {
 		AccelListener ac = new AccelListener(waffle_activity);
 		listeners.add(ac);
 		ac.sensour_callback_funcname = funcname;
+		ac.requestCode = requestCode;
 		ac.start();
 		return listeners.size();
 	}
@@ -58,7 +60,7 @@ public class AccelPlugin extends WafflePlugin {
 	/**
 	 * Set Shake Event callback
 	 */
-	public void setShakeCallback(String shake_callback_fn, String shake_end_callback_fn, double shake_freq, double shake_end_freq ) {
+	public void setShakeCallback(String shake_callback_fn, String shake_end_callback_fn, double shake_freq, double shake_end_freq, int requestCode) {
 		AccelListener ac = new AccelListener(waffle_activity);
 		listeners.add(ac);
 		// shake
@@ -67,6 +69,8 @@ public class AccelPlugin extends WafflePlugin {
 		// shake end
 		ac.shake_end_callback_funcname = shake_end_callback_fn;
 		ac.shake_end_freq = shake_end_freq;
+		//
+		ac.requestCode = requestCode;
 		ac.start();
 	}
 	
@@ -106,6 +110,7 @@ class AccelListener implements SensorEventListener
 	public static final int SHAKE_STATUS_READY = 0;
 	public static final int SHAKE_STATUS_SHAKING = 1;
 	
+	public int requestCode;
 	public String sensour_callback_funcname = null;
 	public String shake_callback_funcname = null;
 	public String shake_end_callback_funcname = null;
@@ -175,7 +180,7 @@ class AccelListener implements SensorEventListener
             	//振ったときの処理
             	if (shake_status == SHAKE_STATUS_READY) {
             		if (shake_callback_funcname != null) {
-            			context.callJsEvent(shake_callback_funcname + "()");
+            			context.callJsEvent(shake_callback_funcname + "(" + requestCode + ")");
             			shake_status = SHAKE_STATUS_SHAKING;
             		}
             	}
@@ -184,7 +189,7 @@ class AccelListener implements SensorEventListener
             	// 振ってないときの処理
             	if (shake_status == SHAKE_STATUS_SHAKING) {
             		if (shake_end_callback_funcname != null) {
-            			context.callJsEvent(shake_end_callback_funcname + "()");
+            			context.callJsEvent(shake_end_callback_funcname + "(" + requestCode + ")");
             			shake_status = SHAKE_STATUS_READY;
             		}
             	}
@@ -210,7 +215,7 @@ class AccelListener implements SensorEventListener
         long diff = now - lastTime;
         if (diff > 100) {
 			String accel_str = sensour_callback_funcname + 
-				"(" + accelX + "," + accelY + "," + accelZ + ")";
+				"(" + accelX + "," + accelY + "," + accelZ + "," + requestCode + ")";
 			context.callJsEvent(accel_str);
 			lastTime = now;
         }

@@ -37,6 +37,10 @@ import android.widget.LinearLayout;
 
 public class WaffleActivity extends Activity {
 	
+	/** jsWaffle Version Info */
+	public static double WAFFLE_VERSON = 1.14;
+	
+	
 	public WaffleActivity activity_instance = this;
 	public WebView webview;
 	public static String LOG_TAG = "jsWaffle";
@@ -59,7 +63,7 @@ public class WaffleActivity extends Activity {
         setWebViewParams();
         
         // Set Plugins
-        pluginManager = new WafflePluginManager();
+        pluginManager = new WafflePluginManager(this);
         onAddPlugins();
         
         // Set WebView to Main View
@@ -86,7 +90,7 @@ public class WaffleActivity extends Activity {
      */
     protected void onAddPlugins() {
     	// main waffle object
-    	addPlugin("_DroidWaffle", new ABasicPlugin());
+    	addPlugin("_base", new ABasicPlugin()); // old '_DroidWaffle'
     	// plugins
     	addPlugin("_accel", new AccelPlugin());
     	addPlugin("_db", new DatabasePlugin());

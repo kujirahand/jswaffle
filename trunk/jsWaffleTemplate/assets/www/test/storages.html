@@ -82,15 +82,15 @@
 			db = droid.openDatabase("test3.db");
 			droid.executeSql(db,
 				"CREATE TABLE IF NOT EXISTS test (name,value)",
-				function(){ alert('Open database!'); db_unlockUI(); },
+				function(){ alert('Open database!'); db_unlockUI(); showDB(); },
 				function(e){ alert('Create database error:' + e); db_unlockUI(); }
 			);
 		}
 		function insertDB(){
 			if (db == null) { alert('DB not opened.'); return; }
 			db_lockUI();
-			var name = prompt("input name");
-			var val = prompt("input value");
+			var name = "hoge" + Math.floor(Math.random() * 1000);
+			var val = Math.floor(Math.random() * 1000);
 			val = parseInt(val);
 			droid.executeSql(db, 
 				"INSERT INTO test (name,value)VALUES('"+name+"',"+val+")",

@@ -212,10 +212,12 @@ public class WaffleUtils {
 	            objStream.close();
 	        }
 	    } catch (IOException e) {
+	    	httpLastError = e.getMessage();
 	    	return null;
 	    }	
 	    return sReturn;
 	}
+	public static String httpLastError = null;
 	
 	/**
 	 * http download
