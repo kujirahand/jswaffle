@@ -4,6 +4,7 @@ import com.kujirahand.jsWaffle.model.IWafflePlugin;
 import com.kujirahand.jsWaffle.model.WafflePluginManager;
 import com.kujirahand.jsWaffle.plugins.AccelPlugin;
 import com.kujirahand.jsWaffle.plugins.DatabasePlugin;
+import com.kujirahand.jsWaffle.plugins.DevInfoPlugin;
 import com.kujirahand.jsWaffle.plugins.GPSPlugin;
 import com.kujirahand.jsWaffle.plugins.ABasicPlugin;
 import com.kujirahand.jsWaffle.plugins.StoragePlugin;
@@ -38,7 +39,7 @@ import android.widget.LinearLayout;
 public class WaffleActivity extends Activity {
 	
 	/** jsWaffle Version Info */
-	public static double WAFFLE_VERSON = 1.14;
+	public static double WAFFLE_VERSON = 1.15;
 	
 	
 	public WaffleActivity activity_instance = this;
@@ -96,6 +97,7 @@ public class WaffleActivity extends Activity {
     	addPlugin("_db", new DatabasePlugin());
     	addPlugin("_gps", new GPSPlugin());
     	addPlugin("_storage", new StoragePlugin());
+    	addPlugin("_dev", new DevInfoPlugin());
     }
     
     protected IWafflePlugin addPlugin(String jsName, IWafflePlugin plugin) {
@@ -144,6 +146,7 @@ public class WaffleActivity extends Activity {
         setting.setJavaScriptEnabled(true);
         setting.setJavaScriptCanOpenWindowsAutomatically(true);
         setting.setLayoutAlgorithm(LayoutAlgorithm.NORMAL);
+        setting.setBuiltInZoomControls(false);
     }
        
     public void showPage(String uri) {
@@ -328,6 +331,7 @@ public class WaffleActivity extends Activity {
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
 			boolean b = IntentHelper.run(appContext, url);
 		  	if (!b) {
+		  		log("loadUrl=" + url);
 		  		view.loadUrl(url); // browse url in waffle browser
 		  		return false;
 		  	}

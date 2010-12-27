@@ -42,7 +42,7 @@ public class WafflePluginManager {
 	 * @param url
 	 */
 	public void onPageStarted(String url) {
-		waffle_activity.log("onPageStarted:" + url);
+		// waffle_activity.log("onPageStarted:" + url);
     	for (IWafflePlugin plugin : items) {
 			plugin.onPageStarted(url);
 		}
@@ -52,7 +52,7 @@ public class WafflePluginManager {
 	 * @param url
 	 */
 	public void onPageFinished(String url) {
-		waffle_activity.log("onPageFinished:" + url);
+		// waffle_activity.log("onPageFinished:" + url);
     	for (IWafflePlugin plugin : items) {
 			plugin.onPageFinished(url);
 		}
