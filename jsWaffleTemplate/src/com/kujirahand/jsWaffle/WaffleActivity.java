@@ -39,10 +39,10 @@ import android.widget.LinearLayout;
 public class WaffleActivity extends Activity {
 	
 	/** jsWaffle Version Info */
-	public static double WAFFLE_VERSON = 1.15;
+	public static double WAFFLE_VERSON = 1.151;
 	
 	
-	public WaffleActivity activity_instance = this;
+	public static WaffleActivity mainInstance = null;
 	public WebView webview;
 	public static String LOG_TAG = "jsWaffle";
 	protected LinearLayout root;
@@ -53,6 +53,7 @@ public class WaffleActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
+    	if (mainInstance == null) mainInstance = this; // set main instance
     	
     	// Initialize Window
     	onSetWindowFlags(getWindow());
@@ -423,7 +424,7 @@ public class WaffleActivity extends Activity {
 		public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, final JsPromptResult result)
 		{
 			// prompt() を拡張して様々な用途のダイアログを表示する
-			DialogHelper.waffle_activity = activity_instance;
+			DialogHelper.waffle_activity = mainInstance;
 			boolean r = true;
 			switch (ABasicPlugin.dialogType) {
 			case ABasicPlugin.DIALOG_TYPE_DEFAULT:

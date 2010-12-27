@@ -2,8 +2,8 @@ package com.kujirahand.jsWaffle.plugins;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import android.app.Activity;
@@ -155,7 +155,7 @@ public class StoragePlugin extends WafflePlugin
 	 */
 	public String loadText(String filename) {
 		try {
-			FileInputStream input = WaffleUtils.getInputStream(filename, waffle_activity);
+			InputStream input = WaffleUtils.getInputStream(filename, waffle_activity);
 			if (input == null) return null;
 			BufferedReader reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
 			StringBuffer buf = new StringBuffer();

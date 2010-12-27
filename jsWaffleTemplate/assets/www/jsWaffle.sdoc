@@ -126,8 +126,10 @@
 
 /**
  * sound play
+ * サウンドを再生する(BGMに最適、効果音はloadSoundPoolを使う)
  * @id droid.playSound
  * @param {String} filename
+ * @param {Boolean} loopMode
  * @return {MediaPlayer}
  */
 
@@ -138,6 +140,34 @@
  * @param {MediaPlayer}
  */
 
+/**
+ * load to SoundPool (for SE)
+ * サウンドを再生する(効果音に最適、BGMはplaySoundを使う)
+ * @id droid.loadSoundPool
+ * @param {String} filename
+ * @return {Number} soundId
+ */
+
+/**
+ * play SoundPool. Before play, needs to loadSoundPool.
+ * @id droid.playSoundPool
+ * @param {Number} soundId	SoundPool's id
+ * @return {Void}
+ */
+
+/**
+ * stop SoundPool. Before play, needs to loadSoundPool.
+ * @id droid.stopSoundPool
+ * @param {Number} soundId	SoundPool's id
+ * @return {Void}
+ */
+
+/**
+ * unload SoundPool. 
+ * @id droid.unloadSoundPool
+ * @param {Number} soundId	SoundPool's id
+ * @return {Void}
+ */
 
 /**
  * Start Intent (ex) mailto:hoge@example.com?subject=xxx&body=xxx

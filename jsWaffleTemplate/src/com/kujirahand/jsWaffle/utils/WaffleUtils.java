@@ -24,7 +24,6 @@ import org.apache.http.params.HttpParams;
 import com.kujirahand.jsWaffle.WaffleActivity;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.util.Log;
@@ -117,18 +116,37 @@ public class WaffleUtils {
 		}
 	}
 	
+	
+	public static Uri checkFileUri(String filename) {
+		Uri uri = Uri.parse(filename);
+		String scheme = uri.getScheme();
+		String path = uri.getPath();
+		if (path.startsWith("/sdcard/")||path.startsWith("/data/")) {
+			uri = Uri.parse("file://" + filename);
+		}
+		if ((scheme == null)&&(path.startsWith("www/") || path.startsWith("/www/"))) {
+			if (path.startsWith("/www")) {
+				path = path.substring(1);
+			}
+			uri = Uri.parse("file:///android_asset/" + path);
+		}
+		/*
+		if (path.startsWith("/android_asset/")) {
+			// android_assets は特殊なので別途処理すべき
+		}
+		*/
+		return uri;
+	}
+	
 	public static File detectFile(String filename, Activity app) {
 		File result = null;
 		try {
-			Uri uri = Uri.parse(filename);
-			String path = uri.getPath();
-			if (path.startsWith("/sdcard/")||path.startsWith("/data/")) {
-				uri = Uri.parse("file://" + filename);
-			}
+			Uri uri = checkFileUri(filename);
 			String scheme = uri.getScheme();
-			path = uri.getPath();
+			String path = uri.getPath();
+			
 			if (scheme == null) {
-				result = app.getFileStreamPath(filename);
+				result = app.getFileStreamPath(path);
 			}
 			else if (scheme.equals("file")) {
 				result = new File(uri.getPath());
@@ -144,41 +162,34 @@ public class WaffleUtils {
 	public static FileOutputStream getOutputStream(String filename, Activity activity) {
 		FileOutputStream output = null;
 		try {
-			Uri uri = Uri.parse(filename);
-			String path = uri.getPath();
-			if (path.startsWith("/sdcard")||path.startsWith("/data/")) {
-				uri = Uri.parse("file://" + filename);
+			File f = detectFile(filename, activity);
+			if (f == null) {
+				WaffleActivity.mainInstance.log_warn("[FileNotFound]" + filename);
+				return null;
 			}
-			String scheme = uri.getScheme();
-			path = uri.getPath();
-			if (scheme == null) {
-				output = activity.openFileOutput(filename, Context.MODE_PRIVATE);
-			}
-			else if (scheme.equals("file")) {
-				File f = new File(uri.getPath());
-				output = new FileOutputStream(f);
-			}
-			else {
-				// error
-			}
+			output = new FileOutputStream(f);
 		} catch (Exception e) {
 		}
 		return output;
 	}
-	public static FileInputStream getInputStream(String filename, Activity activity) {
+	
+	public static InputStream getInputStream(String filename, Activity activity) {
 		FileInputStream input = null;
 		try {
-			Uri uri = Uri.parse(filename);
-			String scheme = uri.getScheme();
-			if (scheme == null) {
-				input = activity.openFileInput(filename);
+			Uri uri = checkFileUri(filename);
+			String path = uri.getPath();
+			// check assets
+			if (path.startsWith("/android_asset/")) {
+				path = path.substring(15);
+				return activity.getAssets().open(path);
 			}
-			else if (scheme.equals("file")) {
-				File f = new File(uri.getPath());
-				input = new FileInputStream(f);
+			// cehck File Path
+			File f = detectFile(filename, activity);
+			if (f == null) {
+				WaffleActivity.mainInstance.log_warn("[FileNotFound]" + filename);
+				return null;
 			}
-			else {
-			}
+			input = new FileInputStream(f);
 		} catch (Exception e) {
 		}
 		return input;

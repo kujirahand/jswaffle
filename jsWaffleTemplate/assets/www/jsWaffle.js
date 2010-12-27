@@ -253,9 +253,12 @@ plugin_defineDroidMethod(
 		
 		/** @id droid.playSound */
 		playSound : {
-			droid : function (filename) {
-				var i = _base.createPlayer(filename);
-				i.start(); // or _base.playPlayer(i);
+			droid : function (filename, loopMode) {
+				if (loopMode == undefined || loopMode == null) loopMode = false;
+				var i = _base.createPlayer(filename, loopMode ? 1 : 0);
+				if (i != null) {
+					_base.playPlayer(i);
+				}
 				return i;
 			},
 			cross : function (filename) { console.log("playSound:" + filename); }
@@ -267,6 +270,30 @@ plugin_defineDroidMethod(
 			cross : function () {}
 		},
 		
+		/** @id droid.loadSoundPool */
+		loadSoundPool : {
+			droid : function (filename) { return _base.loadSoundPool(filename); },
+			cross : function (filename) { console.log("loadSoundPool:" + filename); return -1; }
+		},
+		/** @id droid.playSoundPool */
+		playSoundPool : {
+			droid : function (soundId, loop) {
+				if (soundId < 0) return;
+				if (loop == undefined) loop = 0;
+				_base.playSoundPool(soundId, loop);
+			},
+			cross : function (soundId) { console.log("playSoundPool:" + soundId); }
+		},
+		/** @id droid.stopSoundPool */
+		stopSoundPool : {
+			droid : function (soundId) { _base.stopSoundPool(soundId); },
+			cross : function (soundId) { console.log("stopSoundPool:" + soundId); }
+		},
+		/** @id droid.unloadSoundPool */
+		unloadSoundPool : {
+			droid : function (soundId) { _base.unloadSoundPool(soundId); },
+			cross : function (soundId) { console.log("unloadSoundPool:" + soundId); }
+		},
 		
 		/** @id droid.startIntent */
 		startIntent : {
