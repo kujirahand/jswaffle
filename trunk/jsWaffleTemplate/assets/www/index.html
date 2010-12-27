@@ -34,6 +34,24 @@
 		<button onclick="droid.makeToast('Hello!')">makeToast</button>
 	</div>
 	
+	<h2>Sound/Video</h2>	
+	<div class="buttons">
+		<button onclick="TestPlayer()">Play Sound(load&Play)</button>
+		<button onclick="TestSoundPool()">Play Sound(SoundPool)</button>
+		<button onclick="droid.startIntent('http://www.youtube.com/watch?v=kbRBQ5c51eo')">Play Video(YouTube)</button>
+	</div>
+	<script>
+		// for SoundPool Test
+		var soundId = droid.loadSoundPool("file:///android_asset/www/res/beep.ogg");
+		function TestSoundPool() {
+			droid.playSoundPool(soundId, 2);
+		}
+		function TestPlayer() {
+			droid.playSound('www/res/beep.ogg');
+			//droid.playSound('www/res/test.mp3');
+		}
+	</script>
+	
 	<h2>Mail/Tel</h2>
 	<div class="buttons">
 		<button onclick="TestSendMail()">Send Mail</button>
@@ -83,12 +101,6 @@
 			);
 		}
 	</script>
-	
-	<h2>Sound/Video</h2>	
-	<div class="buttons">
-		<button onclick="droid.playSound('res/beep.mp3')">Play MP3 in asset</button>
-		<button onclick="droid.startIntent('http://www.youtube.com/watch?v=kbRBQ5c51eo')">Play Video(YouTube)</button>
-	</div>
 	
 	<h2>More Samples</h2>
 	<div class="buttons">

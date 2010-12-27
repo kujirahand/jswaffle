@@ -20,9 +20,11 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.text.ClipboardManager;
@@ -138,59 +140,89 @@ public class ABasicPlugin extends WafflePlugin
 	
 	
 	/**
-	 * play media file
+	 * play media file (for BGM)
 	 * @param filename
 	 * @return MediaPlayer
 	 */
-	public MediaPlayer createPlayer(String soundfile) {
+	public MediaPlayer createPlayer(String soundfile, int loopMode) {
+		MediaPlayer mp = new MediaPlayer();
 		try {
-			MediaPlayer mp = new MediaPlayer();
-			// parse uri
-			Uri uri = Uri.parse(soundfile);
-			String scheme = uri.getScheme();
-			log("scheme:"+ uri.getScheme());
-			log("host:"+ uri.getHost());
-			log("path:"+uri.getPath());
-			
-			// check path
-			if (scheme == null) {
-				// relative path
-				log("[audio] assets:" + soundfile);
-				AssetFileDescriptor fis = null;
-				try {
-					fis = waffle_activity.getAssets().openFd(soundfile);
-				} catch (Exception e) {
-					try {
-						fis = waffle_activity.getAssets().openFd("www/" + soundfile);
-					} catch (Exception e2) {
-						fis = null;
-					}
-				}
-				if (fis != null) {
-					mp.setDataSource(fis.getFileDescriptor());
-					mp.prepare();
-				}
+			mp.setAudioStreamType(AudioManager.STREAM_RING);
+			//
+			Uri uri = WaffleUtils.checkFileUri(soundfile);
+			String path = uri.getPath();
+			if (path.startsWith("/android_asset/")) {
+				path = path.substring(15);
+				AssetFileDescriptor fd = waffle_activity.getAssets().openFd(path);
+				mp.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
+			} else {
+				mp.setDataSource(path);
 			}
-			else if (scheme == "file") {
-				log("[audio] file:" + soundfile);
-				mp.setDataSource(uri.getPath());
-				mp.prepare();
-			}
-			else {
-				log_error("[audio]Path Error:" + soundfile);
-				return null;
-			}
-			return mp;
+			mp.prepare();
+			mp.setLooping(loopMode == 1);
 		} catch (IOException e) {
 			log_error("[audio]" + e.getMessage() + "/" + soundfile);
 			return null;
 		}
+		return mp;
 	}
 	public void playPlayer(MediaPlayer mp) {
+		mp.seekTo(0);
 		mp.start();
 	}
 	public void stopPlayer(MediaPlayer mp) {
-		mp.stop();
+		if (mp.isPlaying()) {
+			mp.stop();
+		}
+	}
+	/**
+	 * play sound file (for Realtime play or loop) ... OGG is best!
+	 */
+	private SoundPool pool = null;
+	public int loadSoundPool(String filename) {
+		int res = -1;
+		pool = new SoundPool(5, AudioManager.STREAM_RING, 0);
+		try {
+			Uri uri = WaffleUtils.checkFileUri(filename);
+			String path = uri.getPath();
+			if (path.startsWith("/android_asset/")) {
+				path = path.substring(15);
+				AssetFileDescriptor fd = waffle_activity.getAssets().openFd(path);
+				if (fd == null) throw new IOException("FileOpenError:" + path);
+				res = pool.load(fd, 1);
+			} else {
+				res = pool.load(path, 1);
+			}
+			if (res >= 0) return res;
+			log_error("[loadSoundPool]error:" + filename);
+			return -1;
+		} catch (Exception e) {
+			log_error("[audio]" + e.getMessage());
+			return -1;
+		}
+	}
+	public void playSoundPool(int id, int loop) {
+		if (pool == null) {
+			log_error("SoundPool not ready");
+			return;
+		}
+		AudioManager am = (AudioManager)waffle_activity.getSystemService(Activity.AUDIO_SERVICE);
+		int v = am.getStreamVolume(AudioManager.STREAM_RING);
+		pool.play(id, v, v, 1, loop, 1);
+	}
+	public void stopSoundPool(int id) {
+		if (pool == null) {
+			log_error("SoundPool not ready");
+			return;
+		}
+		pool.stop(id);
+	}
+	public void unloadSoundPool(int id) {
+		if (pool == null) {
+			log_error("SoundPool not ready");
+			return;
+		}
+		pool.unload(id);
 	}
 	
 	/**
