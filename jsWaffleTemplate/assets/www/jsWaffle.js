@@ -250,78 +250,6 @@ plugin_defineDroidMethod(
 			cross : function (id) { return "[" + id + "]" }
 		},
 		 
-		/** @id droid.saveText */
-		saveText : {
-			droid : function (filename, text) {
-				_base.saveText(filename, text);
-			},
-			cross : function (filename, text) {
-				localStorage.setItem(filename, text);
-			}
-		},
-		
-		/** @id droid.loadText */
-		loadText : {
-			droid : function (filename) {
-				return _base.loadText(filename);
-			},
-			cross : function (filename) {
-				return localStorage.getItem(filename);
-			}
-		},
-		
-		/** @id droid.fileList */
-		fileList : {
-			droid : function (path) {
-				var s = _base.fileList(path);
-				return s.split(";");
-			},
-			cross : function () { return []; }
-		},
-		
-		/** @id droid.fileExists */
-		fileExists : {
-			droid : function (path) {
-				return _base.fileExists(path);
-			},
-			cross : function () { return false; }
-		},
-		
-		/** @id droid.mkdir */
-		mkdir : {
-			droid : function (path) {
-				return _base.mkdir(path);
-			},
-			cross : function () {}
-		},
-		
-		/** @id droid.deleteFile */
-		deleteFile : {
-			droid : function (path) {
-				return _base.deleteFile(path);
-			},
-			cross : function () {}
-		},
-		
-		/** @id droid.fileSize */
-		fileSize : {
-			droid : function (path) { return _base.fileSize(path); },
-			cross : function (path) { return 0; }
-		},
-		
-		/** @id droid.copyAssetsFile */
-		copyAssetsFile : {
-			droid : function (assetsName, savepath) { return _base.copyAssetsFile(assetsName, savepath); },
-			cross : function () {}
-		},
-		
-		/** @id droid.mergeSeparatedAssetsFile */
-		mergeSeparatedAssetsFile : {
-			droid : function (assetsName, savepath) {
-				return _base.mergeSeparatedAssetsFile(assetsName, savepath);
-			},
-			cross : function () {}
-		},
 		
 		/** @id droid.playSound */
 		playSound : {
@@ -527,6 +455,28 @@ plugin_defineDroidMethod(
 			cross : function (url, post_obj, callback) {
 				console.log('[dummy] httpPost : ' + url);
 				setTimeout(callback, 1000);
+			}
+		},
+		
+		/** @id droid.clipboardSetText */
+		clipboardSetText : {
+			droid : function (text) {
+				_base.clipboardSetText(text);
+			},
+			cross : function (text) {
+				console.log("[dummy] clipboardSetText : " + text);
+				droid._clipboard = text;
+			}
+		},
+		
+		/** @id droid.clipboardGetText */
+		clipboardGetText : {
+			droid : function () {
+				return _base.clipboardGetText();
+			},
+			cross : function () {
+				console.log("[dummy] clipboardSetText : " + text);
+				return droid._clipboard;
 			}
 		},
 		
@@ -828,21 +778,98 @@ plugin_defineDroidMethod(
 	{ pluginName:'_storage', className:'StoragePlugin' },
 	{
 		pref_set : {
-			droid : function (key, value) { _storage.preferencePut(key, value); },
+			droid : function (key, value) { _storage.localStorage_put(key, value); },
 			cross : function (key, value) { window.localStorage.setItem(key, value); }
 		},
 		pref_get : {
-			droid : function (key, defValue) { return _storage.preferenceGet(key, defValue); },
+			droid : function (key, defValue) { 
+				if (defValue == undefined) defValue = null;
+				return _storage.localStorage_get(key, defValue);
+			},
 			cross : function (key, defValue) { return window.localStorage.getItem(key, defValue); }
 		},
 		pref_remove : {
-			droid : function (key) { return _storage.preferenceRemove(key, defValue); },
+			droid : function (key) { return _storage.localStorage_remove(key, defValue); },
 			cross : function (key) { return window.localStorage.removeItem(key); }
 		},
 		pref_clear : {
-			droid : function () { _storage.preferenceClear(); },
+			droid : function () { _storage.localStorage_clear(); },
 			cross : function () { window.localStorage.clear(); }
 		},
+		/** @id droid.saveText */
+		saveText : {
+			droid : function (filename, text) {
+				_storage.saveText(filename, text);
+			},
+			cross : function (filename, text) {
+				localStorage.setItem(filename, text);
+			}
+		},
+		
+		/** @id droid.loadText */
+		loadText : {
+			droid : function (filename) {
+				return _storage.loadText(filename);
+			},
+			cross : function (filename) {
+				return localStorage.getItem(filename);
+			}
+		},
+		
+		/** @id droid.fileList */
+		fileList : {
+			droid : function (path) {
+				var s = _storage.fileList(path) + "";
+				var a = s.split(";");
+				return a;
+			},
+			cross : function () { return []; }
+		},
+		
+		/** @id droid.fileExists */
+		fileExists : {
+			droid : function (path) {
+				return _storage.fileExists(path);
+			},
+			cross : function () { return false; }
+		},
+		
+		/** @id droid.mkdir */
+		mkdir : {
+			droid : function (path) {
+				return _storage.mkdir(path);
+			},
+			cross : function () {}
+		},
+		
+		/** @id droid.deleteFile */
+		deleteFile : {
+			droid : function (path) {
+				return _storage.deleteFile(path);
+			},
+			cross : function () {}
+		},
+		
+		/** @id droid.fileSize */
+		fileSize : {
+			droid : function (path) { return _storage.fileSize(path); },
+			cross : function (path) { return 0; }
+		},
+		
+		/** @id droid.copyAssetsFile */
+		copyAssetsFile : {
+			droid : function (assetsName, savepath) { return _storage.copyAssetsFile(assetsName, savepath); },
+			cross : function () {}
+		},
+		
+		/** @id droid.mergeSeparatedAssetsFile */
+		mergeSeparatedAssetsFile : {
+			droid : function (assetsName, savepath) {
+				return _storage.mergeSeparatedAssetsFile(assetsName, savepath);
+			},
+			cross : function () {}
+		},
+		
 		___ : end_of_define_method
 	}
 );
@@ -852,7 +879,7 @@ if (typeof(window.localStorage) == "undefined") {
 	window.localStorage = {
 		getItem    : function (key, defvalue) {
 			if (defvalue == undefined) defvalue = null;
-			return _base.localStorage_get(key, defvalue);
+			return _storage.localStorage_get(key, defvalue);
 		},
 		setItem    : function (key, value) { return _storage.localStorage_put(key, value); },
 		removeItem : function (key) { return _storage.localStorage_remove(key, defValue); },
@@ -860,6 +887,57 @@ if (typeof(window.localStorage) == "undefined") {
 		___ : 0
 	};
 }
+
+
+plugin_defineDroidMethod(
+	{ pluginName:'_dev', className:'DevInfoPlugin' },
+	{
+		/** @id droid.getDisplayInfo */
+		getDisplayInfo : {
+			droid : function () { var str = _dev.getDisplayInfo(); return eval("("+str+")"); },
+			cross : function () { return {'width':document.width, 'height':document.height}; }
+		},
+		/** @id droid.getSystemMemory */
+		getSystemMemory : {
+			droid : function () { return _dev.getSystemMemory(); },
+			cross : function () { return -1; }
+		},
+		/** @id droid.getMemoryInfo */
+		getMemoryInfo : {
+			droid : function (key) { return _storage.preferenceRemove(key, defValue); },
+			cross : function (key) { return {availMem:0, lowMemory:false, threshold:0} }
+		},
+		/** @id droid.hasSDCard */
+		hasSDCard : {
+			droid : function () { return _dev.hasSDCard(); },
+			cross : function () { return false; }
+		},
+		/** @id droid.getSDCardPath */
+		getSDCardPath : {
+			droid : function () { return _dev.getSDCardPath(); },
+			cross : function () { return "/sdcard"; }
+		},
+		/** @id droid.getAndroidVersionInt */
+		getAndroidVersionInt : {
+			droid : function () { return _dev.getAndroidVersionInt(); },
+			cross : function () { return 4; }
+		},
+		
+		/** @id droid.getAndroidVersionRelease */
+		getAndroidVersionRelease : {
+			droid : function () { return _dev.getAndroidVersionRelease(); },
+			cross : function () { return "?"; }
+		},
+		
+		/** @id droid.getAndroidId */
+		getAndroidId : {
+			droid : function() { return _dev.getAndroidId() ; },
+			cross : function() { return "hoge"; }
+		},
+		
+		___ : end_of_define_method
+	}
+);
 
 
 
@@ -905,8 +983,8 @@ var stringify = function(obj) {
 		return "undefined";
 	}
 };
-/** @id droid.stringfy */
-self.droid.stringfy = stringify;
+/** @id droid.stringify */
+self.droid.stringify = stringify;
 
 
 

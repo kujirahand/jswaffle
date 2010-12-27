@@ -31,8 +31,8 @@ import android.util.Log;
 
 public class WaffleUtils {
 	
-	private static int BUFFSIZE = 1024 * 32;
-	public static int http_timeout = 2000;
+	private static int BUFFSIZE = 1024 * 8;
+	public static int http_timeout = 5000;
 	
 	/**
 	 * copy assets to external file 

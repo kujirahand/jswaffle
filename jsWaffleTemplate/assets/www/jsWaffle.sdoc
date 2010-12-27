@@ -122,70 +122,6 @@
 
 
 
-/**
- * save text file
- * @id droid.saveText
- * @param {String} filename
- * @param {String} text
- */
-
-/**
- * load text file
- * @id droid.loadText
- * @param {String} filename
- * @return {String} text
- */
-
-/**
- * get file list
- * @id droid.fileList
- * @param {String} path (if undefined then default data area)
- * @return {Array} file list
- */
-
-/**
- * check file exists
- * @id droid.fileExists
- * @param {String} path
- * @return {Boolean}
- */
-
-/**
- * create directories
- * @id droid.mkdir
- * @param {String} path
- * @return {Boolean}
- */
-
-/**
- * delete file
- * @id droid.deleteFile
- * @param {String} path
- * @return {Boolean}
- */
-
-/**
- * fileSize
- * @id droid.fileSize
- * @param {String} path
- * @return {Number}
- */
-
-/**
- * copy file from assets to sdcard
- * @id droid.copyAssetsFile
- * @param {String} assetsName
- * @param {String} savepath
- * @return {Boolean}
- */
-
-/**
- * copy separated file from assets to sdcard
- * @id droid.mergeSeparatedAssetsFile
- * @param {String} assetsName
- * @param {String} savepath
- * @return {Boolean}
- */
 
 
 /**
@@ -290,6 +226,17 @@
  * @param {Function} callback	set Function(result)
  */
 
+/**
+ * copy text to clipboard
+ * @id dorid.clipboardSetText
+ * @param {String} text
+ */
+
+/**
+ * get text from clipboard
+ * @id dorid.clipboardGetText
+ * @return {String} text
+ */
 
 //---------------------------------------------------------------------
 // _accel
@@ -404,13 +351,127 @@
  * @id droid.pref_clear
  */
 
+/**
+ * save text file
+ * @id droid.saveText
+ * @param {String} filename
+ * @param {String} text
+ */
+
+/**
+ * load text file
+ * @id droid.loadText
+ * @param {String} filename
+ * @return {String} text
+ */
+
+/**
+ * get file list
+ * @id droid.fileList
+ * @param {String} path (if undefined then default data area)
+ * @return {Array} file list
+ */
+
+/**
+ * check file exists
+ * @id droid.fileExists
+ * @param {String} path
+ * @return {Boolean}
+ */
+
+/**
+ * create directories
+ * @id droid.mkdir
+ * @param {String} path
+ * @return {Boolean}
+ */
+
+/**
+ * delete file
+ * @id droid.deleteFile
+ * @param {String} path
+ * @return {Boolean}
+ */
+
+/**
+ * fileSize
+ * @id droid.fileSize
+ * @param {String} path
+ * @return {Number}
+ */
+
+/**
+ * copy file from assets to sdcard
+ * @id droid.copyAssetsFile
+ * @param {String} assetsName
+ * @param {String} savepath
+ * @return {Boolean}
+ */
+
+/**
+ * copy separated file from assets to sdcard
+ * @id droid.mergeSeparatedAssetsFile
+ * @param {String} assetsName
+ * @param {String} savepath
+ * @return {Boolean}
+ */
+
+//---------------------------------------------------------------------
+// _dev
+//---------------------------------------------------------------------
+/**
+ * Get Display info
+ * @id droid.getDisplayInfo
+ * @return {Object}
+ */
+
+/**
+ * get system memory size
+ * @id droid.getSystemMemory
+ * @return {Number} bytes
+ */
+
+/**
+ * get memory info object
+ * @id droid.getMemoryInfo
+ * @return {Object}
+ */
+
+/**
+ * has sdcard ?
+ * @id droid.hasSDCard
+ * @return {Boolean}
+ */
+
+/**
+ * SD card path
+ * @id droid.getSDCardPath
+ * @return {String} sdcard path
+ */
+
+/**
+ * @id droid.getAndroidVersionInt
+ * @return {Number}
+ */
+
+/**
+ * @id droid.getAndroidVersionRelease
+ * @return {String}
+ */
+
+/**
+ * get device unique info
+ * 端末固有のIDを取得する
+ * @id droid.getAndroidId
+ * @return {String}
+ */
 
 //---------------------------------------------------------------------
 // other
 //---------------------------------------------------------------------
 /**
  * JSON encode
- * @id droid.stringfy
+ * @id droid.stringify
  * @param {Object} value
  * @return {String} JSON string
  */

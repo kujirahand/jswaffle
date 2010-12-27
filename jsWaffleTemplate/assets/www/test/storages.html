@@ -33,7 +33,7 @@
 	<div class="buttons">
 		<button onclick="TestSaveFile()">Save File</button>
 		<button onclick="TestLoadFile()">Load File</button>
-		<button onclick="TestWriteStorage()">Counter Test(localStorage)</button>
+		<button onclick="TestPref()">Counter Test(pref_get)</button>
 	</div>
 	<div class="disp">
 		<div id="storage_disp">counter : ?</div>
@@ -49,11 +49,11 @@
 			var txt = droid.loadText("hoge.txt");
 			alert(txt);
 		}
-		function TestWriteStorage() {
-			var cnt = parseInt(localStorage.getItem("cnt"));
+		function TestPref() {
+			var cnt = parseInt(droid.pref_get("counter", 0));
 			if (isNaN(cnt)) { cnt = 0; }
 			cnt++;
-			localStorage.setItem("cnt", cnt);
+			droid.pref_set("counter", cnt);
 			$("storage_disp").innerHTML = "counter : " + cnt;
 			droid.beep();
 		}

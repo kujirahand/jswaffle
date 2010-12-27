@@ -7,7 +7,10 @@
 	<link rel="stylesheet" type="text/css" href="res/demo.css" />
 	<script type="text/javascript">
 		function init() {
-			$("ver").innerHTML = droid.getWaffleVersion();
+			$("ver").innerHTML = "jsWaffle ver." + droid.getWaffleVersion();
+			var disp = droid.getDisplayInfo();
+			$("info").innerHTML = "Android ver." + droid.getAndroidVersionRelease() +
+				" (" + disp.width + "x" + disp.height + "px)";
 			setMyMenuItem();
 		}
 	</script>
@@ -18,7 +21,8 @@
 		<div style="text-align:center;">
 			<img src="res/logo150.png" onclick="droid.vibrate()">
 		</div>
-		<div style="text-align:center;margin-bottom:8px;">jsWaffle ver.<span id="ver" ></span></div>
+		<div style="text-align:center;margin-bottom:8px;" id="ver"></div>
+		<div style="text-align:center;margin-bottom:8px;" id="info"></div>
 	</div>
 	
 	<!-- *** sample *** -->
