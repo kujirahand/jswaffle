@@ -175,6 +175,10 @@ public class ABasicPlugin extends WafflePlugin
 			mp.stop();
 		}
 	}
+	public boolean isPlayingSound(MediaPlayer mp) {
+		return (mp.isPlaying());
+	}
+	
 	/**
 	 * play sound file (for Realtime play or loop) ... OGG is best!
 	 */
@@ -208,7 +212,11 @@ public class ABasicPlugin extends WafflePlugin
 		}
 		AudioManager am = (AudioManager)waffle_activity.getSystemService(Activity.AUDIO_SERVICE);
 		int v = am.getStreamVolume(AudioManager.STREAM_RING);
-		pool.play(id, v, v, 1, loop, 1);
+		int max_v = am.getStreamMaxVolume(AudioManager.STREAM_RING);
+		float vf = (float)v / (float)max_v;
+		// volume (0-1.0)
+		log("volume=" + vf);
+		pool.play(id, vf, vf, 1, loop, 1);
 	}
 	public void stopSoundPool(int id) {
 		if (pool == null) {
