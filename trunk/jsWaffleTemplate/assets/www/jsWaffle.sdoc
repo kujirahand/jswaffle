@@ -137,8 +137,17 @@
 /**
  * stop sound
  * @id droid.stopSound
- * @param {MediaPlayer}
+ * @param {MediaPlayer} playerObj
+ * @return {Void}
  */
+
+/**
+ * Check playing sound 
+ * @id droid.isPlayingSound 
+ * @param {MediaPlayer} playerObj
+ * @return {Boolean}
+ */
+
 
 /**
  * load to SoundPool (for SE)

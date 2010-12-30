@@ -36,18 +36,26 @@
 	
 	<h2>Sound/Video</h2>	
 	<div class="buttons">
-		<button onclick="TestPlayer()">Play Sound(load&Play)</button>
-		<button onclick="TestSoundPool()">Play Sound(SoundPool)</button>
+		<button onclick="TestPlayer()">BGM:Play | Stop</button>
+		<button onclick="TestSoundPool()">SE:Play SoundPool</button>
 		<button onclick="droid.startIntent('http://www.youtube.com/watch?v=kbRBQ5c51eo')">Play Video(YouTube)</button>
 	</div>
 	<script>
-		// for SoundPool Test
+		// for SoundPool Test (ogg file)
 		var soundId = droid.loadSoundPool("file:///android_asset/www/res/beep.ogg");
 		function TestSoundPool() {
 			droid.playSoundPool(soundId, 2);
 		}
+		var playerObj = null;
 		function TestPlayer() {
-			droid.playSound('www/res/beep.ogg');
+			if (playerObj == null) {
+				playerObj = droid.playSound('www/res/beet.ogg', true);
+			} else {
+				if (droid.isPlayingSound(playerObj)) {
+					droid.stopSound(playerObj);
+				} 
+				playerObj = null;
+			}
 			//droid.playSound('www/res/test.mp3');
 		}
 	</script>

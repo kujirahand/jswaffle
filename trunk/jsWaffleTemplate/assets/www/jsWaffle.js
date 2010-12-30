@@ -266,8 +266,14 @@ plugin_defineDroidMethod(
 		
 		/** @id droid.stopSound */
 		stopSound : {
-			droid : function (playObj) { _base.stopPlayer(playerObj); /* or playerObj.stop() */ },
+			droid : function (playerObj) { _base.stopPlayer(playerObj); /* or playerObj.stop() */ },
 			cross : function () {}
+		},
+		
+		/** @id droid.isPlayingSound */
+		isPlayingSound : {
+			droid : function (playerObj) { return _base.isPlayingSound(playerObj); },
+			cross : function () { return false; }
 		},
 		
 		/** @id droid.loadSoundPool */
