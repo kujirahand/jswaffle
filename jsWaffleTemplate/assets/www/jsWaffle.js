@@ -131,6 +131,44 @@ plugin_defineDroidMethod(
 			cross : function (message) { console.log('makeToast:' + message); }
 		},
 		
+		/** @id droid.addEventListener */
+		addEventListener : {
+			droid : function (eventName, listener) {
+				if (typeof(self.droid._addEventListener) != "function") {
+					self.droid._addEventListener = function (tag, args) {
+						var f = func_bank.getItem(tag);
+						if (typeof(f) == "function") {
+							f(args);
+						}
+					};
+					self.droid._addEventListener_items = [];
+				}
+				var tag = func_bank.registerItem(listener);
+				_base.addEventListener(eventName, "droid._addEventListener", tag);
+				self.droid._addEventListener_items.push({"tag":tag, "listener": listener});
+			},
+			cross : function (eventName, listener) {
+				console.log('addEventListener:' + eventName);
+			}
+		},
+		
+		/** @id droid.removeEventListener */
+		removeEventListener : {
+			droid : function (eventName, listener) {
+				if (self.droid._addEventListener_items == null) return;
+				for (var i = 0; i < self.droid._addEventListener_items.length; i++) {
+					var n = self.droid._addEventListener_items[i];
+					if (n.listener == listener) {
+						_base.removeEventListener(eventName, n.tag);
+						break;
+					}
+				}
+			},
+			cross : function (eventName, listener) {
+				console.log('removeEventListener:' + eventName);
+			}
+		},
+		
 		/** @id droid.setMenuItem */
 		setMenuItem : {
 			droid : function (itemNo, visible, title, iconName, callback) {

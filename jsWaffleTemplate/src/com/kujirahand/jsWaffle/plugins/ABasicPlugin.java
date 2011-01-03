@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 import com.kujirahand.jsWaffle.WaffleActivity;
@@ -86,9 +88,7 @@ public class ABasicPlugin extends WafflePlugin
 		}
 		return waffle_activity.getResources().getString(id);
 	}
-	
-	
-	
+		
 	/**
 	 * beep
 	 */
@@ -507,6 +507,67 @@ public class ABasicPlugin extends WafflePlugin
 			callJsEvent(param);
 		}
 	}
+	
+	private Hashtable<String, EventList> eventList = null;
+	public void addEventListener(String eventName, String callback, int tag) {
+		if (eventList == null) eventList = new Hashtable<String, EventList>();
+		EventList e = eventList.get(eventName);
+		if (e == null) {
+			e = new EventList();
+			eventList.put(eventName, e);
+		}
+		EventListItem i = new EventListItem();
+		i.callback = callback;
+		i.tag = tag;
+		e.list.add(i);
+	}
+	public void removeEventListener(String eventName, int tag) {
+		if (eventList == null) return;
+		EventList e = eventList.get(eventName);
+		if (e == null) return;
+		for (int i = 0; i < e.list.size(); i++) {
+			EventListItem item = e.list.get(i);
+			if (item.tag == i) {
+				e.list.remove(i);
+				break;
+			}
+		}
+	}
+	
+	private void doEventListener(String eventName, String paramStr) {
+		if (eventList == null) return;
+		EventList e = eventList.get(eventName);
+		if (e == null) return;
+		for (int i = 0; i < e.list.size(); i++) {
+			EventListItem item = e.list.get(i);
+			String args = "";
+			if (paramStr != null) {
+				args = item.tag + "," + paramStr;
+			} else {
+				args = Integer.toString(item.tag);
+			}
+			String p = String.format("%s(%s)", item.callback, args);
+			callJsEvent(p);
+		}
+	}
+	
+	@Override
+	public void onPause() { doEventListener("pause", null); }
+	@Override
+	public void onResume() { doEventListener("resume", null); }
+	@Override
+	public void onDestroy() { doEventListener("destroy", null); }
+	@Override
+	public void onPageStarted(String url) {
+		// remove listener
+		if (eventList != null) {
+			eventList.clear();
+			eventList = null;
+		}
+	}
+	@Override
+	public void onPageFinished(String url){ doEventListener("pageFinished", url); }
+
 		
 	//---------------------------------------------------------------
 	// Private method
@@ -514,5 +575,13 @@ public class ABasicPlugin extends WafflePlugin
     public void callJsEvent(String query) {
         waffle_activity.callJsEvent(query);
     }
+    class EventListItem {
+    	String callback;
+    	int tag;
+    }
+	class EventList {
+		ArrayList<EventListItem> list = new ArrayList<EventListItem>();
+	}
+	
 
 }

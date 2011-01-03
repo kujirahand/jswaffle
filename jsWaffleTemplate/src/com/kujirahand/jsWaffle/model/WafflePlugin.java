@@ -25,7 +25,7 @@ public class WafflePlugin implements IWafflePlugin {
 	@Override
 	public void onResume() {
 	}
-
+	
 	@Override
 	public void onPageStarted(String url) {
 	}

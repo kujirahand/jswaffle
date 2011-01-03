@@ -16,15 +16,28 @@ public class WafflePluginManager {
 	}
 
 	public void onPause() {
+		waffle_activity.log("onPause");
     	for (IWafflePlugin plugin : items) {
 			plugin.onPause();
 		}
 	}
+	
 	public void onResume() {
+		waffle_activity.log("onResume");
     	for (IWafflePlugin plugin : items) {
 			plugin.onResume();
 		}
 	}
+	
+	/*
+	public void onUnload() {
+		waffle_activity.log("onUnload");
+    	for (IWafflePlugin plugin : items) {
+			plugin.onUnload();
+		}
+	}
+	*/
+	
 	public void onDestroy() { // Remove listener from system
 		waffle_activity.log("onDestroy");
     	for (IWafflePlugin plugin : items) {
@@ -42,7 +55,7 @@ public class WafflePluginManager {
 	 * @param url
 	 */
 	public void onPageStarted(String url) {
-		// waffle_activity.log("onPageStarted:" + url);
+		waffle_activity.log("onPageStarted:" + url);
     	for (IWafflePlugin plugin : items) {
 			plugin.onPageStarted(url);
 		}
@@ -52,7 +65,7 @@ public class WafflePluginManager {
 	 * @param url
 	 */
 	public void onPageFinished(String url) {
-		// waffle_activity.log("onPageFinished:" + url);
+		waffle_activity.log("onPageFinished:" + url);
     	for (IWafflePlugin plugin : items) {
 			plugin.onPageFinished(url);
 		}

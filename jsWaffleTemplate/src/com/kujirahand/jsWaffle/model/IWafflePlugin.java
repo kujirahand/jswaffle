@@ -18,6 +18,7 @@ public interface IWafflePlugin {
 	/* activity events */
 	void onPause();
 	void onResume();
+	// void onUnload(); // Android1.6 not supported
 	void onDestroy(); // To remove listener from system
 	void onActivityResult(int requestCode, int resultCode, Intent intent);
 	/* webview event */

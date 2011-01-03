@@ -2,6 +2,9 @@
  * ScriptDoc for jsWaffle.js
  */
 
+//---------------------------------------------------------------------
+// _base
+//---------------------------------------------------------------------
 /**
  * get jsWaffle API Version
  * @id droid.getWaffleVersion
@@ -9,9 +12,6 @@
  * @return {Number} version number
  */
 
-//---------------------------------------------------------------------
-// _base
-//---------------------------------------------------------------------
 /**
  * beep sound
  * ビープ音を鳴らす
@@ -120,9 +120,21 @@
  * @return {String} Get String from resource
  */
 
+/**
+ * Add Event Listener
+ * イベントリスナを追加する(resume/pause/pageFinished)
+ * @droid.addEventListener
+ * @param {String} eventName
+ * @param {Function} listener
+ */
 
-
-
+/**
+ * Remove Event Listener
+ * イベントリスナを削除する
+ * @droid.addEventListener
+ * @param {String} eventName
+ * @param {Function} listener
+ */
 
 /**
  * sound play
