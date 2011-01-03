@@ -11,6 +11,8 @@
 			var disp = droid.getDisplayInfo();
 			$("info").innerHTML = "Android ver." + droid.getAndroidVersionRelease() +
 				" (" + disp.width + "x" + disp.height + "px)";
+			droid.addEventListener("pause", function(){ droid.log("droid:pause") });
+			droid.addEventListener("resume", function(){ droid.log("droid:resume"); });
 			setMyMenuItem();
 		}
 	</script>
