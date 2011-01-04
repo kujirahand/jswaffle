@@ -73,6 +73,13 @@ public class DialogHelper {
 		    	result.confirm("false");
 		    }
 		})
+        .setOnCancelListener(
+                new DialogInterface.OnCancelListener() {
+                    public void onCancel(DialogInterface dialog) {
+                        result.cancel();
+                    }
+                })
+        .setCancelable(true)
 		.show();
 		return true;
 	}
@@ -90,6 +97,13 @@ public class DialogHelper {
 				result.confirm(ans);
 			}
 		})
+        .setOnCancelListener(
+                new DialogInterface.OnCancelListener() {
+                    public void onCancel(DialogInterface dialog) {
+                        result.cancel();
+                    }
+                })
+        .setCancelable(true)
 		.show();
 		return true;
 	}
@@ -129,6 +143,13 @@ public class DialogHelper {
 				result.confirm("");
 			}
 		})
+        .setOnCancelListener(
+            new DialogInterface.OnCancelListener() {
+                public void onCancel(DialogInterface dialog) {
+                    result.confirm("");
+                }
+            })
+        .setCancelable(true)
 		.show();
 		return true;
 	}
@@ -156,6 +177,7 @@ public class DialogHelper {
 		};
 		DatePickerDialog d = new DatePickerDialog(waffle_activity, mDateSetListener, 
 				defYear, defMon, defDate);
+		d.setCancelable(false);
 		d.show();
 		return true;
 	}
@@ -176,6 +198,7 @@ public class DialogHelper {
 			}
 		};
 		TimePickerDialog d = new TimePickerDialog(waffle_activity, mTimeSetListener, defHour, defMin, true);
+		d.setCancelable(false);
 		d.show();
 		return true;
 	}

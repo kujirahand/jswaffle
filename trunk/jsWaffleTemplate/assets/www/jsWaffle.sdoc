@@ -111,6 +111,19 @@
  * @id droid.log 
  * @param {String} msg	log message
  */
+/**
+ * show log
+ * DDMSに警告ログを表示する 
+ * @id droid.log_warn 
+ * @param {String} msg	log message
+ */
+/**
+ * show log
+ * DDMSにエラーログを表示する 
+ * @id droid.log_error 
+ * @param {String} msg	log message
+ */
+
 
 /**
  * Get Res Strings
@@ -123,7 +136,7 @@
 /**
  * Add Event Listener
  * イベントリスナを追加する(resume/pause/pageFinished)
- * @droid.addEventListener
+ * @id droid.addEventListener
  * @param {String} eventName
  * @param {Function} listener
  */
@@ -131,7 +144,7 @@
 /**
  * Remove Event Listener
  * イベントリスナを削除する
- * @droid.addEventListener
+ * @id droid.removeEventListener
  * @param {String} eventName
  * @param {Function} listener
  */
@@ -278,14 +291,23 @@
  */
 
 /**
+ * http post
+ * @id droid.httpPost
+ * @param {String} url
+ * @param {Object} post_obj
+ * @param {Function} callback	set Function(result)
+ */
+
+
+/**
  * copy text to clipboard
- * @id dorid.clipboardSetText
+ * @id droid.clipboardSetText
  * @param {String} text
  */
 
 /**
  * get text from clipboard
- * @id dorid.clipboardGetText
+ * @id droid.clipboardGetText
  * @return {String} text
  */
 

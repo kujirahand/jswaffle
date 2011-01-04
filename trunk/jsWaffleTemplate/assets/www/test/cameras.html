@@ -32,6 +32,7 @@
 	<h2>Camera/Video</h2>
 	<div class="buttons">
 		<button onclick="TestCamera()">Camera</button>
+		<button onclick="TestCameraMail()">Camera+Mail</button>
 		<button onclick="TestVideo()">Video</button>
 	</div>
 	<script>
@@ -39,13 +40,29 @@
 			droid.startIntentForResult(
 				"camera:/sdcard/hoge.jpg",
 				function(code){
-					droid.startIntent("file:/sdcard/hoge.jpg");
+					if (code == 0) {
+						alert("canceled"); return;
+					}
+					droid.startIntent("file:///sdcard/hoge.jpg");
+				});
+		}
+		function TestCameraMail() {
+			droid.startIntentForResult(
+				"camera:/sdcard/hoge.jpg",
+				function(code){
+					if (code == 0) {
+						alert("canceled"); return;
+					}
+					droid.startIntent("mailto:test@example.com?subject=camera&attach=/sdcard/hoge.jpg");
 				});
 		}
 		function TestVideo() {
 			droid.startIntentForResult(
 				"video:/sdcard/hoge.mpg",
 				function(code){
+					if (code == 0) {
+						alert("canceled"); return;
+					}
 					droid.startIntent("file:/sdcard/hoge.mpg");
 				});
 		}

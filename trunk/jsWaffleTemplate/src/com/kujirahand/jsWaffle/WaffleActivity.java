@@ -3,6 +3,7 @@ package com.kujirahand.jsWaffle;
 import com.kujirahand.jsWaffle.model.IWafflePlugin;
 import com.kujirahand.jsWaffle.model.WafflePluginManager;
 import com.kujirahand.jsWaffle.plugins.AccelPlugin;
+import com.kujirahand.jsWaffle.plugins.ContactPlugin;
 import com.kujirahand.jsWaffle.plugins.DatabasePlugin;
 import com.kujirahand.jsWaffle.plugins.DevInfoPlugin;
 import com.kujirahand.jsWaffle.plugins.GPSPlugin;
@@ -99,6 +100,7 @@ public class WaffleActivity extends Activity {
     	addPlugin("_gps", new GPSPlugin());
     	addPlugin("_storage", new StoragePlugin());
     	addPlugin("_dev", new DevInfoPlugin());
+    	addPlugin("_contact", new ContactPlugin());
     }
     
     protected IWafflePlugin addPlugin(String jsName, IWafflePlugin plugin) {
@@ -381,11 +383,18 @@ public class WaffleActivity extends Activity {
 					android.R.string.ok,
 					new DialogInterface.OnClickListener()
 					{
+						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							result.confirm();
 						}
 					})
-				.setCancelable(false) // true にすると[back]ボタンをで戻ったとき、再度このイベントが呼ばれない
+				.setCancelable(true)
+		        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+					@Override
+					public void onCancel(DialogInterface dialog) {
+						result.cancel();
+					}
+				})
 				.create()
 				.show();
 			return true;
@@ -401,6 +410,7 @@ public class WaffleActivity extends Activity {
 		        		android.R.string.ok,
 		        		new DialogInterface.OnClickListener()
 		        {
+					@Override
 		            public void onClick(DialogInterface dialog, int which)
 		            {
 		                result.confirm();
@@ -409,11 +419,19 @@ public class WaffleActivity extends Activity {
 		        .setNegativeButton(android.R.string.cancel,
 		                new DialogInterface.OnClickListener()
 		        {
+					@Override
 		            public void onClick(DialogInterface dialog, int which)
 		            {
 		                result.cancel();
 		            }
 		        })
+		        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+					@Override
+					public void onCancel(DialogInterface dialog) {
+						result.cancel();
+					}
+				})
+		        .setCancelable(true)
 		        .create()
 		        .show();
 		        return true;			
@@ -426,28 +444,32 @@ public class WaffleActivity extends Activity {
 			// prompt() を拡張して様々な用途のダイアログを表示する
 			DialogHelper.waffle_activity = mainInstance;
 			boolean r = true;
-			switch (ABasicPlugin.dialogType) {
-			case ABasicPlugin.DIALOG_TYPE_DEFAULT:
-				r = DialogHelper.inputDialog("Prompt", message, defaultValue, result);
-				break;
-			case ABasicPlugin.DIALOG_TYPE_YESNO:
-				r = DialogHelper.dialogYesNo(ABasicPlugin.dialogTitle, message, defaultValue, result);
-				break;
-			case ABasicPlugin.DIALOG_TYPE_SELECT_LIST:
-				r = DialogHelper.selectList(ABasicPlugin.dialogTitle, message, defaultValue, result);
-				break;
-			case ABasicPlugin.DIALOG_TYPE_CHECKBOX_LIST:
-				r = DialogHelper.checkboxList(ABasicPlugin.dialogTitle, message, defaultValue, result);
-				break;
-			case ABasicPlugin.DIALOG_TYPE_DATE:
-				r = DialogHelper.datePickerDialog(ABasicPlugin.dialogTitle, message, defaultValue, result);
-				break;
-			case ABasicPlugin.DIALOG_TYPE_TIME:
-				r = DialogHelper.timePickerDialog(ABasicPlugin.dialogTitle, message, defaultValue, result);
-				break;
-			case ABasicPlugin.DIALOG_TYPE_PROGRESS:
-				r = DialogHelper.seekbarDialog(ABasicPlugin.dialogTitle, message, defaultValue, result);
-				break;
+			try {
+				switch (ABasicPlugin.dialogType) {
+				case ABasicPlugin.DIALOG_TYPE_DEFAULT:
+					r = DialogHelper.inputDialog("Prompt", message, defaultValue, result);
+					break;
+				case ABasicPlugin.DIALOG_TYPE_YESNO:
+					r = DialogHelper.dialogYesNo(ABasicPlugin.dialogTitle, message, defaultValue, result);
+					break;
+				case ABasicPlugin.DIALOG_TYPE_SELECT_LIST:
+					r = DialogHelper.selectList(ABasicPlugin.dialogTitle, message, defaultValue, result);
+					break;
+				case ABasicPlugin.DIALOG_TYPE_CHECKBOX_LIST:
+					r = DialogHelper.checkboxList(ABasicPlugin.dialogTitle, message, defaultValue, result);
+					break;
+				case ABasicPlugin.DIALOG_TYPE_DATE:
+					r = DialogHelper.datePickerDialog(ABasicPlugin.dialogTitle, message, defaultValue, result);
+					break;
+				case ABasicPlugin.DIALOG_TYPE_TIME:
+					r = DialogHelper.timePickerDialog(ABasicPlugin.dialogTitle, message, defaultValue, result);
+					break;
+				case ABasicPlugin.DIALOG_TYPE_PROGRESS:
+					r = DialogHelper.seekbarDialog(ABasicPlugin.dialogTitle, message, defaultValue, result);
+					break;
+				}
+			} catch (Exception e) {
+				log("[DialogError]" + e.getMessage());
 			}
 			return r;
 		}

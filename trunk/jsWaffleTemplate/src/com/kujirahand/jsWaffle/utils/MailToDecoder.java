@@ -9,6 +9,7 @@ public class MailToDecoder {
 	public String mail;
 	public String subject;
 	public String body;
+	public String attach;
 	public Hashtable<String, String> query;
 	
 	public MailToDecoder(String uri) {
@@ -45,6 +46,7 @@ public class MailToDecoder {
 		try {
 			subject = query.get("subject");
 			body = query.get("body");
+			attach = query.get("attach");
 		}
 		finally {
 			if (subject == null) { subject = ""; }

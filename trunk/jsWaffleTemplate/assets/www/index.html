@@ -66,10 +66,18 @@
 	<div class="buttons">
 		<button onclick="TestSendMail()">Send Mail</button>
 		<button onclick="droid.startIntent('tel:117')">Call 117</button>
+		<button onclick="TestContact()">Contact</button>
 	</div>
 	<script>
 		function TestSendMail() {
 			droid.startIntent("mailto:web@kujirahand.com?subject=About_jsWaffle&body=test");
+		}
+		function TestContact() {
+			droid.pickupContact(function(obj){
+				if (obj == null) return;
+				alert(JSON.stringify(obj));
+				droid.startIntent("mailto:" + obj["email"] + "?subject=test");
+			});
 		}
 	</script>
 	
