@@ -1011,6 +1011,26 @@ plugin_defineDroidMethod(
 );
 
 
+plugin_defineDroidMethod(
+		{ pluginName:'_contact', className:'ContactPlugin' },
+		{
+			/** @id droid.pickupContact */
+			pickupContact : {
+				droid : function (callback) {
+					var tag = func_bank.registerItem(callback);
+					self.droid._pickupContact = function (tag, obj) {
+						var f = func_bank.getItem(tag);
+						f(obj);
+					};
+					var str = _contact.pickupContact("droid._pickupContact", tag);
+				},
+				cross : function (callback) { callback(null); }
+			},
+			___ : end_of_define_method
+		}
+	);
+
+
 
 //JSON.stringfy for Android 1.6
 var escapeString = function (str) {

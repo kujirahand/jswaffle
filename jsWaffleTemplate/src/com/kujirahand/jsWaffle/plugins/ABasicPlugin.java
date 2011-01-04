@@ -38,7 +38,8 @@ import android.widget.Toast;
  */
 public class ABasicPlugin extends WafflePlugin
 {
-	public static int ACTIVITY_REQUEST_CODE_BARCODE = 0xFF0001;
+	public final static int ACTIVITY_REQUEST_CODE_BARCODE = 0xFF0001;
+	public final static int ACTIVITY_REQUEST_CODE_CONTACT = 0xFF0002;
 	//
 	public final static int DIALOG_TYPE_DEFAULT = 0;
 	public final static int DIALOG_TYPE_YESNO = 0x10;

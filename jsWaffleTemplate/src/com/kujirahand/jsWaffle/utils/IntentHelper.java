@@ -52,16 +52,22 @@ public class IntentHelper {
 	  	}
 		else if (url.startsWith("mailto:"))
 		{
-			// mailto:hoge@example.com?subject=test&body=hogehoge
+			// mailto:hoge@example.com?subject=test&body=hogehoge&attach=/sdcard/hoge.jpg
 			Uri mailUri = Uri.parse(url);
 			MailToDecoder dec = new MailToDecoder(url);
 			String subject = dec.subject;
 			String body = dec.body;
+			String attach = dec.attach;
 			Intent intentMail = new Intent(Intent.ACTION_SENDTO, mailUri);
 			intentMail.putExtra(Intent.EXTRA_SUBJECT, subject);
 			intentMail.putExtra(Intent.EXTRA_TEXT, body);
 			intentMail.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			//TODO:mailto attachfile
+			if (attach != null) { // attachfile
+				Uri uri = WaffleUtils.checkFileUri(attach);
+				intentMail.putExtra(Intent.EXTRA_STREAM, uri);
+				String mime = getContentType(uri.toString());
+				intentMail.setType(mime);
+			}
 			appContext.startActivity(intentMail);
 			return true;
 		}
