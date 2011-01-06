@@ -25,7 +25,9 @@ public class GPSPlugin extends WafflePlugin
 		geo.callback_ok = callback_ok;
 		geo.callback_ng = callback_ng;
 		geo.report_count = 1;
+		geo.accuracy_fine = accuracy_fine;
 		geo.start(accuracy_fine);
+		geo.flagLive = true;
 		return listeners.size();
 	}
 	
@@ -35,8 +37,10 @@ public class GPSPlugin extends WafflePlugin
 		geo.tag = tag;
 		geo.callback_ok = callback_ok;
 		geo.callback_ng = callback_ng;
-		geo.report_count = 1;
-		geo.start(accuracy_fine);
+		geo.report_count = 0;
+		geo.accuracy_fine = accuracy_fine;
+		geo.start(false);
+		geo.flagLive = true;
 		return listeners.size();
 	}
 	
@@ -100,6 +104,8 @@ class GeoListener implements LocationListener
 	public String callback_ng = "DroidWaffle._geolocation_fn_ng";
 	public WaffleActivity waffle_activity;
 	public int tag = -1;
+	public boolean accuracy_fine = false;
+	public boolean accuracy_fine_last = false;
 	
 	public GeoListener(WaffleActivity app) {
 		this.waffle_activity = app;
@@ -110,6 +116,7 @@ class GeoListener implements LocationListener
 	}
 	
 	public void start(boolean accuracy_fine) {
+		accuracy_fine_last = accuracy_fine;
 		// select provider
 		Criteria crit = new Criteria();
 		if (accuracy_fine) {
@@ -150,14 +157,29 @@ class GeoListener implements LocationListener
 				stop();
 			}
 		}
+		
 		// Call Event
-		String param = "" +
-		location.getLatitude() + "," +
-		location.getLongitude() + "," +
-		location.getAltitude() + "," +
+		// (HTML5 geolocations 互換)
+		String param = "{" +
+		"coords:{" +
+			"latitude:"  + location.getLatitude() + "," + // 緯度
+			"longitude:" + location.getLongitude() + "," + // 経度
+			"altitude:" + location.getAltitude() + "," + // 標高
+			"accuracy:" + location.getAccuracy() + "," + // 精度
+			"heading:" + location.getBearing() + "," + // 方向
+			"speed:" + location.getSpeed() + "," + // 速度
+		"}," +
+		"timestamp:" + location.getTime() + // 時間
+		"}," + 
 		tag;
 		String q = callback_ok + "(" + param + ")";
 		waffle_activity.callJsEvent(q);
+		
+		if (accuracy_fine != accuracy_fine_last) {
+			stop();
+			start(accuracy_fine);
+			waffle_activity.log("[Location] change provider");
+		}
 	}
 
 	@Override

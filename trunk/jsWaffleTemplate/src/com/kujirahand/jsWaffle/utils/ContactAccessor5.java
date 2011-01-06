@@ -110,9 +110,11 @@ public class ContactAccessor5 extends ContactAccessor {
 			c = cr.query(
 					cu, null, ci + " = ?",
 					new String[] { id }, null);
-			if (c.moveToFirst()) {
+			while (c.moveToNext()) {
 				int emailIndex = c.getColumnIndex(getFieldStr(_CommonDataKinds_Email, "DATA"));
-				email = c.getString(emailIndex);
+				String s = c.getString(emailIndex);
+				if (email != "") email += ",";
+				email += s;
 			}
 			// --- phone number
 			cu = getFieldUri(_CommonDataKinds_Phone, "CONTENT_URI");

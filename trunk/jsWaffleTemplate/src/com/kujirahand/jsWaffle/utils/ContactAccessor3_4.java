@@ -37,14 +37,16 @@ public class ContactAccessor3_4 extends ContactAccessor {
 				Contacts.ContactMethods.CONTENT_EMAIL_URI, null,
 				Contacts.ContactMethods.PERSON_ID + " = ?",
 				new String[] { id }, null);
-			if (c.moveToFirst()) {
+			while (c.moveToNext()) {
 				int emailIndex = c.getColumnIndexOrThrow(ContactMethodsColumns.DATA);
-				email = c.getString(emailIndex);
+				String s = c.getString(emailIndex);
+				if (email != "") email += ",";
+				email += s;
 			}
 			// set info
 			result.put("name", name);
-			result.put("email", email);
 			result.put("number", number);
+			result.put("email", email);
 		} finally {
 			if (c != null) {
 				c.close();

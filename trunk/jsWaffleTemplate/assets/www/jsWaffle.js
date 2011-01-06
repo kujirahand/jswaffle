@@ -6,7 +6,6 @@ jsWaffle for Android (JavaScript Wrapper)
 /**
  * @projectDescription jsWaffle for Android (JavaScript Wrapper)
  * @author	kujirahand.com (http://kujirahand.com)
- * @version	1.3
  * @see http://d.aoikujira.com/jsWaffle/wiki/
  */
 
@@ -729,9 +728,9 @@ plugin_defineDroidMethod(
 					'ok': onSuccess,
 					'ng': onError
 				});
-				self.droid._geolocation_fn_ok = function (lat,lon,alt, tag) {
+				self.droid._geolocation_fn_ok = function (obj, tag) {
 					var o = func_bank.getItem(tag);
-					if (typeof(o.ok) == "function") o.ok(lat,lon,alt);
+					if (typeof(o.ok) == "function") o.ok(obj);
 				};
 				self.droid._geolocation_fn_ng = function (err, tag) {
 					if (typeof(o.ng) == "function") o.ng(err);
@@ -757,9 +756,9 @@ plugin_defineDroidMethod(
 					'ok': onSuccess,
 					'ng': onError
 				});
-				self.droid._watchPosition_ok = function (lat,lon,alt, tag) {
+				self.droid._watchPosition_ok = function (obj, tag) {
 					var o = func_bank.getItem(tag);
-					if (typeof(o.ok) == "function") o.ok(lat,lon,alt);
+					if (typeof(o.ok) == "function") o.ok(obj);
 				};
 				self.droid._watchPosition_ng = function (err, tag) {
 					if (typeof(o.ng) == "function") o.ng(err);
@@ -799,9 +798,8 @@ if (typeof(navigator.geolocation) == "undefined") {
 			var tag = func_bank.registerItem({
 				ok: ok_f, ng: ng_f
 			});
-			self.droid._getCurrentPosition_ok = function(lat, lon, alt) {
-				var p = {latitude:lat, longitude:lon, altitude:alt};
-				if (typeof(ok_f) == "function") ok_f(p);
+			self.droid._getCurrentPosition_ok = function(obj, tag) {
+				if (typeof(ok_f) == "function") ok_f(obj);
 			};
 			self.droid._getCurrentPosition_ng = function(err) {
 				if (typeof(ng_f) == "function") ng_f(err);
@@ -821,9 +819,8 @@ if (typeof(navigator.geolocation) == "undefined") {
 			var tag = func_bank.registerItem({
 				ok: ok_f, ng: ng_f
 			});
-			self.droid._getCurrentPosition_ok = function(lat, lon, alt) {
-				var p = {latitude:lat, longitude:lon, altitude:alt};
-				if (typeof(ok_f) == "function") ok_f(p);
+			self.droid._getCurrentPosition_ok = function(obj) {
+				if (typeof(ok_f) == "function") ok_f(obj);
 			};
 			self.droid._getCurrentPosition_ng = function(err) {
 				if (typeof(ng_f) == "function") ng_f(err);
@@ -1080,6 +1077,3 @@ self.droid.stringify = stringify;
 
 
 })(this);
-
-
-
