@@ -37,59 +37,53 @@
 		<button  id="bntLocation2" onclick="getLoc2()">Get Location&Show Map</button>
 		<script>
 			var watchid = 0;
+			
 			function getLoc() {
 				$("bntLocation").disabled = true;
-				/*
 				// jsWaffle original method
 				watchid = droid.getCurrentPosition(
-					function(lat, lon, alt) {
-						droid.vibrate(500);
-						alert("geo:" + lat + "," + lon);
-						$("bntLocation").disabled = false;
-					},
-					function (err) { droid.vibrate(500); alert("err:" + err);}
-				);
-				*/
+					showLocation,
+					errorLocation);
+				/*
 				// HTML5 geolocation method
 				navigator.geolocation.getCurrentPosition(
-					function(position){
-						var lat = position.coords.latitude;
-						var lon = position.coords.longitude;
-					 	droid.vibrate(500);
-						alert("geo:" + lat + "," + lon);
-						$("bntLocation").disabled = false;
-					},
-					function(err) { alert("err:" + err); },
-					{"enableHighAccuracy": true}
-				);
+					showLocation,
+					errorLocation);
+				*/
+			}
+			// Show Position Info
+			function showLocation(position) {
+				$("bntLocation").disabled = false;
+				var lat = position.coords.latitude;
+				var lon = position.coords.longitude;
+				var acc = position.coords.accuracy ;
+			 	droid.vibrate(500);
+				alert("geo:" + lat + "," + lon + "," + acc);
+			}
+			function errorLocation (err) {
+				$("bntLocation").disabled = false;
+				alert("location error : " + err);
 			}
 			function cancelLoc() {
 				// droid.clearWatchPosition(watchid);
 				navigator.geolocation.clearWatch(watchid);
+				$("bntLocation").disabled = false;
+				$("bntLocation2").disabled = false;
 			}
 			function getLoc2() {
 				$("bntLocation2").disabled = true;
-				// html5 method
-				navigator.geolocation.getCurrentPosition(
-					function(position){
-						var lat = position.coords.latitude;
-						var lon = position.coords.longitude;
-					 	droid.vibrate(500);
-						droid.startIntent("geo:" + lat + "," + lon);
-						$("bntLocation2").disabled = false;
-					},
-					function(err) { alert("err:" + err); },
-					{"enableHighAccuracy": false}
-				);
-				/*
-				watchid = droid.watchPosition(function(lat,lon,alt){
-					droid.clearWatchPosition(watchid);
-				 	droid.vibrate(500);
-					droid.startIntent("geo:" + lat + "," + lon);
-					$("bntLocation2").disabled = false;
-				}, function(err){
-				});
-				*/
+				watchid = droid.getCurrentPosition(
+					showLocation2,
+					errorLocation);
+			}
+			function showLocation2(position){
+				$("bntLocation").disabled = false;
+				var lat = position.coords.latitude;
+				var lon = position.coords.longitude;
+				var acc = position.coords.accuracy ;
+			 	droid.vibrate(500);
+				droid.startIntent("geo:" + lat + "," + lon + "," + acc);
+				$("bntLocation2").disabled = false;
 			}
 		</script>
 	</div>

@@ -75,7 +75,7 @@
 		function TestContact() {
 			droid.pickupContact(function(obj){
 				if (obj == null) return;
-				alert(JSON.stringify(obj));
+				// alert(droid.stringify(obj));
 				droid.startIntent("mailto:" + obj["email"] + "?subject=test");
 			});
 		}

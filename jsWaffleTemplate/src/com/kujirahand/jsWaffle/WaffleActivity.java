@@ -40,7 +40,7 @@ import android.widget.LinearLayout;
 public class WaffleActivity extends Activity {
 	
 	/** jsWaffle Version Info */
-	public static double WAFFLE_VERSON = 1.153;
+	public static double WAFFLE_VERSON = 1.161;
 	
 	
 	public static WaffleActivity mainInstance = null;
