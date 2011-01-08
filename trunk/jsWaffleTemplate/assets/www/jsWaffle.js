@@ -22,8 +22,10 @@ if (typeof(self.$) == 'undefined') {
 	self.$ = function (id) {
 		var obj = document.getElementById(id);
 		// extends dom obj
-		obj.hide = function() { this.style.display = "none";  };
-		obj.show = function() { this.style.display = "block"; };
+		if (obj != null) {
+			obj.hide = function() { this.style.display = "none";  };
+			obj.show = function() { this.style.display = "block"; };
+		}
 		return obj;
 	};
 	
@@ -718,12 +720,13 @@ plugin_defineDroidMethod(
 	}
 );
 
+
 plugin_defineDroidMethod(
 	{ pluginName:'_gps', className:'GPSPlugin' },
 	{
 		/** @id droid.getCurrentPosition */
 		getCurrentPosition : {
-			droid : function (onSuccess, onError, accuracy_fine) {
+			droid : function (onSuccess, onError, option) {
 				var tag = func_bank.registerItem({
 					'ok': onSuccess,
 					'ng': onError
@@ -733,14 +736,20 @@ plugin_defineDroidMethod(
 					if (typeof(o.ok) == "function") o.ok(obj);
 				};
 				self.droid._geolocation_fn_ng = function (err, tag) {
+					var o = func_bank.getItem(tag);
 					if (typeof(o.ng) == "function") o.ng(err);
 				};
-				if (accuracy_fine == undefined) accuracy_fine = true;
+				// check option
+				if (option == undefined || option == null) option = {};
+				self.droid._geolocation_check_option(option);
+				
 				// register callback function
 				return _gps.getCurrentPosition(
 					"droid._geolocation_fn_ok",
 					"droid._geolocation_fn_ng",
-					accuracy_fine,
+					option.enableHighAccuracy,
+					option.timeout,
+					option.maximumAge,
 					tag
 				);
 			},
@@ -751,7 +760,7 @@ plugin_defineDroidMethod(
 		
 		/** @id droid.watchPosition */
 		watchPosition : {
-			droid : function (onSuccess, onError, accuracy_fine) {
+			droid : function (onSuccess, onError, option) {
 				var tag = func_bank.registerItem({
 					'ok': onSuccess,
 					'ng': onError
@@ -761,17 +770,22 @@ plugin_defineDroidMethod(
 					if (typeof(o.ok) == "function") o.ok(obj);
 				};
 				self.droid._watchPosition_ng = function (err, tag) {
+					var o = func_bank.getItem(tag);
 					if (typeof(o.ng) == "function") o.ng(err);
 				};
-				if (accuracy_fine == undefined) accuracy_fine = true;
+				// check option
+				if (option == undefined || option == null) option = {};
+				self.droid._geolocation_check_option(option);
 				return _gps.watchPosition(
 					"droid._watchPosition_ok",
 					"droid._watchPosition_ng",
-					accuracy_fine,
+					option.enableHighAccuracy,
+					option.timeout,
+					option.maximumAge,
 					tag
 				);
 			},
-			cross : function (onSuccess, onError, accuracy_fine) {
+			cross : function (onSuccess, onError, option) {
 				navigator.geolocation.watchPosition(onSuccess, onError);
 			}
 		},
@@ -790,55 +804,19 @@ plugin_defineDroidMethod(
 		
 	}
 );
+self.droid._geolocation_check_option = function (option) {
+	var def_values = {timeout:0, maximumAge:5000, enableHighAccuracy:true};
+	for (var key in def_values) {
+		if (typeof(option[key]) == "undefined") option[key] = def_values[key];
+	}
+};
 
 // emulate HTML5 geolocation (for Android 1.6)
 if (typeof(navigator.geolocation) == "undefined") {
 	navigator.geolocation = {
-		getCurrentPosition : function (ok_f, ng_f, opt) {
-			var tag = func_bank.registerItem({
-				ok: ok_f, ng: ng_f
-			});
-			self.droid._getCurrentPosition_ok = function(obj, tag) {
-				if (typeof(ok_f) == "function") ok_f(obj);
-			};
-			self.droid._getCurrentPosition_ng = function(err) {
-				if (typeof(ng_f) == "function") ng_f(err);
-			};
-			var accuracy_fine = true;
-			if (typeof(opt) == "object") {
-				accuracy_fine = opt.enableHighAccuracy;
-			}
-			// register callback function
-			return _gps.getCurrentPosition(
-				"droid._getCurrentPosition_ok",
-				"droid._getCurrentPosition_ng",
-				accuracy_fine, tag
-			);
-		},
-		watchPosition : function (ok_f, ng_f, opt) {
-			var tag = func_bank.registerItem({
-				ok: ok_f, ng: ng_f
-			});
-			self.droid._getCurrentPosition_ok = function(obj) {
-				if (typeof(ok_f) == "function") ok_f(obj);
-			};
-			self.droid._getCurrentPosition_ng = function(err) {
-				if (typeof(ng_f) == "function") ng_f(err);
-			};
-			var accuracy_fine = true;
-			if (typeof(opt) == "object") {
-				accuracy_fine = opt.enableHighAccuracy;
-			}
-			// register callback function
-			return _gps.watchPosition(
-				"droid._getCurrentPosition_ok",
-				"droid._getCurrentPosition_ng",
-				accuracy_fine, 0
-			);
-		},
-		clearWatch : function (watchid) {
-			_gps.clearWatch(watchid);
-		}
+		getCurrentPosition : droid.getCurrentPosition,
+		watchPosition : droid.watchPosition,
+		clearWatch : droid.clearWatchPosition
 	};
 }
 

@@ -37,18 +37,30 @@
 		<button  id="bntLocation2" onclick="getLoc2()">Get Location&Show Map</button>
 		<script>
 			var watchid = 0;
+			var pos_options = {
+				enableHighAccuracy: true,
+				timeout: 8 * 1000,
+				maximumAge: 3000
+			};
+			var pos_options2 = {
+				enableHighAccuracy: false,
+				timeout: 10 * 1000,
+				maximumAge: 1000
+			};
 			
 			function getLoc() {
 				$("bntLocation").disabled = true;
 				// jsWaffle original method
 				watchid = droid.getCurrentPosition(
 					showLocation,
-					errorLocation);
+					errorLocation,
+					pos_options);
 				/*
 				// HTML5 geolocation method
 				navigator.geolocation.getCurrentPosition(
 					showLocation,
-					errorLocation);
+					errorLocation,
+					pos_options);
 				*/
 			}
 			// Show Position Info
@@ -60,9 +72,12 @@
 			 	droid.vibrate(500);
 				alert("geo:" + lat + "," + lon + "," + acc);
 			}
-			function errorLocation (err) {
+			function errorLocation (errorObj) {
+				var message = errorObj.message;
+				var code = errorObj.code;
+				alert("location error : " + code + " : " + message);
 				$("bntLocation").disabled = false;
-				alert("location error : " + err);
+				$("bntLocation2").disabled = false;
 			}
 			function cancelLoc() {
 				// droid.clearWatchPosition(watchid);
@@ -74,7 +89,8 @@
 				$("bntLocation2").disabled = true;
 				watchid = droid.getCurrentPosition(
 					showLocation2,
-					errorLocation);
+					errorLocation,
+					pos_options2);
 			}
 			function showLocation2(position){
 				$("bntLocation").disabled = false;

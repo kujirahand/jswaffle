@@ -80,6 +80,10 @@ public class IntentHelper {
 		else if (url.startsWith("video:")) {
 			return runCamera(appContext, url, MediaStore.ACTION_VIDEO_CAPTURE);
 		}
+		// could not set savefile (but set savedir) ... 保存ファイル名を指定できないのでカメラから分離する
+		else if (url.startsWith("record:")) {
+			return runCamera(appContext, url, MediaStore.Audio.Media.RECORD_SOUND_ACTION);
+		}
 		return false;
 	}
 	
@@ -87,6 +91,7 @@ public class IntentHelper {
 		try {
 			url = url.replace("camera:", "file:");
 			url = url.replace("video:",  "file:");
+			url = url.replace("record:", "file:");
 			//
 			Uri saveUri = Uri.parse(url);
 			Intent intent = new Intent();

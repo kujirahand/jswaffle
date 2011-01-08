@@ -57,6 +57,7 @@
 				});
 		}
 		function TestVideo() {
+			//TODO:not supported
 			droid.startIntentForResult(
 				"video:/sdcard/hoge.mpg",
 				function(code){
@@ -64,6 +65,16 @@
 						alert("canceled"); return;
 					}
 					droid.startIntent("file:/sdcard/hoge.mpg");
+				});
+		}
+		function TestRecorder() {
+			droid.startIntentForResult(
+				"record:/sdcard/audio.3gp",
+				function(code){
+					if (code == 0) {
+						alert("canceled"); return;
+					}
+					droid.startIntent("file:/sdcard/audio.3gp");
 				});
 		}
 	</script>
