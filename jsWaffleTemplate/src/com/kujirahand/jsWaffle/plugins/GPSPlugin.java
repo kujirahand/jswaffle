@@ -1,5 +1,6 @@
 package com.kujirahand.jsWaffle.plugins;
 
+import java.util.Date;
 import java.util.Vector;
 
 import android.app.Activity;
@@ -9,6 +10,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
+import android.os.Handler;
 
 import com.kujirahand.jsWaffle.WaffleActivity;
 import com.kujirahand.jsWaffle.model.WafflePlugin;
@@ -18,12 +20,14 @@ public class GPSPlugin extends WafflePlugin
 	Vector<GeoListener> listeners = new Vector<GeoListener>();
 	
 	// javascript interface
-	public int getCurrentPosition(String callback_ok, String callback_ng, boolean accuracy_fine, int tag) {
+	public int getCurrentPosition(String callback_ok, String callback_ng, boolean accuracy_fine, int timeout, int maximumAge, int tag) {
 		GeoListener geo = new GeoListener(waffle_activity);
 		listeners.add(geo);
 		geo.tag = tag;
 		geo.callback_ok = callback_ok;
 		geo.callback_ng = callback_ng;
+		geo.timeout = timeout;
+		geo.maximumAge = maximumAge;
 		geo.report_count = 1;
 		geo.accuracy_fine = accuracy_fine;
 		geo.start(accuracy_fine);
@@ -31,7 +35,7 @@ public class GPSPlugin extends WafflePlugin
 		return listeners.size();
 	}
 	
-	public int watchPosition(String callback_ok, String callback_ng, boolean accuracy_fine, int tag) {
+	public int watchPosition(String callback_ok, String callback_ng, boolean accuracy_fine, int timeout, int maximumAge, int tag) {
 		GeoListener geo = new GeoListener(waffle_activity);
 		listeners.add(geo);
 		geo.tag = tag;
@@ -39,6 +43,8 @@ public class GPSPlugin extends WafflePlugin
 		geo.callback_ng = callback_ng;
 		geo.report_count = 0;
 		geo.accuracy_fine = accuracy_fine;
+		geo.timeout = timeout;
+		geo.maximumAge = maximumAge;
 		geo.start(false);
 		geo.flagLive = true;
 		return listeners.size();
@@ -95,17 +101,26 @@ public class GPSPlugin extends WafflePlugin
 
 class GeoListener implements LocationListener
 {
-	public long min_time = 1000; // msec 
 	public float min_dist = 1f;  // 1m
 	public long report_count = 0;
 	public Boolean flagLive = false;
 	private static LocationManager locman = null;
+	public int maximumAge = 5000;
+	public int timeout = -1;
 	public String callback_ok = "DroidWaffle._geolocation_fn_ok";
 	public String callback_ng = "DroidWaffle._geolocation_fn_ng";
 	public WaffleActivity waffle_activity;
 	public int tag = -1;
 	public boolean accuracy_fine = false;
 	public boolean accuracy_fine_last = false;
+	private Date last_report_time = null; // 最後に位置情報を報告した時間
+	private String last_result = null; // 最後の報告結果
+	
+	final int ERROR_PERMISSION_DENIED = 1;
+	final int ERROR_POSITION_UNAVAILABLE = 2;
+	final int ERROR_TIMEOUT = 3;
+	
+	private Handler handler = new Handler();
 	
 	public GeoListener(WaffleActivity app) {
 		this.waffle_activity = app;
@@ -116,7 +131,26 @@ class GeoListener implements LocationListener
 	}
 	
 	public void start(boolean accuracy_fine) {
+		waffle_activity.log(
+			String.format("GeoListener: acc:%s, timeout:%s, maximumAge:%s", 
+				this.accuracy_fine ? "true":"false",
+				timeout, maximumAge
+			)
+		);
 		accuracy_fine_last = accuracy_fine;
+		// check maximumAge
+		if (last_report_time != null) {
+			if (report_count == 1) {
+				Date now = new Date();
+				if (now.getTime() - last_report_time.getTime() < maximumAge) {
+					jsCallSuccess(last_result);
+					report_count = 0;
+					flagLive = false;
+					return;
+				}
+			}
+		}
+		
 		// select provider
 		Criteria crit = new Criteria();
 		if (accuracy_fine) {
@@ -130,13 +164,57 @@ class GeoListener implements LocationListener
 			p = getLocMan().getProvider(providerName);
 		}
 		if (p == null) {
-			waffle_activity.log_error("[GPS] no provider");
-			waffle_activity.callJsEvent(callback_ng + "('no provider', "+tag+")");
+			jsThrowError("no provider", ERROR_POSITION_UNAVAILABLE);
 			return;
 		}
+		
 		// register
 		waffle_activity.log("[GPS] set provider:" + providerName);
-		getLocMan().requestLocationUpdates(providerName, min_time, min_dist, this);
+		getLocMan().requestLocationUpdates(providerName, maximumAge, min_dist, this);
+		checkTimeout();
+	}
+	
+	private void checkTimeout() {
+		if (timeout <= 0) return;
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				if (report_count > 0) report_count--;
+				// check timeout
+				Boolean flag_ok = true;
+				Date now = new Date();
+				if (flagLive == false) return;
+				if (last_report_time == null) {
+					flag_ok = false;
+				}
+				else if (now.getTime() - last_report_time.getTime() > timeout) {
+					flag_ok = false;
+				}
+				if (!flag_ok) {
+					// raise error
+					jsThrowError("timeout", ERROR_TIMEOUT);
+				}
+				// repeat ?
+				if (report_count != 0) {
+					handler.postDelayed(this, timeout);
+				}
+				else {
+					flagLive = false;
+					stop();
+				}
+			}
+		}, timeout);
+	}
+	
+	public void jsThrowError(String msg, int code) {
+		waffle_activity.log_error(msg);
+		String s = String.format("%s({message:'%s', code:%s},%s)", callback_ng, msg, code, tag);
+		waffle_activity.callJsEvent(s);
+	}
+	public void jsCallSuccess(String param) {
+		String q = callback_ok + "(" + param + "," + tag + ")";
+		waffle_activity.callJsEvent(q);
+		last_result = param;
 	}
 
 	public void stop() {
@@ -149,6 +227,7 @@ class GeoListener implements LocationListener
 	
 	@Override
 	public void onLocationChanged(Location location) {
+		last_report_time = new Date();
 		// Check Stop
 		if (report_count > 0) {
 			report_count--;
@@ -170,10 +249,8 @@ class GeoListener implements LocationListener
 			"speed:" + location.getSpeed() + "," + // 速度
 		"}," +
 		"timestamp:" + location.getTime() + // 時間
-		"}," + 
-		tag;
-		String q = callback_ok + "(" + param + ")";
-		waffle_activity.callJsEvent(q);
+		"}";
+		jsCallSuccess(param);
 		
 		if (accuracy_fine != accuracy_fine_last) {
 			stop();
