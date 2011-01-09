@@ -378,7 +378,7 @@
  * @id droid.getCurrentPosition
  * @param {Function} onSuccess
  * @param {Function} onError
- * @param {boolean} accuracy_fine
+ * @param {Object} options {Boolean}enableHighAccuracy/{Integer}timeout(msec)/{Integer}maximumAge
  * @return {Number} watchId
  */
 
@@ -387,7 +387,7 @@
  * @id droid.watchPosition
  * @param {Function} onSuccess
  * @param {Function} onError
- * @param {boolean} accuracy_fine
+ * @param {Object} options {Boolean}enableHighAccuracy/{Integer}timeout(msec)/{Integer}maximumAge
  * @return {Number} watchId
  */
 

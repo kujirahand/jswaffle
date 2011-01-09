@@ -41,7 +41,7 @@ public class GPSPlugin extends WafflePlugin
 		geo.tag = tag;
 		geo.callback_ok = callback_ok;
 		geo.callback_ng = callback_ng;
-		geo.report_count = 0;
+		geo.report_count = -1;
 		geo.accuracy_fine = accuracy_fine;
 		geo.timeout = timeout;
 		geo.maximumAge = maximumAge;
@@ -132,9 +132,12 @@ class GeoListener implements LocationListener
 	
 	public void start(boolean accuracy_fine) {
 		waffle_activity.log(
-			String.format("GeoListener: acc:%s, timeout:%s, maximumAge:%s", 
+			String.format(
+				"GeoListener: acc:%s, timeout:%s, maximumAge:%s, repeat:%s", 
 				this.accuracy_fine ? "true":"false",
-				timeout, maximumAge
+				timeout, 
+				maximumAge, 
+				report_count
 			)
 		);
 		accuracy_fine_last = accuracy_fine;
@@ -196,6 +199,7 @@ class GeoListener implements LocationListener
 				}
 				// repeat ?
 				if (report_count != 0) {
+					last_report_time = new Date(); // set last timeout
 					handler.postDelayed(this, timeout);
 				}
 				else {

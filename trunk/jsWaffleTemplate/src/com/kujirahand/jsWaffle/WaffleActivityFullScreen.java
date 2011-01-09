@@ -1,29 +1,24 @@
 package com.kujirahand.jsWaffle;
 
+import com.kujirahand.jsWaffle.model.WaffleFlags;
 import android.content.Intent;
-import android.os.Bundle;
-import android.view.Window;
-import android.view.WindowManager;
 
 public class WaffleActivityFullScreen extends WaffleActivity {
+    /** Set jsWaffle Setting flags */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-    	super.onCreate(savedInstanceState);
-        // Check url (Intent Param)
+    protected void onSetWaffleFlags(WaffleFlags flags) {
+    	super.onSetWaffleFlags(flags);
+    	
+    	// Check Intent Parameter
         Intent i = getIntent();
         String url = i.getStringExtra("url");
         if (url != null) {
-        	this.showPage(url);
+        	flags.mainHtmlUrl = url;
         }
         else {
-        	this.showPage("file:///android_asset/www/index.html");
+        	flags.mainHtmlUrl = "file:///android_asset/www/index.html";
         }
+        
+        flags.useFullScreen = true;
     }
-    @Override
-	public void onSetWindowFlags(Window w) {
-        w.requestFeature(Window.FEATURE_NO_TITLE);
-        // * Full Screen
-        w.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-	}
-
 }

@@ -1,22 +1,26 @@
 package com.kujirahand.template;
 
 import com.kujirahand.jsWaffle.WaffleActivity;
-
-import android.os.Bundle;
+import com.kujirahand.jsWaffle.model.WaffleFlags;
 
 public class ShowHTML extends WaffleActivity {
     
-	/** Called when the activity is first created. */
+    /** Set jsWaffle Setting flags */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-    	super.onCreate(savedInstanceState);
-    	
-    	// show index.html
-    	this.showPage("file:///android_asset/www/index.html");
+    protected void onSetWaffleFlags(WaffleFlags flags) {
+    	super.onSetWaffleFlags(flags);
+    	// set flags
+    	flags.mainHtmlUrl = "file:///android_asset/www/index.html";
+    	flags.keepScreenNotSleep = false;
+    	flags.useFullScreen = false;
+    	flags.useVerticalScrollBar = false;
     }
     
+    
+    /** Please add the custom plug-in if it is necessary. */
     @Override
     protected void onAddPlugins() {
     	super.onAddPlugins();
     }
+
 }
