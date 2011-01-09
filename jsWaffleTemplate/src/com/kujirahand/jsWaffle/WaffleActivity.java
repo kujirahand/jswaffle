@@ -1,6 +1,7 @@
 package com.kujirahand.jsWaffle;
 
 import com.kujirahand.jsWaffle.model.IWafflePlugin;
+import com.kujirahand.jsWaffle.model.WaffleFlags;
 import com.kujirahand.jsWaffle.model.WafflePluginManager;
 import com.kujirahand.jsWaffle.plugins.AccelPlugin;
 import com.kujirahand.jsWaffle.plugins.ContactPlugin;
@@ -40,7 +41,7 @@ import android.widget.LinearLayout;
 public class WaffleActivity extends Activity {
 	
 	/** jsWaffle Version Info */
-	public static double WAFFLE_VERSON = 1.162;
+	public static double WAFFLE_VERSON = 1.163;
 	
 	
 	public static WaffleActivity mainInstance = null;
@@ -50,11 +51,15 @@ public class WaffleActivity extends Activity {
 	protected Handler handler = new Handler();
 	
 	public WafflePluginManager pluginManager;
+	protected WaffleFlags waffle_flags = new WaffleFlags();
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
     	if (mainInstance == null) mainInstance = this; // set main instance
+    	
+    	// Initialize jsWaffle setting flags
+    	onSetWaffleFlags(waffle_flags);
     	
     	// Initialize Window
     	onSetWindowFlags(getWindow());
@@ -71,21 +76,40 @@ public class WaffleActivity extends Activity {
         
         // Set WebView to Main View
         setContentView(root);
+        
+        // Show Index page
+        showPage(waffle_flags.mainHtmlUrl);
     }
    
+    /**
+     * set jsWaffle setting flags
+     * @param flags
+     */
+    protected void onSetWaffleFlags(WaffleFlags flags) {
+    }
+
+    
     /**
      * set Window Flags
      * @param w
      */
 	public void onSetWindowFlags(Window w) {
-        w.requestFeature(Window.FEATURE_NO_TITLE);
-        w.setFlags(
-        		WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN,
-        		WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-       // * Full Screen
-        // w.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        // * Keep Screen (Not Sleep)
-        // w.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		// title
+		if (waffle_flags.noTitle) w.requestFeature(Window.FEATURE_NO_TITLE);
+		
+		// full screen
+		if (waffle_flags.useFullScreen) {
+			w.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		} else {
+	        w.setFlags(
+	        		WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN,
+	        		WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+		}
+		
+		// keep screen (do not sleep)
+		if (waffle_flags.keepScreenNotSleep) {
+			w.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		}
 	}
 	
     /**
@@ -94,7 +118,7 @@ public class WaffleActivity extends Activity {
     protected void onAddPlugins() {
     	// main waffle object
     	addPlugin("_base", new ABasicPlugin()); // old '_DroidWaffle'
-    	// plugins
+    	// plug-ins
     	addPlugin("_accel", new AccelPlugin());
     	addPlugin("_db", new DatabasePlugin());
     	addPlugin("_gps", new GPSPlugin());
@@ -142,19 +166,24 @@ public class WaffleActivity extends Activity {
     protected void setWebViewParams() {
     	webview.setWebChromeClient(new jsWaffleChromeClient(this));
         webview.setWebViewClient(new jsWaffleWebViewClient(this));
-        webview.setInitialScale(100);
-        webview.setVerticalScrollBarEnabled(false);
+        webview.setInitialScale(waffle_flags.initialScale);
+        // scroll bar
+        webview.setVerticalScrollBarEnabled(waffle_flags.useVerticalScrollBar);
+        webview.setHorizontalScrollBarEnabled(waffle_flags.useHorizontalScrollBar);
         
     	WebSettings setting = webview.getSettings();
         setting.setJavaScriptEnabled(true);
         setting.setJavaScriptCanOpenWindowsAutomatically(true);
         setting.setLayoutAlgorithm(LayoutAlgorithm.NORMAL);
-        setting.setBuiltInZoomControls(false);
+        setting.setBuiltInZoomControls(waffle_flags.useBuiltInZoomControls);
     }
        
     public void showPage(String uri) {
     	webview.loadUrl(uri);
-        webview.requestFocus();
+    	try {
+    		webview.requestFocus();
+    	} catch (Exception e) {
+    	}
     }
 
     /**

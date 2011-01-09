@@ -33,14 +33,15 @@
 	<h2>Geolocation</h2>
 	<div class="buttons">
 		<button  id="bntLocation" onclick="getLoc()">Get Location</button>
-		<button  onclick="cancelLoc()">Stop Location</button>
 		<button  id="bntLocation2" onclick="getLoc2()">Get Location&Show Map</button>
+		<button  id="bntLocation3" onclick="watchLoc()">Watch Location</button>
+		<button  onclick="cancelLoc()">Stop Location</button>
 		<script>
 			var watchid = 0;
 			var pos_options = {
-				enableHighAccuracy: true,
-				timeout: 8 * 1000,
-				maximumAge: 3000
+				enableHighAccuracy : true,
+				timeout            : 10 * 1000,
+				maximumAge         : 3 * 1000
 			};
 			var pos_options2 = {
 				enableHighAccuracy: false,
@@ -75,7 +76,7 @@
 			function errorLocation (errorObj) {
 				var message = errorObj.message;
 				var code = errorObj.code;
-				alert("location error : " + code + " : " + message);
+				$("dispLocation").innerHTML = "location error : " + code + " : " + message;
 				$("bntLocation").disabled = false;
 				$("bntLocation2").disabled = false;
 			}
@@ -84,6 +85,7 @@
 				navigator.geolocation.clearWatch(watchid);
 				$("bntLocation").disabled = false;
 				$("bntLocation2").disabled = false;
+				$("bntLocation3").disabled = false;
 			}
 			function getLoc2() {
 				$("bntLocation2").disabled = true;
@@ -101,8 +103,23 @@
 				droid.startIntent("geo:" + lat + "," + lon + "," + acc);
 				$("bntLocation2").disabled = false;
 			}
+			function watchLoc() {
+				$("bntLocation3").disabled = true;
+				watchid = droid.watchPosition(
+					showLocation3,
+					errorLocation,
+					pos_options);
+			}
+			function showLocation3(position){
+				var lat = position.coords.latitude;
+				var lon = position.coords.longitude;
+				var acc = position.coords.accuracy ;
+				$("dispLocation").innerHTML = "lat:" + lat + "<br/>lon:" + lon + "<br/>acc:" + acc;
+				droid.vibrate();
+			}
 		</script>
 	</div>
+	<div class="disp" id="dispLocation"></div>
 	
 	<h2>Acceleration Sensor</h2>
 	<div class="buttons">
