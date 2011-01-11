@@ -18,7 +18,7 @@ public class ContactPlugin extends WafflePlugin {
 		// select SDK Version
 		contactAccessor = ContactAccessor.getInstance();
 		Intent it = contactAccessor.getContactPickerIntent();
-		waffle_activity.startActivityForResult(it, ABasicPlugin.ACTIVITY_REQUEST_CODE_CONTACT);
+		waffle_activity.startActivityForResult(it, IntentPlugin.ACTIVITY_REQUEST_CODE_CONTACT);
 	}
 	
 	public void getContact(Intent intent) {
@@ -40,7 +40,7 @@ public class ContactPlugin extends WafflePlugin {
 		if (resultCode == 0) {
 			failed(); return;
 		}
-		if (requestCode == ABasicPlugin.ACTIVITY_REQUEST_CODE_CONTACT && callbackStr != null) {
+		if (requestCode == IntentPlugin.ACTIVITY_REQUEST_CODE_CONTACT && callbackStr != null) {
 			getContact(intent);
 		}
 	}

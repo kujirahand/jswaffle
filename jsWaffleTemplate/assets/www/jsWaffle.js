@@ -208,7 +208,7 @@ plugin_defineDroidMethod(
 				_base.setPromptType(0x11, title);
 				var r = prompt("", items.join(";;;"));
 				_base.setPromptType(0, "prompt");
-				return r;
+				return String(r);
 			},
 			cross : function (title, items) {
 				return prompt(title + ':select(' + items.join(",")+')');
@@ -237,7 +237,7 @@ plugin_defineDroidMethod(
 				}
 				var d = defaultDate;
 				var r = prompt("", new Array(d.getFullYear(), d.getMonth(), d.getDate()).join(","));
-				var a = r.split(",");
+				var a = String(r).split(",");
 				d = new Date(a[0], a[1], a[2]);
 				_base.setPromptType(0, "prompt");
 				return d;
@@ -259,7 +259,7 @@ plugin_defineDroidMethod(
 				_base.setPromptType(0x14, "");
 				var r = prompt("", hours + ":" + minutes);
 				_base.setPromptType(0, "prompt");
-				return r;
+				return String(r);
 			},
 			cross : function (hours, minutes) {
 				return prompt("Please input Time (hh:nn)");
@@ -285,7 +285,7 @@ plugin_defineDroidMethod(
 		
 		/** @id droid.getResString */
 		getResString : {
-			droid : function (id) { return _base.getResString(id); },
+			droid : function (id) { return String(_base.getResString(id)); },
 			cross : function (id) { return "[" + id + "]" }
 		},
 		 
@@ -340,108 +340,6 @@ plugin_defineDroidMethod(
 			cross : function (soundId) { console.log("unloadSoundPool:" + soundId); }
 		},
 		
-		/** @id droid.startIntent */
-		startIntent : {
-			droid : function (url) { return _base.startIntent(url); },
-			cross : function (url) { console.log('startIntent:' + url); }
-		},
-		
-		/** @id droid.startIntentForResult */
-		startIntentForResult : {
-			droid : function (url, callback) {
-				// register user function
-				var tag = func_bank.getTag();
-				func_bank.setItem(tag, callback);
-				// set proxy function
-				self.droid._startIntentForResult_callback = function (request_code, result_code) {
-					var f = func_bank.getItem(request_code);
-					if (typeof(f) == "function") {
-						f(result_code);
-					}
-				};
-				return _base.startIntentForResult(url, "droid._startIntentForResult_callback", tag);
-			},
-			cross : function (url) { console.log('startIntentForResult:' + url); }
-		},
-		
-		/** @id droid.startIntentFullScreen */
-		startIntentFullScreen : {
-			droid :  function (url) {
-				return _base.startIntentFullScreen(url);
-			},
-			cross : function (url) { console.log('startIntentFullScreen:' + url); }
-		},
-		
-		/** @id droid.newIntent */
-		newIntent : {
-			droid : function (action, uri) {
-				return _base.newItent(action, uri);
-			},
-			cross : function (action, uri) {
-				console.log('newIntent:' + action + ',' + uri);
-				return {};
-			}
-		},
-		/** @id droid.intent_putExtra */
-		intent_putExtra : {
-			droid : function (intent, name, value) {
-				_base.intent_putExtra(intent, name, value);
-			},
-			cross : function (action, uri) {
-				console.log('intent_putExtra:' + action + ',' + uri);
-			}
-		},
-		/** @id droid.intent_startActivity */
-		intent_startActivity : {
-			droid : function (intent) {
-				return _base.intent_startActivity(intent);
-			},
-			cross : function (intent) {
-				console.log('intent_putExtra:' + action + ',' + uri);
-				return true;
-			}
-		},
-		
-		/** @id droid.scanBarcode */
-		scanBarcode : {
-			droid : function (callback_fn, mode, show_help) {
-				// params
-				self.droid._scanBarcode_callback = callback_fn;
-				self.droid._scanBarcode = function (contents, format) {
-					var f = self.droid._scanBarcode_callback;
-					if (typeof(f) == "function") {
-						contents = decodeURIComponent(contents);
-						f(contents, format);
-					}
-				};
-				if (typeof(mode) != "string") { mode = "AUTO"; }
-				// execute
-				var b = _base.scanBarcode("droid._scanBarcode", mode);
-				if (b) return true;
-				// show help
-				if (!show_help) return false;
-				var show_link = confirm("You need Barcode Scanner. Download?");
-				if (show_link) {
-					droid.startIntent("market://search?q=pname:com.google.zxing.client.android");
-				}
-				return false;
-			},
-			cross : function (callback_fn, mode, show_help) {
-				console.log("scanBarcode");
-				return true;
-			}
-		},
-		
-		/** @id droid.scanQRCode */
-		scanQRCode : {
-			droid : function (callback_fn, show_help) {
-				return this.scanBarcode(callback_fn, "QR_CODE_MODE", show_help);
-			},
-			cross : function (callback_fn, show_help) {
-				console.log("scanQRCode");
-				return true;
-			}
-		},
 		
 		/** @id droid.quit */
 		quit : {
@@ -473,7 +371,7 @@ plugin_defineDroidMethod(
 					var f = func_bank.getItem(tag);
 					if (typeof(f.ng) == "function") f.ng(str);
 				};
-				return _base.httpGet(url, "droid._httpGet_ok", "droid._httpGet_ng", tag);
+				return String(_base.httpGet(url, "droid._httpGet_ok", "droid._httpGet_ng", tag));
 			},
 			cross : function (url,callback_ok, callback_ng) {
 				console.log('httpGet : ' + url);
@@ -517,7 +415,7 @@ plugin_defineDroidMethod(
 				self.droid._httpPost = function (result, tag) {
 					var f = func_bank.getItem(tag);
 					if (typeof(f) == "function") {
-						f(result);
+						f(String(result));
 					}
 				};
 				var res = _base.httpPostJSON(url, json, "droid._httpPost", tag);
@@ -544,7 +442,7 @@ plugin_defineDroidMethod(
 		/** @id droid.clipboardGetText */
 		clipboardGetText : {
 			droid : function () {
-				return _base.clipboardGetText();
+				return String(_base.clipboardGetText());
 			},
 			cross : function () {
 				console.log("[dummy] clipboardSetText : " + text);
@@ -793,7 +691,7 @@ plugin_defineDroidMethod(
 		/** @id droid.clearWatchPosition */
 		clearWatchPosition : {
 			droid : function (watchId) {
-				_gps.clearWatch(watchid);
+				_gps.clearWatch(watchId);
 			},
 			cross : function (watchId) {
 				navigator.geolocation.clearWatch(watchId);
@@ -830,7 +728,7 @@ plugin_defineDroidMethod(
 		pref_get : {
 			droid : function (key, defValue) { 
 				if (defValue == undefined) defValue = null;
-				return _storage.localStorage_get(key, defValue);
+				return String(_storage.localStorage_get(key, defValue));
 			},
 			cross : function (key, defValue) { return window.localStorage.getItem(key, defValue); }
 		},
@@ -855,7 +753,7 @@ plugin_defineDroidMethod(
 		/** @id droid.loadText */
 		loadText : {
 			droid : function (filename) {
-				return _storage.loadText(filename);
+				return String(_storage.loadText(filename));
 			},
 			cross : function (filename) {
 				return localStorage.getItem(filename);
@@ -865,7 +763,7 @@ plugin_defineDroidMethod(
 		/** @id droid.fileList */
 		fileList : {
 			droid : function (path) {
-				var s = _storage.fileList(path) + "";
+				var s = String(_storage.fileList(path));
 				var a = s.split(";");
 				return a;
 			},
@@ -925,7 +823,7 @@ if (typeof(window.localStorage) == "undefined") {
 	window.localStorage = {
 		getItem    : function (key, defvalue) {
 			if (defvalue == undefined) defvalue = null;
-			return _storage.localStorage_get(key, defvalue);
+			return String(_storage.localStorage_get(key, defvalue));
 		},
 		setItem    : function (key, value) { return _storage.localStorage_put(key, value); },
 		removeItem : function (key) { return _storage.localStorage_remove(key, defValue); },
@@ -960,7 +858,7 @@ plugin_defineDroidMethod(
 		},
 		/** @id droid.getSDCardPath */
 		getSDCardPath : {
-			droid : function () { return _dev.getSDCardPath(); },
+			droid : function () { return String(_dev.getSDCardPath()); },
 			cross : function () { return "/sdcard"; }
 		},
 		/** @id droid.getAndroidVersionInt */
@@ -987,24 +885,169 @@ plugin_defineDroidMethod(
 
 
 plugin_defineDroidMethod(
-		{ pluginName:'_contact', className:'ContactPlugin' },
-		{
-			/** @id droid.pickupContact */
-			pickupContact : {
-				droid : function (callback) {
-					var tag = func_bank.registerItem(callback);
-					self.droid._pickupContact = function (tag, obj) {
-						var f = func_bank.getItem(tag);
-						f(obj);
-					};
-					var str = _contact.pickupContact("droid._pickupContact", tag);
-				},
-				cross : function (callback) { callback(null); }
+	{ pluginName:'_contact', className:'ContactPlugin' },
+	{
+		/** @id droid.pickupContact */
+		pickupContact : {
+			droid : function (callback) {
+				var tag = func_bank.registerItem(callback);
+				self.droid._pickupContact = function (tag, obj) {
+					var f = func_bank.getItem(tag);
+					f(obj);
+				};
+				var str = _contact.pickupContact("droid._pickupContact", tag);
 			},
-			___ : end_of_define_method
-		}
-	);
+			cross : function (callback) { callback(null); }
+		},
+		___ : end_of_define_method
+	}
+);
 
+
+
+plugin_defineDroidMethod(
+	{ pluginName:'_intent', className:'IntentPlugin' },
+	{
+		/** @id droid.startIntent */
+		startIntent : {
+			droid : function (url) { return _intent.startIntent(url); },
+			cross : function (url) { console.log('startIntent:' + url); }
+		},
+		
+		/** @id droid.startIntentForResult */
+		startIntentForResult : {
+			droid : function (url, callback) {
+				// register user function
+				var tag = func_bank.getTag();
+				func_bank.setItem(tag, callback);
+				// set proxy function
+				self.droid._startIntentForResult_callback = function (request_code, result_code) {
+					var f = func_bank.getItem(request_code);
+					if (typeof(f) == "function") {
+						f(result_code);
+					}
+				};
+				return _intent.startIntentForResult(url, "droid._startIntentForResult_callback", tag);
+			},
+			cross : function (url) { console.log('startIntentForResult:' + url); }
+		},
+		
+		/** @id droid.startIntentFullScreen */
+		startIntentFullScreen : {
+			droid :  function (url) {
+				return _intent.startIntentFullScreen(url);
+			},
+			cross : function (url) { console.log('startIntentFullScreen:' + url); }
+		},
+		
+		/** @id droid.intent_new */
+		intent_new : {
+			droid : function (action, uri) {
+				return _intent.newIntent(action, uri);
+			},
+			cross : function (action, uri) {
+				console.log('newIntent:' + action + ',' + uri);
+				return {};
+			}
+		},
+		
+		/** @id droid.intent_putExtra */
+		intent_putExtra : {
+			droid : function (intent, name, value) {
+				_intent.intent_putExtra(intent, name, value);
+			},
+			cross : function (action, uri) {
+				console.log('intent_putExtra:' + action + ',' + uri);
+			}
+		},
+		
+		/** @id droid.intent_getExtra */
+		intent_getExtra : {
+			droid : function (intent, name) {
+				return _intent.intent_getExtra(intent, name);
+			},
+			cross : function (action, uri) {
+				return "";
+			}
+		},
+		
+		/** @id droid.intent_startActivity */
+		intent_startActivity : {
+			droid : function (intent) {
+				return _intent.intent_startActivity(intent);
+			},
+			cross : function (intent) {
+				console.log('intent_putExtra:' + action + ',' + uri);
+				return true;
+			}
+		},
+		
+		/** @id droid.intent_exists */
+		intent_exists : {
+			droid : function (intentName) { return _intent.intent_exists(intentName); },
+			cross : function (intentName) { return false; }
+		},
+		
+		/** @id droid.scanBarcode */
+		scanBarcode : {
+			droid : function (callback_fn, mode, show_help) {
+				// params
+				self.droid._scanBarcode_callback = callback_fn;
+				self.droid._scanBarcode = function (contents, format) {
+					var f = self.droid._scanBarcode_callback;
+					if (typeof(f) == "function") {
+						contents = decodeURIComponent(contents);
+						f(String(contents), String(format));
+					}
+				};
+				if (typeof(mode) != "string") { mode = "AUTO"; }
+				// execute
+				var b = _intent.scanBarcode("droid._scanBarcode", mode);
+				if (b) return true;
+				// show help
+				if (!show_help) return false;
+				var show_link = confirm("You need Barcode Scanner. Download?");
+				if (show_link) {
+					droid.startIntent("market://search?q=pname:com.google.zxing.client.android");
+				}
+				return false;
+			},
+			cross : function (callback_fn, mode, show_help) {
+				console.log("scanBarcode");
+				return true;
+			}
+		},
+		
+		/** @id droid.scanQRCode */
+		scanQRCode : {
+			droid : function (callback_fn, show_help) {
+				return this.scanBarcode(callback_fn, "QR_CODE_MODE", show_help);
+			},
+			cross : function (callback_fn, show_help) {
+				console.log("scanQRCode");
+				return true;
+			}
+		},
+		
+		/** @id droid.showRoute */
+		showRoute : {
+			droid : function (start, end) {
+				var p = ["f=d",
+				         "saddr=" + escape(start),
+				         "daddr=" + escape(end),
+				         "hl=ja"];
+				var intent = _intent.intent_new(
+					"android.intent.action.VIEW", 
+					"http://maps.google.com/maps?" + p.join("&"));
+				_intent.intent_setClassName(intent, "com.google.android.apps.maps","com.google.android.maps.MapsActivity");
+				droid.intent_startActivity(intent);
+			},
+			cross : function () {
+			}
+		},
+		___ : end_of_define_method
+	}
+);
 
 
 //JSON.stringfy for Android 1.6
