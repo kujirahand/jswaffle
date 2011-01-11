@@ -58,17 +58,32 @@ public class IntentHelper {
 			String subject = dec.subject;
 			String body = dec.body;
 			String attach = dec.attach;
-			Intent intentMail = new Intent(Intent.ACTION_SENDTO, mailUri);
+			String action = Intent.ACTION_SENDTO;
+			if (attach != null) action = Intent.ACTION_SEND;
+			Intent intentMail = new Intent(action, mailUri);
 			intentMail.putExtra(Intent.EXTRA_SUBJECT, subject);
 			intentMail.putExtra(Intent.EXTRA_TEXT, body);
 			intentMail.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			String mime = "text/plain";
 			if (attach != null) { // attachfile
-				Uri uri = WaffleUtils.checkFileUri(attach);
-				intentMail.putExtra(Intent.EXTRA_STREAM, uri);
-				String mime = getContentType(uri.toString());
+				Uri attachFileUri = WaffleUtils.checkFileUri(attach);
+				mime = getContentType(attachFileUri.toString());
 				intentMail.setType(mime);
+				//TODO:添付ファイルをメールするとき、メールアドレスが入らない
+				intentMail.putExtra(Intent.EXTRA_STREAM, attachFileUri);
+				String[] tos = dec.mail.split(",");
+				intentMail.putExtra(Intent.EXTRA_EMAIL, tos);
 			}
-			appContext.startActivity(intentMail);
+			try {
+				appContext.startActivity(intentMail);
+			} catch (android.content.ActivityNotFoundException e) {
+				WaffleActivity.mainInstance.log("ActivityNotFoundException:" + mime);
+				intentMail = new Intent(Intent.ACTION_SENDTO, mailUri);
+				intentMail.putExtra(Intent.EXTRA_SUBJECT, subject);
+				intentMail.putExtra(Intent.EXTRA_TEXT, body);
+				intentMail.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				appContext.startActivity(intentMail);
+			}
 			return true;
 		}
 		else if (url.startsWith("file:")) {

@@ -9,6 +9,7 @@ import com.kujirahand.jsWaffle.plugins.DatabasePlugin;
 import com.kujirahand.jsWaffle.plugins.DevInfoPlugin;
 import com.kujirahand.jsWaffle.plugins.GPSPlugin;
 import com.kujirahand.jsWaffle.plugins.ABasicPlugin;
+import com.kujirahand.jsWaffle.plugins.IntentPlugin;
 import com.kujirahand.jsWaffle.plugins.StoragePlugin;
 import com.kujirahand.jsWaffle.utils.DialogHelper;
 import com.kujirahand.jsWaffle.utils.IntentHelper;
@@ -41,8 +42,7 @@ import android.widget.LinearLayout;
 public class WaffleActivity extends Activity {
 	
 	/** jsWaffle Version Info */
-	public static double WAFFLE_VERSON = 1.163;
-	
+	public static double WAFFLE_VERSON = 1.1702;
 	
 	public static WaffleActivity mainInstance = null;
 	public WebView webview;
@@ -125,6 +125,7 @@ public class WaffleActivity extends Activity {
     	addPlugin("_storage", new StoragePlugin());
     	addPlugin("_dev", new DevInfoPlugin());
     	addPlugin("_contact", new ContactPlugin());
+    	addPlugin("_intent", new IntentPlugin());
     }
     
     protected IWafflePlugin addPlugin(String jsName, IWafflePlugin plugin) {

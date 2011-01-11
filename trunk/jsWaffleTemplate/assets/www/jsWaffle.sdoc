@@ -226,8 +226,8 @@
  */
 
 /**
- * Custom Intent
- * @id droid.newIntent
+ * Create custom Intent 
+ * @id droid.intent_new
  * @param {String}action
  * @param {String}uri
  * @return {Intent}
@@ -240,6 +240,21 @@
  * @param {String} name
  * @param {String} value
  * @return {Void}
+ */
+
+/**
+ * Gut Extra Data to Custom Intent
+ * @id droid.intent_getExtra
+ * @param {Intent} intent
+ * @param {String} name
+ * @return {String}
+ */
+
+/**
+ * Check exists intent
+ * @id droid.intent_exists
+ * @param {String} intentName
+ * @return {Boolean}
  */
 
 /**
@@ -258,6 +273,14 @@
  * @param {String} mode (AUTO|QR_CODE_MODE|ONE_D_MODE|DATA_MATRIX_MODE)
  * @param {boolean} show_help
  * @return {boolean} Scanner exisits?
+ */
+
+/**
+ * Show Route with GoogleMaps
+ * @id droid.showRoute
+ * @param {String} start (example)'35.671989 139.7' or '東京都渋谷区'
+ * @param {String} end
+ * @return {Void}
  */
 
 /**
