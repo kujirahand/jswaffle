@@ -53,7 +53,8 @@
 					if (code == 0) {
 						alert("canceled"); return;
 					}
-					droid.startIntent("mailto:test@example.com?subject=camera&attach=/sdcard/hoge.jpg");
+					var subject = encodeURI("[画像]");
+					droid.startIntent("mailto:test@example.com?subject="+subject+"&attach=/sdcard/hoge.jpg");
 				});
 		}
 		function TestVideo() {

@@ -51,7 +51,7 @@ public class WaffleActivity extends Activity {
 	protected Handler handler = new Handler();
 	
 	public WafflePluginManager pluginManager;
-	protected WaffleFlags waffle_flags = new WaffleFlags();
+	protected WaffleFlags waffle_flags;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,6 +59,7 @@ public class WaffleActivity extends Activity {
     	if (mainInstance == null) mainInstance = this; // set main instance
     	
     	// Initialize jsWaffle setting flags
+    	waffle_flags = new WaffleFlags(this);
     	onSetWaffleFlags(waffle_flags);
     	
     	// Initialize Window
@@ -331,25 +332,6 @@ public class WaffleActivity extends Activity {
 		pluginManager.onActivityResult(requestCode, resultCode, intent);
 	}
 	
-	
-	/*
-	// example fullscreen
-	protected void updateFullscreenStatus(boolean bUseFullscreen)
-	{   
-	   if(bUseFullscreen)
-	   {
-	        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-	        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-	    }
-	    else
-	    {
-	        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-	        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-	    }
-	    root.requestLayout();
-	}
-	*/
-	
 	//-------------------------------------------------------------------
 	//WebViewClient
 	//-------------------------------------------------------------------
@@ -362,6 +344,11 @@ public class WaffleActivity extends Activity {
 		
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
+			// HTTP or HTTPS
+			if (url.startsWith("http://") || url.startsWith("https://")) {
+				view.loadUrl(url); return false;
+			}
+			
 			boolean b = IntentHelper.run(appContext, url);
 		  	if (!b) {
 		  		log("loadUrl=" + url);
