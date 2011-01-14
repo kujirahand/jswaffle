@@ -9,5 +9,5 @@ body { background-color: black; color: white; font-size:12px; }
 #func button { width: 150px; margin: 3px; padding:3px; }
 #disp div { height: 16px; padding: 1px; }
 div.buttons { margin-left:auto; margin-right:auto; padding:9px; text-align:center; font-size:18px; }
-div.buttons > button { padding:6px; margin:6px; width: 300px; }
+div.buttons > button { padding:6px; margin:6px; width: 90%; }
 div.disp { background-color:#FFCCCC; color:#009; font-size:16px; padding: 16px; margin: 16px;}

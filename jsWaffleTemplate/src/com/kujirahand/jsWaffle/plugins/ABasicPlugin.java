@@ -174,7 +174,7 @@ public class ABasicPlugin extends WafflePlugin
 	private SoundPool pool = null;
 	public int loadSoundPool(String filename) {
 		int res = -1;
-		pool = new SoundPool(5, AudioManager.STREAM_RING, 0);
+		if (pool == null) pool = new SoundPool(5, AudioManager.STREAM_RING, 0);
 		try {
 			Uri uri = WaffleUtils.checkFileUri(filename);
 			String path = uri.getPath();

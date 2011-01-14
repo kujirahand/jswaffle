@@ -14,6 +14,7 @@ public class ShowHTML extends WaffleActivity {
     	flags.keepScreenNotSleep = false;
     	flags.useFullScreen = false;
     	flags.useVerticalScrollBar = false;
+    	//flags.setWidth(320);
     }
     
     

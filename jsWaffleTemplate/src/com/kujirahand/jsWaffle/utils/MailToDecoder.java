@@ -39,8 +39,11 @@ public class MailToDecoder {
 				key = kv[0];
 				val = kv[1];
 			}
-			key = URLDecoder.decode(key);
-			val = URLDecoder.decode(val);
+			try {
+				key = URLDecoder.decode(key);
+				val = URLDecoder.decode(val);
+			} catch (Exception e) {
+			}
 			query.put(key, val);
 		}
 		try {
