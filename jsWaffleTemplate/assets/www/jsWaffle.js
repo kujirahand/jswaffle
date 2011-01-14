@@ -322,12 +322,12 @@ plugin_defineDroidMethod(
 		},
 		/** @id droid.playSoundPool */
 		playSoundPool : {
-			droid : function (soundId, loop) {
+			droid : function (soundId, loopCound) {
 				if (soundId < 0) return;
-				if (loop == undefined) loop = 0;
-				_base.playSoundPool(soundId, loop);
+				if (loopCound == undefined) loopCound = 0;
+				_base.playSoundPool(soundId, loopCound);
 			},
-			cross : function (soundId) { console.log("playSoundPool:" + soundId); }
+			cross : function (soundId, loopCound) { console.log("playSoundPool:" + soundId); }
 		},
 		/** @id droid.stopSoundPool */
 		stopSoundPool : {

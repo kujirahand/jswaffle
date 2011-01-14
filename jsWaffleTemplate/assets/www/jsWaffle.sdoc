@@ -186,6 +186,7 @@
  * play SoundPool. Before play, needs to loadSoundPool.
  * @id droid.playSoundPool
  * @param {Number} soundId	SoundPool's id
+ * @param {Number} loopCount
  * @return {Void}
  */
 
