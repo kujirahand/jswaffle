@@ -7,6 +7,7 @@ jsWaffle for Android (JavaScript Wrapper)
  * @projectDescription jsWaffle for Android (JavaScript Wrapper)
  * @author	kujirahand.com (http://kujirahand.com)
  * @see http://d.aoikujira.com/jsWaffle/wiki/
+ * @namespace jsWaffle.droid
  */
 
 (function(self){
