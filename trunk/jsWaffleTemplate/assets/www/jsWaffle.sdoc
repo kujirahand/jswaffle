@@ -1,5 +1,6 @@
 /**
  * ScriptDoc for jsWaffle.js
+ * @namespace jsWaffle.droid
  */
 
 //---------------------------------------------------------------------
@@ -16,6 +17,7 @@
  * beep sound
  * ビープ音を鳴らす
  * @id droid.beep
+ * @alias droid.beep
  * @return {Void}
  */
 
@@ -23,6 +25,7 @@
  * vibrate device
  * 端末をバイブさせる
  * @id droid.vibrate
+ * @alias droid.vibrate
  * @param {Number} msec vibration time(milliseconds). Default is 500.
  * @return {Void}
  */
@@ -31,6 +34,7 @@
  * popup message (toast)
  * メッセージをポップアップする(トーストを表示する)
  * @id droid.makeToast
+ * @alias droid.makeToast
  * @param {String} message
  * @return {Void}
  */
@@ -38,10 +42,12 @@
 /**
  * Set MenuItem
  * [menu]ボタンを押した時に出るメニューを設定する
+
  * (example) iconName is "ic_menu_edit/ic_menu_gallery/ic_menu_help/ic_menu_info_details/ic_menu_manage/ic_menu_preferences"
  * @see http://www.taosoftware.co.jp/blog/2008/11/android_5.html About Android's icon name
  * 
  * @id droid.setMenuItem
+ * @alias droid.setMenuItem
  * @param {Integer} itemNo (0-5)
  * @param {boolean} visible
  * @param {String} title
@@ -54,6 +60,7 @@
  * Dialog Yes or No
  * [はい][いいえ]で選択するダイアログを表示する
  * @id droid.dialogYesNo
+ * @alias droid.dialogYesNo
  * @param {String} title
  * @param {String} message
  * @return {Boolean}
@@ -63,6 +70,7 @@
  * List Dialog
  * 一覧から一つを選ぶリストダイアログを表示する
  * @id droid.dialogList
+ * @alias droid.dialogList
  * @param {String} title
  * @param {Array} items
  * @return {String} selected item
@@ -72,6 +80,7 @@
  * Checkbox list dialog
  * チェックボックス付のリストダイアログを表示する
  * @id dorid.dialogCheckboxList
+ * @alias dorid.dialogCheckboxList
  * @param {String} title
  * @param {Array} items
  * @return {Array} selected item
@@ -81,6 +90,7 @@
  * Date picker dialog
  * 日付選択ダイアログを表示する
  * @id droid.dialogDatePicker
+ * @alias droid.dialogDatePicker
  * @param {Date} defaultDate
  * @return {Date}
  */
@@ -89,6 +99,7 @@
  * Time picker dialog
  * 時間選択ダイアログを表示する
  * @id droid.dialogTimePicker
+ * @alias droid.dialogTimePicker
  * @param {Integer} hours
  * @param {Integer} minutes
  * @return {String} time format "hh:nn"
@@ -98,6 +109,7 @@
  * Seekbar dialog
  * シークバーの付いたダイアログを表示する
  * @id droid.dialogSeekbar
+ * @alias droid.dialogSeekbar
  * @param {String} title
  * @param {Integer} min
  * @param {Integer} max
@@ -109,18 +121,21 @@
  * show log
  * DDMSにログを表示する 
  * @id droid.log 
+ * @alias droid.log 
  * @param {String} msg	log message
  */
 /**
  * show log
  * DDMSに警告ログを表示する 
  * @id droid.log_warn 
+ * @alias droid.log_warn
  * @param {String} msg	log message
  */
 /**
  * show log
  * DDMSにエラーログを表示する 
  * @id droid.log_error 
+ * @alias droid.log_error 
  * @param {String} msg	log message
  */
 
@@ -128,7 +143,9 @@
 /**
  * Get Res Strings
  * 国際化のためのリソース文字列(values-xx/strings.xml)の値を取得する
+
  * @id droid.getResString
+ * @alias droid.getResString
  * @param {String} id
  * @return {String} Get String from resource
  */
@@ -137,6 +154,7 @@
  * Add Event Listener
  * イベントリスナを追加する(resume/pause/pageFinished)
  * @id droid.addEventListener
+ * @alias droid.addEventListener
  * @param {String} eventName
  * @param {Function} listener
  */
@@ -145,6 +163,7 @@
  * Remove Event Listener
  * イベントリスナを削除する
  * @id droid.removeEventListener
+ * @alias droid.removeEventListener
  * @param {String} eventName
  * @param {Function} listener
  */
@@ -153,6 +172,7 @@
  * sound play
  * サウンドを再生する(BGMに最適、効果音はloadSoundPoolを使う)
  * @id droid.playSound
+ * @alias droid.playSound
  * @param {String} filename
  * @param {Boolean} loopMode
  * @return {MediaPlayer}
@@ -162,6 +182,7 @@
 /**
  * stop sound
  * @id droid.stopSound
+ * @alias droid.stopSound
  * @param {MediaPlayer} playerObj
  * @return {Void}
  */
@@ -169,6 +190,7 @@
 /**
  * Check playing sound 
  * @id droid.isPlayingSound 
+ * @alias droid.isPlayingSound 
  * @param {MediaPlayer} playerObj
  * @return {Boolean}
  */
@@ -178,6 +200,7 @@
  * load to SoundPool (for SE)
  * サウンドを再生する(効果音に最適、BGMはplaySoundを使う)
  * @id droid.loadSoundPool
+ * @alias droid.loadSoundPool
  * @param {String} filename
  * @return {Number} soundId
  */
@@ -185,6 +208,8 @@
 /**
  * play SoundPool. Before play, needs to loadSoundPool.
  * @id droid.playSoundPool
+ * @alias droid.playSoundPool
+ * @alias droid.playSoundPool
  * @param {Number} soundId	SoundPool's id
  * @param {Number} loopCount
  * @return {Void}
@@ -193,6 +218,7 @@
 /**
  * stop SoundPool. Before play, needs to loadSoundPool.
  * @id droid.stopSoundPool
+ * @alias droid.stopSoundPool
  * @param {Number} soundId	SoundPool's id
  * @return {Void}
  */
@@ -200,6 +226,7 @@
 /**
  * unload SoundPool. 
  * @id droid.unloadSoundPool
+ * @alias droid.unloadSoundPool
  * @param {Number} soundId	SoundPool's id
  * @return {Void}
  */
@@ -207,6 +234,7 @@
 /**
  * Start Intent (ex) mailto:hoge@example.com?subject=xxx&body=xxx
  * @id droid.startIntent
+ * @alias droid.startIntent
  * @param {String}url (http/https/market/tel/sms/geo/mailto/file/camera/video)
  * @return {Boolean} result
  */
@@ -214,6 +242,7 @@
 /**
  * Start Intent for Result
  * @id droid.startIntentForResult
+ * @alias droid.startIntentForResult
  * @param {String} url
  * @param {Function} callback
  * @return {Boolean} result
@@ -222,6 +251,7 @@
 /**
  * Start Intent with FullScreen
  * @id droid.startIntentFullScreen
+ * @alias droid.startIntentFullScreen
  * @param {String} url (ex) file:///assets/www/full.html
  * @return {Boolean}
  */
@@ -229,6 +259,7 @@
 /**
  * Create custom Intent 
  * @id droid.intent_new
+ * @alias droid.intent_new
  * @param {String}action
  * @param {String}uri
  * @return {Intent}
@@ -237,6 +268,7 @@
 /**
  * Put Extra Data to Custom Intent
  * @id droid.intent_putExtra
+ * @alias droid.intent_putExtra
  * @param {Intent} intent
  * @param {String} name
  * @param {String} value
@@ -246,6 +278,7 @@
 /**
  * Gut Extra Data to Custom Intent
  * @id droid.intent_getExtra
+ * @alias droid.intent_getExtra
  * @param {Intent} intent
  * @param {String} name
  * @return {String}
@@ -254,6 +287,7 @@
 /**
  * Check exists intent
  * @id droid.intent_exists
+ * @alias droid.intent_exists
  * @param {String} intentName
  * @return {Boolean}
  */
@@ -261,6 +295,7 @@
 /**
  * Start Custom Intent
  * @id droid.intent_startActivity
+ * @alias droid.intent_startActivity
  * @param {Intent} intent
  * @return {Boolean}
  */
@@ -268,6 +303,7 @@
 /**
  * Scan Barcode
  * @id droid.scanBarcode
+ * @alias droid.scanBarcode
  * require "com.google.zxing.client.android"
  * @see http://code.google.com/p/zxing/
  * @param {Object} callback_fn
@@ -279,6 +315,7 @@
 /**
  * Show Route with GoogleMaps
  * @id droid.showRoute
+ * @alias droid.showRoute
  * @param {String} start (example)'35.671989 139.7' or '東京都渋谷区'
  * @param {String} end
  * @return {Void}
@@ -287,11 +324,13 @@
 /**
  * finish app
  * @id droid.quit
+ * @alias droid.quit
  */
 
 /**
  * save screen capture 
  * @id droid.snapshotToFile
+ * @alias droid.snapshotToFile
  * @param {String} filename
  * @param {String} format (png or jpeg)
  * @return {Boolean} save result
@@ -300,6 +339,7 @@
 /**
  * http get
  * @id droid.httpGet
+ * @alias droid.httpGet
  * @param {String} url
  * @param {Function}callback_ok	set Function(resultStr)
  * @param {Function}callback_ng set Function(errorMessage)
@@ -309,6 +349,7 @@
 /**
  * http download
  * @id droid.httpDownload
+ * @alias droid.httpDownload
  * @param {String} url
  * @param {String} filename
  * @param {Function} callback	set Function(result)
@@ -317,6 +358,7 @@
 /**
  * http post
  * @id droid.httpPost
+ * @alias droid.httpPost
  * @param {String} url
  * @param {Object} post_obj
  * @param {Function} callback	set Function(result)
@@ -326,12 +368,14 @@
 /**
  * copy text to clipboard
  * @id droid.clipboardSetText
+ * @alias droid.clipboardSetText
  * @param {String} text
  */
 
 /**
  * get text from clipboard
  * @id droid.clipboardGetText
+ * @alias droid.clipboardGetText
  * @return {String} text
  */
 
@@ -341,7 +385,9 @@
 /**
  * watch ACCELEROMETER
  * 傾きセンサーを監視する
+
  * @id droid.watchAccel
+ * @alias droid.watchAccel
  * @param {Function} callback
  * @return {Number} watchId
  */
@@ -349,7 +395,9 @@
 /** 
  * clear ACCELEROMETER
  * 傾きセンサーの監視を中止する。watchId を省略すると全ての傾きセンサーの利用を中断する。
+
  * @id droid.clearAccel
+ * @alias droid.clearAccel
  * @param {Number} watchId	watchAccel's return value (Default is clear all.)
  * @return {Void}
  */
@@ -357,7 +405,9 @@
 /**
  * watch Shake device
  * デバイスがシェイクされるのを監視する
+
  * @id droid.watchShake
+ * @alias droid.watchShake
  * @param {Function} shake_begin_callback_fn
  * @param {Function} shake_end_callback_fn
  * @param {Number} shake_begin_freq (default = 20)
@@ -373,6 +423,7 @@
 /**
  * open database
  * @id droid.openDatabase
+ * @alias droid.openDatabase
  * @paran {String} dbname
  * @return {DBHelper} database object
  */
@@ -380,6 +431,7 @@
 /**
  * executeSql
  * @id droid.executeSql
+ * @alias droid.executeSql
  * @param {DBHelper}db
  * @param {String}sql
  * @param {Function}fn_ok
@@ -389,6 +441,7 @@
 /**
  * executeSqlSync
  * @id droid.executeSqlSync
+ * @alias droid.executeSqlSync
  * @param {DBHelper}db
  * @param {String}sql
  * @return {Array}query result
@@ -400,6 +453,7 @@
 /**
  * get current position (GPS)
  * @id droid.getCurrentPosition
+ * @alias droid.getCurrentPosition
  * @param {Function} onSuccess
  * @param {Function} onError
  * @param {Object} options {Boolean}enableHighAccuracy/{Integer}timeout(msec)/{Integer}maximumAge
@@ -409,6 +463,7 @@
 /**
  * watchPosition (GPS)
  * @id droid.watchPosition
+ * @alias droid.watchPosition
  * @param {Function} onSuccess
  * @param {Function} onError
  * @param {Object} options {Boolean}enableHighAccuracy/{Integer}timeout(msec)/{Integer}maximumAge
@@ -418,6 +473,7 @@
 /**
  * clear watchPosion function
  * @id droid.clearWatchPosition
+ * @alias droid.clearWatchPosition
  * @alias DroidWaffle.geolocation.clearWatch
  * @param {Number} watchid
  */
@@ -429,28 +485,33 @@
 /**
  * storage set
  * @id droid.storage_set
+ * @alias droid.storage_set
  * @param {String} key
  * @param {String} value
  */
 /**
  * storage get
  * @id droid.pref_get
+ * @alias droid.pref_get
  * @param {String} key
  * @param {String} defValue
  */
 /**
  * storage remove
  * @id droid.pref_remove
+ * @alias droid.pref_remove
  * @param {String} key
  */
 /**
  * storage clear all
  * @id droid.pref_clear
+ * @alias droid.pref_clear
  */
 
 /**
  * save text file
  * @id droid.saveText
+ * @alias droid.saveText
  * @param {String} filename
  * @param {String} text
  */
@@ -458,6 +519,7 @@
 /**
  * load text file
  * @id droid.loadText
+ * @alias droid.loadText
  * @param {String} filename
  * @return {String} text
  */
@@ -465,6 +527,7 @@
 /**
  * get file list
  * @id droid.fileList
+ * @alias droid.fileList
  * @param {String} path (if undefined then default data area)
  * @return {Array} file list
  */
@@ -472,6 +535,7 @@
 /**
  * check file exists
  * @id droid.fileExists
+ * @alias droid.fileExists
  * @param {String} path
  * @return {Boolean}
  */
@@ -479,6 +543,7 @@
 /**
  * create directories
  * @id droid.mkdir
+ * @alias droid.mkdir
  * @param {String} path
  * @return {Boolean}
  */
@@ -486,6 +551,7 @@
 /**
  * delete file
  * @id droid.deleteFile
+ * @alias droid.deleteFile
  * @param {String} path
  * @return {Boolean}
  */
@@ -493,6 +559,7 @@
 /**
  * fileSize
  * @id droid.fileSize
+ * @alias droid.fileSize
  * @param {String} path
  * @return {Number}
  */
@@ -500,6 +567,7 @@
 /**
  * copy file from assets to sdcard
  * @id droid.copyAssetsFile
+ * @alias droid.copyAssetsFile
  * @param {String} assetsName
  * @param {String} savepath
  * @return {Boolean}
@@ -508,6 +576,7 @@
 /**
  * copy separated file from assets to sdcard
  * @id droid.mergeSeparatedAssetsFile
+ * @alias droid.mergeSeparatedAssetsFile
  * @param {String} assetsName
  * @param {String} savepath
  * @return {Boolean}
@@ -519,47 +588,56 @@
 /**
  * Get Display info
  * @id droid.getDisplayInfo
+ * @alias droid.getDisplayInfo
  * @return {Object}
  */
 
 /**
  * get system memory size
  * @id droid.getSystemMemory
+ * @alias droid.getSystemMemory
  * @return {Number} bytes
  */
 
 /**
  * get memory info object
  * @id droid.getMemoryInfo
+ * @alias droid.getMemoryInfo
  * @return {Object}
  */
 
 /**
  * has sdcard ?
  * @id droid.hasSDCard
+ * @alias droid.hasSDCard
  * @return {Boolean}
  */
 
 /**
  * SD card path
  * @id droid.getSDCardPath
+ * @alias droid.getSDCardPath
  * @return {String} sdcard path
  */
 
 /**
  * @id droid.getAndroidVersionInt
+ * @alias droid.getAndroidVersionInt
  * @return {Number}
  */
 
 /**
  * @id droid.getAndroidVersionRelease
+ * @alias droid.getAndroidVersionRelease
  * @return {String}
  */
 
 /**
  * get device unique info
  * 端末固有のIDを取得する
+
  * @id droid.getAndroidId
+ * @alias droid.getAndroidId
  * @return {String}
  */
 
@@ -569,6 +647,7 @@
 /**
  * pickup Contanct
  * @id droid.pickupContact
+ * @alias droid.pickupContact
  * @param {Function} callback
  * @return {Void}
  */
@@ -580,6 +659,7 @@
 /**
  * JSON encode
  * @id droid.stringify
+ * @alias droid.stringify
  * @param {Object} value
  * @return {String} JSON string
  */
