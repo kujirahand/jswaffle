@@ -177,7 +177,19 @@ public class DialogHelper {
 		};
 		DatePickerDialog d = new DatePickerDialog(waffle_activity, mDateSetListener, 
 				defYear, defMon, defDate);
-		d.setCancelable(false);
+		d.setCancelable(true);
+		d.setOnCancelListener(
+	            new DialogInterface.OnCancelListener() {
+	                public void onCancel(DialogInterface dialog) {
+	                    result.confirm("");
+	                }
+	            });
+		d.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+                result.confirm("");
+			}
+		});
 		d.show();
 		return true;
 	}
@@ -198,7 +210,20 @@ public class DialogHelper {
 			}
 		};
 		TimePickerDialog d = new TimePickerDialog(waffle_activity, mTimeSetListener, defHour, defMin, true);
-		d.setCancelable(false);
+		d.setCancelable(true);
+		d.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+                result.confirm("");
+			}
+		});
+		d.setOnCancelListener(
+            new DialogInterface.OnCancelListener() {
+    			@Override
+                public void onCancel(DialogInterface dialog) {
+                    result.confirm("");
+                }
+            });
 		d.show();
 		return true;
 	}
