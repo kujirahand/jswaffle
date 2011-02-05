@@ -175,9 +175,9 @@
  * @alias droid.playSound
  * @param {String} filename
  * @param {Boolean} loopMode
+ * @param {String} audioType ("ring" or "music")
  * @return {MediaPlayer}
  */
-
 
 /**
  * stop sound

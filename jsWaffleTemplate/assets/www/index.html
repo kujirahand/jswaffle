@@ -2,6 +2,7 @@
 <html>
 <head>
 	<meta charset="utf-8">
+	<title>jsWaffle DEMO</title>
 	<script type="text/javascript" src="jsWaffle.js"></script>
 	<script type="text/javascript" src="res/demo-common.js"></script>
 	<link rel="stylesheet" type="text/css" href="res/demo.css" />
@@ -21,19 +22,13 @@
 	<h1>jsWaffle DEMO</h1>
 	<div id="logo">
 		<div style="text-align:center;">
-			<img src="res/logo150.png" onclick="droid.vibrate()">
+			<img src="res/logo150.png" alt="jsWaffle LOGO" onclick="droid.vibrate()">
 		</div>
 		<div style="text-align:center;margin-bottom:8px;" id="ver"></div>
 		<div style="text-align:center;margin-bottom:8px;" id="info"></div>
 	</div>
 	
 	<!-- *** sample *** -->
-	<h2>Maps</h2>
-	<div class="buttons">
-		<button onclick="droid.startIntent('geo:0,0?q=tokyo')">Map(Tokyo)</button>
-		<button onclick="droid.showRoute('', '34.976002 138.383789')">showRoute</button>
-	</div>
-	
 	<h2>Beep/Ring/Vibrate</h2>
 	<div class="buttons">
 		<button onclick="droid.beep()">beep</button>
@@ -48,7 +43,7 @@
 		<button onclick="TestSoundPool()">SE:Play SoundPool</button>
 		<button onclick="droid.startIntent('http://www.youtube.com/watch?v=kbRBQ5c51eo')">Play Video(YouTube)</button>
 	</div>
-	<script>
+	<script type="text/javascript">
 		// for SoundPool Test (ogg file)
 		var soundId = droid.loadSoundPool("file:///android_asset/www/res/beep.ogg");
 		function TestSoundPool() {
@@ -68,13 +63,19 @@
 		}
 	</script>
 	
+	<h2>Maps</h2>
+	<div class="buttons">
+		<button onclick="droid.startIntent('geo:0,0?q=tokyo')">Map(Tokyo)</button>
+		<button onclick="droid.showRoute('', '34.976002 138.383789')">showRoute</button>
+	</div>
+	
 	<h2>Mail/Tel</h2>
 	<div class="buttons">
 		<button onclick="TestSendMail()">Send Mail</button>
 		<button onclick="droid.startIntent('tel:117')">Call 117</button>
 		<button onclick="TestContact()">Contact</button>
 	</div>
-	<script>
+	<script type="text/javascript">
 		function TestSendMail() {
 			droid.startIntent("mailto:web@kujirahand.com?subject=About_jsWaffle&body=test");
 		}
@@ -91,7 +92,7 @@
 	<div class="buttons">
 		<button onclick="showSnapshot()">Snapshot!!</button>
 	</div>
-	<script>
+	<script type="text/javascript">
 		function showSnapshot() {
 			var path = "file:/sdcard/test.png";
 			droid.snapshotToFile(path, "png");
@@ -104,7 +105,7 @@
 		<button id="httpget_btn" onclick="testHTTP()">httpGet:Get IP</button>
 		<button id="dl_btn" onclick="testHTTPDownload()">httpDownload:DL Image</button>
 	</div>
-	<script>
+	<script type="text/javascript">
 		function testHTTP() {
 			$("httpget_btn").disabled = true;
 			droid.httpGet("http://api.aoikujira.com/ip/json",

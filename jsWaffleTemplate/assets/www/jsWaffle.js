@@ -293,9 +293,10 @@ plugin_defineDroidMethod(
 		
 		/** @id droid.playSound */
 		playSound : {
-			droid : function (filename, loopMode) {
+			droid : function (filename, loopMode, audioType) {
 				if (loopMode == undefined || loopMode == null) loopMode = false;
-				var i = _base.createPlayer(filename, loopMode ? 1 : 0);
+				if (audioType == undefined) audioType = "ring";
+				var i = _base.createPlayer(filename, loopMode ? 1 : 0, audioType);
 				if (i != null) {
 					_base.playPlayer(i);
 				}

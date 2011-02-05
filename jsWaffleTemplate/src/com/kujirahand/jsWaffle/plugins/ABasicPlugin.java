@@ -131,12 +131,19 @@ public class ABasicPlugin extends WafflePlugin
 	/**
 	 * play media file (for BGM)
 	 * @param filename
+	 * @param loopMode
+	 * @paran audioType (music || ring)
 	 * @return MediaPlayer
 	 */
-	public MediaPlayer createPlayer(String soundfile, int loopMode) {
+	public MediaPlayer createPlayer(String soundfile, int loopMode, String audioType) {
 		MediaPlayer mp = new MediaPlayer();
 		try {
-			mp.setAudioStreamType(AudioManager.STREAM_RING);
+			if (audioType == "music") {
+				mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+			}
+			else if (audioType == "ring" || audioType == null || audioType == "") {
+				mp.setAudioStreamType(AudioManager.STREAM_RING);
+			}
 			//
 			Uri uri = WaffleUtils.checkFileUri(soundfile);
 			String path = uri.getPath();
@@ -156,15 +163,18 @@ public class ABasicPlugin extends WafflePlugin
 		return mp;
 	}
 	public void playPlayer(MediaPlayer mp) {
+		if (mp == null) return;
 		mp.seekTo(0);
 		mp.start();
 	}
 	public void stopPlayer(MediaPlayer mp) {
+		if (mp == null) return;
 		if (mp.isPlaying()) {
 			mp.stop();
 		}
 	}
 	public boolean isPlayingSound(MediaPlayer mp) {
+		if (mp == null) return false;
 		return (mp.isPlaying());
 	}
 	
