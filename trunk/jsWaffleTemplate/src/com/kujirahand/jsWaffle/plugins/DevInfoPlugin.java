@@ -7,6 +7,7 @@ import android.app.ActivityManager;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
+import android.provider.Settings.Secure;
 import android.util.DisplayMetrics;
 import android.view.Display;
 
@@ -109,7 +110,20 @@ Log.d("build","VERSION.SDK_INT:" + Build.VERSION.SDK_INT);
 	 * @return
 	 */
 	public String getAndroidId() {
-		return android.provider.Settings.Secure.ANDROID_ID;
+		String android_id = null;
+		try {
+			android_id = Secure.getString(waffle_activity.getContentResolver(), Secure.ANDROID_ID);
+		} catch (Exception e) {
+		}
+		try {
+			// for Android 1.5
+			if (android_id == null) {
+				android_id = android.provider.Settings.System.getString(
+						waffle_activity.getContentResolver(), android.provider.Settings.System.ANDROID_ID);
+			}
+		} catch (Exception e) {
+		}
+		return android_id;
 	}
 	
 }
