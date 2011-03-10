@@ -3,8 +3,6 @@ package com.kujirahand.jsWaffle;
 
 import java.io.File;
 
-import com.kujirahand.template.R;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -144,10 +142,10 @@ public class WaffleMemoActivity extends Activity {
 	@Override
 	 public boolean onCreateOptionsMenu(Menu menu) {
 		// create
-		MenuItem menuSave = menu.add(R.string.menu_save);
-		MenuItem menuSaveAs = menu.add(R.string.menu_saveas);
-		MenuItem menuLoad = menu.add(R.string.menu_load);
-		MenuItem menuClose = menu.add(R.string.menu_close);
+		MenuItem menuSave = menu.add("Save");
+		MenuItem menuSaveAs = menu.add("Save As");
+		MenuItem menuLoad = menu.add("Load");
+		MenuItem menuClose = menu.add("Close");
 		// icon
 		menuSave.setIcon(android.R.drawable.ic_menu_save);
 		menuSaveAs.setIcon(android.R.drawable.ic_menu_save);

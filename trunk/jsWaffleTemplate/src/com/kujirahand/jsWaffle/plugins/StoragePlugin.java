@@ -258,5 +258,18 @@ public class StoragePlugin extends WafflePlugin
 		}
 		return r;
 	}
+	
+	/**
+	 * file copy
+	 */
+	public boolean fileCopy(String src, String des) {
+		try {
+			WaffleUtils.copyFileFromName(src, des, waffle_activity);
+			return true;
+		} catch (Exception e) {
+			waffle_activity.log_error(e.getMessage());
+			return false;
+		}
+	 }
 
 }

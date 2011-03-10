@@ -3,10 +3,12 @@ package com.kujirahand.jsWaffle.utils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -152,6 +154,7 @@ public class WaffleUtils {
 				result = new File(uri.getPath());
 			}
 			else {
+				WaffleActivity.mainInstance.log_warn("Unknown scheme : " + filename);
 				// error
 			}
 		} catch (Exception e) {
@@ -178,10 +181,15 @@ public class WaffleUtils {
 		try {
 			Uri uri = checkFileUri(filename);
 			String path = uri.getPath();
+			String scheme = uri.getScheme();
 			// check assets
 			if (path.startsWith("/android_asset/")) {
 				path = path.substring(15);
 				return activity.getAssets().open(path);
+			}
+			// check Contents Provider
+			if (scheme.equals("content")) {
+				return activity.getContentResolver().openInputStream(uri);
 			}
 			// cehck File Path
 			File f = detectFile(filename, activity);
@@ -193,6 +201,47 @@ public class WaffleUtils {
 		} catch (Exception e) {
 		}
 		return input;
+	}
+	
+	/**
+	 * copy file
+	 * @param src
+	 * @param des
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public static void copyFileFromName(String src, String des, Activity app)
+		throws FileNotFoundException, IOException {
+		InputStream srcFile = getInputStream(src, app);
+		if (srcFile == null) {
+			throw new FileNotFoundException(src);
+		}
+		OutputStream desFile = getOutputStream(des, app);
+		copyFileStream(srcFile, desFile);
+	}
+	public static void copyFile(File srcFile, File desFile)
+		throws FileNotFoundException, IOException {
+		try {
+			File parent = desFile.getParentFile();
+			if (!parent.exists()) {
+				parent.mkdirs();
+			}
+		} catch (Exception e) {
+		}
+		//
+		InputStream input = new FileInputStream(srcFile);
+		OutputStream output = new FileOutputStream(desFile);
+		copyFileStream(input, output);
+	}
+	public static void copyFileStream(InputStream input, OutputStream output)
+		throws IOException {
+		byte[] buffer = new byte[BUFFSIZE];
+		int n = 0;
+		while (-1 != (n = input.read(buffer))) {
+			output.write(buffer, 0, n);
+		}
+		input.close();
+		output.close();
 	}
 	
 	/**
