@@ -313,6 +313,14 @@
  */
 
 /**
+ * Select Image From Gallery
+ * @id droid.pickupImageFromGallery
+ * @alias droid.pickupImageFromGallery
+ * @param {Object} callback_fn (Function (url) {} )
+ * @return {Void}
+ */
+
+/**
  * Show Route with GoogleMaps
  * @id droid.showRoute
  * @alias droid.showRoute
@@ -579,6 +587,15 @@
  * @alias droid.mergeSeparatedAssetsFile
  * @param {String} assetsName
  * @param {String} savepath
+ * @return {Boolean}
+ */
+
+/**
+ * copy file
+ * @id droid.fileCopy
+ * @alias droid.fileCopy
+ * @param {String} src source url
+ * @param {String} des destination url
  * @return {Boolean}
  */
 

@@ -816,6 +816,16 @@ plugin_defineDroidMethod(
 			cross : function () {}
 		},
 		
+		/** @id droid.fileCopy */
+		fileCopy : {
+			droid : function (src, des) {
+				return _storage.fileCopy(src, des);
+			},
+			cross : function (src, des) {
+				return false;
+			}
+		},
+		
 		___ : end_of_define_method
 	}
 );
@@ -1028,6 +1038,21 @@ plugin_defineDroidMethod(
 			cross : function (callback_fn, show_help) {
 				console.log("scanQRCode");
 				return true;
+			}
+		},
+		
+		/** @id droid.pickupImageFromGallery */
+		pickupImageFromGallery : {
+			droid : function (callback_fn) {
+				self.droid._pickupImageFromGallery_callback = callback_fn;
+				self.droid._pickupImageFromGallery = function (url) {
+					self.droid._pickupImageFromGallery_callback(url);
+				};
+				return _intent.pickupImageFromGallery("droid._pickupImageFromGallery");
+			},
+			cross : function (callback_fn) {
+				console.log("pickupImageFromGallery");
+				return false;
 			}
 		},
 		

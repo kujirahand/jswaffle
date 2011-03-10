@@ -7,20 +7,24 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.provider.MediaStore;
 
 import com.kujirahand.jsWaffle.WaffleActivityFullScreen;
 import com.kujirahand.jsWaffle.WaffleActivitySub;
 import com.kujirahand.jsWaffle.model.WafflePlugin;
 import com.kujirahand.jsWaffle.utils.IntentHelper;
+import com.kujirahand.jsWaffle.utils.WaffleUtils;
 
 public class IntentPlugin extends WafflePlugin {
 	//
 	public final static int ACTIVITY_REQUEST_CODE_BARCODE = 0xFF0001;
 	public final static int ACTIVITY_REQUEST_CODE_CONTACT = 0xFF0002;
+	public final static int ACTIVITY_REQUEST_CODE_GALLARY = 0xFF0003;
 	
 	// Callback string
 	private String intent_startActivity_callback = null;
 	private String intent_startActivity_callback_barcode = null;
+	private String intent_startActivity_callback_gallery = null;
 
 	/**
 	 * Start Intent
@@ -105,6 +109,24 @@ public class IntentPlugin extends WafflePlugin {
 	}
 	
 	/**
+	 * Pickup Image From Gallery
+	 */
+	public boolean pickupImageFromGallery(String callbackName) {
+		intent_startActivity_callback_gallery = callbackName;
+		try {
+			Intent intent = new Intent();
+			intent.setType("image/*");
+			intent.setAction(Intent.ACTION_GET_CONTENT);
+			waffle_activity.startActivityForResult(
+					intent, ACTIVITY_REQUEST_CODE_GALLARY);
+			return true;
+		}
+		catch (Exception e) {
+			return false;
+		}
+	}
+	
+	/**
 	 * Intent Exists?
 	 * @param intentName (ex: com.kujirahand.jsWaffle.xxx)
 	 */
@@ -144,6 +166,8 @@ public class IntentPlugin extends WafflePlugin {
 		}
 	}
 	
+	
+	
 	//-----------------------------------------------------------------
 	// @see intent_startActivityForResult
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -158,10 +182,44 @@ public class IntentPlugin extends WafflePlugin {
 			}
 	        param = intent_startActivity_callback_barcode + "('" + contents + "','" + format + "')";
 			waffle_activity.callJsEvent(param);
+		} else if (requestCode == ACTIVITY_REQUEST_CODE_GALLARY) {
+			String fname = intent.getData().toString();
+	        param = intent_startActivity_callback_gallery + "('" + fname + "')";
+			waffle_activity.callJsEvent(param);
+		} else if (
+			requestCode == IntentHelper.request_code && 
+			(IntentHelper.last_intent_type == MediaStore.ACTION_IMAGE_CAPTURE ||
+					IntentHelper.last_intent_type == MediaStore.ACTION_VIDEO_CAPTURE)
+		) {
+			cameraResult(requestCode, resultCode, intent);
 		} else {
 			if (intent_startActivity_callback == null) return;
 			param = intent_startActivity_callback + "(" + requestCode + "," + resultCode + ")";
 			waffle_activity.callJsEvent(param);
 		}
+	}
+	
+	public void cameraResult(int requestCode, int resultCode, Intent intent) {
+		// Android 2.x (not use EXTRA_OUTPUT)
+		if (intent != null) {
+			Uri imageurl = intent.getData();
+			if (imageurl != null && resultCode != 0) {
+				try {
+					String s_src = imageurl.toString();
+					String s_des = IntentHelper.last_intent_uri.toString();
+					if (!s_src.equals(s_des)) {
+						WaffleUtils.copyFileFromName(
+								imageurl.toString(),
+								IntentHelper.last_intent_uri.toString(),
+								waffle_activity);
+					}
+				} catch (Exception e) {
+					resultCode = 0;
+				}
+			}
+		}
+		if (intent_startActivity_callback == null) return;
+		String param = intent_startActivity_callback + "(" + requestCode + "," + resultCode + ")";
+		waffle_activity.callJsEvent(param);
 	}
 }

@@ -17,6 +17,8 @@ import android.util.Log;
 public class IntentHelper {
 	
 	public static int request_code = 0;
+	public static Uri last_intent_uri = null;
+	public static String last_intent_type = null;
 	
 	public static boolean run(Context appContext, String url) {
 		//TODO:URIの独自スキーマの定義
@@ -86,7 +88,7 @@ public class IntentHelper {
 			}
 			return true;
 		}
-		else if (url.startsWith("file:")) {
+		else if (url.startsWith("file:") || url.startsWith("/sdcard/")) {
 			return runFile(appContext, url);
 		}
 		else if (url.startsWith("camera:")) {
@@ -107,8 +109,11 @@ public class IntentHelper {
 			url = url.replace("camera:", "file:");
 			url = url.replace("video:",  "file:");
 			url = url.replace("record:", "file:");
-			//
+			// set path
 			Uri saveUri = Uri.parse(url);
+			last_intent_uri = saveUri;
+			last_intent_type = mediaType;
+			// start activity
 			Intent intent = new Intent();
 			intent.setAction(mediaType);
 			intent.putExtra(MediaStore.EXTRA_OUTPUT, saveUri);
@@ -123,6 +128,9 @@ public class IntentHelper {
 
 	
 	private static boolean runFile(Context appContext, String url) {
+		if (!url.startsWith("file:")) {
+			url = "file://" + url;
+		}
 		Uri uriFile = Uri.parse(url);
 		if (url.startsWith("file:///android_asset")) {
 			return false; // show in WaffleActivity
