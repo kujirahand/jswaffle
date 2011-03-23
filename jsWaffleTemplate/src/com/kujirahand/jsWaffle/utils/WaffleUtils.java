@@ -188,7 +188,7 @@ public class WaffleUtils {
 				return activity.getAssets().open(path);
 			}
 			// check Contents Provider
-			if (scheme.equals("content")) {
+			if (scheme != null && scheme.equals("content")) {
 				return activity.getContentResolver().openInputStream(uri);
 			}
 			// cehck File Path
