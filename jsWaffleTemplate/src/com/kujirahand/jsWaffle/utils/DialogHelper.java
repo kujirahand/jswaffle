@@ -6,8 +6,11 @@ import android.R;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.view.View;
 import android.webkit.JsPromptResult;
+import android.webkit.JsResult;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -16,12 +19,26 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 public class DialogHelper {
-	public static WaffleActivity waffle_activity;
+	public static WaffleActivity waffle_activity = null;
+	
+	public static Context getFocusView() {
+		try {
+			WaffleActivity wa = DialogHelper.waffle_activity;
+			wa.getWindow().makeActive();
+			View v = wa.getCurrentFocus();
+			if (v == null) {
+				return wa;
+			}
+			return v.getContext();
+		} catch (Exception e) {
+			return DialogHelper.waffle_activity;
+		}
+	}
 	
 	public static boolean inputDialog(String title, String message, String defaultValue, final JsPromptResult result) {
-		final LinearLayout layout = new LinearLayout(waffle_activity);
-		final EditText edtInput = new EditText(waffle_activity);
-		final TextView txtView = new TextView(waffle_activity);
+		final LinearLayout layout = new LinearLayout(getFocusView());
+		final EditText edtInput = new EditText(getFocusView());
+		final TextView txtView = new TextView(getFocusView());
 		txtView.setPadding(10,10,10,10);
 		
 		layout.setOrientation(LinearLayout.VERTICAL);
@@ -31,7 +48,7 @@ public class DialogHelper {
 		txtView.setText(message);
 		edtInput.setText(defaultValue);
 		
-		new AlertDialog.Builder(waffle_activity)
+		new AlertDialog.Builder(getFocusView())
             .setTitle("Prompt")
             .setView(layout)
             .setPositiveButton(android.R.string.ok,
@@ -59,7 +76,7 @@ public class DialogHelper {
 	}
 	
 	public static boolean dialogYesNo(String title, String message, String defaultValue, final JsPromptResult result) {
-		new AlertDialog.Builder(waffle_activity)
+		new AlertDialog.Builder(getFocusView())
 		.setIcon(android.R.drawable.ic_menu_help)
 		.setTitle(title)
 		.setMessage(message)
@@ -83,12 +100,72 @@ public class DialogHelper {
 		.show();
 		return true;
 	}
+
+	public static boolean alert(String title, String message, final JsResult result) {
+		new AlertDialog.Builder(getFocusView())
+		.setTitle("Information")
+		.setMessage(message)
+		.setPositiveButton(
+			android.R.string.ok,
+			new DialogInterface.OnClickListener()
+			{
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					result.confirm();
+				}
+			})
+		.setCancelable(true)
+        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+			@Override
+			public void onCancel(DialogInterface dialog) {
+				result.cancel();
+			}
+		})
+		.create()
+		.show();
+		return true;
+	}
 	
+	public static boolean confirm(String title, String message, final JsResult result) {
+	    new AlertDialog.Builder(getFocusView())
+        .setTitle(title)
+        .setMessage(message)
+        .setPositiveButton(
+        		android.R.string.ok,
+        		new DialogInterface.OnClickListener()
+        {
+			@Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                result.confirm();
+            }
+        })
+        .setNegativeButton(android.R.string.cancel,
+                new DialogInterface.OnClickListener()
+        {
+			@Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                result.cancel();
+            }
+        })
+        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+			@Override
+			public void onCancel(DialogInterface dialog) {
+				result.cancel();
+			}
+		})
+        .setCancelable(true)
+        .create()
+        .show();
+        return true;			
+	}
+
 	public static boolean selectList(String title, String message, String items, final JsPromptResult result) {
 		// items
 		final String[] str_items = items.split(";;;");
 		// show select list
-		new AlertDialog.Builder(waffle_activity)
+		new AlertDialog.Builder(getFocusView())
 		.setTitle(title)
 		.setItems(str_items, new DialogInterface.OnClickListener(){
 			public void onClick(DialogInterface dialog, int which) {
@@ -113,7 +190,7 @@ public class DialogHelper {
 		final String[] str_items = items.split(";;;");
 		final boolean[] bool_items = new boolean[str_items.length];
 		//
-		new AlertDialog.Builder(waffle_activity)
+		new AlertDialog.Builder(getFocusView())
 		.setTitle(title)
 		.setMultiChoiceItems(str_items, bool_items, new DialogInterface.OnMultiChoiceClickListener() {
 			@Override
@@ -175,7 +252,7 @@ public class DialogHelper {
 				result.confirm(ans);
 			}
 		};
-		DatePickerDialog d = new DatePickerDialog(waffle_activity, mDateSetListener, 
+		DatePickerDialog d = new DatePickerDialog(getFocusView(), mDateSetListener, 
 				defYear, defMon, defDate);
 		d.setCancelable(true);
 		d.setOnCancelListener(
@@ -209,7 +286,7 @@ public class DialogHelper {
 				result.confirm(String.format("%02d:%02d", hourOfDay, minute));
 			}
 		};
-		TimePickerDialog d = new TimePickerDialog(waffle_activity, mTimeSetListener, defHour, defMin, true);
+		TimePickerDialog d = new TimePickerDialog(getFocusView(), mTimeSetListener, defHour, defMin, true);
 		d.setCancelable(true);
 		d.setOnDismissListener(new DialogInterface.OnDismissListener() {
 			@Override
@@ -229,8 +306,8 @@ public class DialogHelper {
 	}
 	
 	public static boolean seekbarDialog(String title, String message, String defaultValue, final JsPromptResult result) {
-		final LinearLayout layout = new LinearLayout(waffle_activity);
-		final SeekBar bar = new SeekBar(waffle_activity);
+		final LinearLayout layout = new LinearLayout(getFocusView());
+		final SeekBar bar = new SeekBar(getFocusView());
 		bar.setPadding(10, 10, 10, 10);
 		
 		String[] a = defaultValue.split(","); // min, max, default
@@ -244,7 +321,7 @@ public class DialogHelper {
 		layout.setOrientation(LinearLayout.VERTICAL);
 		layout.addView(bar);
 		
-		new AlertDialog.Builder(waffle_activity)
+		new AlertDialog.Builder(getFocusView())
             .setTitle(title)
             .setView(layout)
             .setPositiveButton(android.R.string.ok,
