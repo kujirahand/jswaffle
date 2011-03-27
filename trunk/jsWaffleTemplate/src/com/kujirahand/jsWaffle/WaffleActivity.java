@@ -15,9 +15,7 @@ import com.kujirahand.jsWaffle.utils.DialogHelper;
 import com.kujirahand.jsWaffle.utils.IntentHelper;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -42,7 +40,7 @@ import android.widget.LinearLayout;
 public class WaffleActivity extends Activity {
 	
 	/** jsWaffle Version Info */
-	public static double WAFFLE_VERSON = 1.176;
+	public static double WAFFLE_VERSON = 1.177;
 	
 	public static WaffleActivity mainInstance = null;
 	public WebView webview;
@@ -56,7 +54,10 @@ public class WaffleActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
-    	if (mainInstance == null) mainInstance = this; // set main instance
+    	if (mainInstance == null) {
+    		mainInstance = this; // set main instance
+    		DialogHelper.waffle_activity = this;
+    	}
     	
     	// Initialize jsWaffle setting flags
     	waffle_flags = new WaffleFlags(this);
@@ -393,65 +394,27 @@ public class WaffleActivity extends Activity {
 		@Override
 		public boolean onJsAlert(WebView view, String url, String message, final android.webkit.JsResult result)
 		{
-			new AlertDialog.Builder(appContext)
-				.setTitle("Information")
-				.setMessage(message)
-				.setPositiveButton(
-					android.R.string.ok,
-					new DialogInterface.OnClickListener()
-					{
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							result.confirm();
-						}
-					})
-				.setCancelable(true)
-		        .setOnCancelListener(new DialogInterface.OnCancelListener() {
-					@Override
-					public void onCancel(DialogInterface dialog) {
-						result.cancel();
-					}
-				})
-				.create()
-				.show();
-			return true;
+			boolean r = false;
+			try {
+				r = DialogHelper.alert("Information", message, result);
+			} catch (Exception e) {
+				log("[DialogError]" + e.getMessage());
+				result.cancel();
+			}
+			return r;
 		}
 		
 		@Override
 		public boolean onJsConfirm(WebView view, String url, String message, final JsResult result)
 		{
-		     new AlertDialog.Builder(appContext)
-		        .setTitle("Confirm")
-		        .setMessage(message)
-		        .setPositiveButton(
-		        		android.R.string.ok,
-		        		new DialogInterface.OnClickListener()
-		        {
-					@Override
-		            public void onClick(DialogInterface dialog, int which)
-		            {
-		                result.confirm();
-		            }
-		        })
-		        .setNegativeButton(android.R.string.cancel,
-		                new DialogInterface.OnClickListener()
-		        {
-					@Override
-		            public void onClick(DialogInterface dialog, int which)
-		            {
-		                result.cancel();
-		            }
-		        })
-		        .setOnCancelListener(new DialogInterface.OnCancelListener() {
-					@Override
-					public void onCancel(DialogInterface dialog) {
-						result.cancel();
-					}
-				})
-		        .setCancelable(true)
-		        .create()
-		        .show();
-		        return true;			
+			boolean r = false;
+			try {
+				r = DialogHelper.confirm("Confirm", message, result);
+			} catch (Exception e) {
+				log("[DialogError]" + e.getMessage());
+				result.cancel();
+			}
+			return r;
 		}
 		
 		
@@ -459,7 +422,6 @@ public class WaffleActivity extends Activity {
 		public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, final JsPromptResult result)
 		{
 			// prompt() を拡張して様々な用途のダイアログを表示する
-			DialogHelper.waffle_activity = mainInstance;
 			boolean r = true;
 			try {
 				switch (ABasicPlugin.dialogType) {
@@ -487,6 +449,7 @@ public class WaffleActivity extends Activity {
 				}
 			} catch (Exception e) {
 				log("[DialogError]" + e.getMessage());
+				result.cancel();
 			}
 			return r;
 		}
