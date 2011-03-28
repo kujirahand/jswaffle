@@ -19,11 +19,9 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 public class DialogHelper {
-	public static WaffleActivity waffle_activity = null;
-	
 	public static Context getFocusView() {
 		try {
-			WaffleActivity wa = DialogHelper.waffle_activity;
+			WaffleActivity wa = WaffleActivity.mainInstance;
 			wa.getWindow().makeActive();
 			View v = wa.getCurrentFocus();
 			if (v == null) {
@@ -31,7 +29,7 @@ public class DialogHelper {
 			}
 			return v.getContext();
 		} catch (Exception e) {
-			return DialogHelper.waffle_activity;
+			return WaffleActivity.mainInstance;
 		}
 	}
 	

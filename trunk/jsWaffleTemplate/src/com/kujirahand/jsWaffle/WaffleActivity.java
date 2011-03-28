@@ -56,7 +56,6 @@ public class WaffleActivity extends Activity {
     	super.onCreate(savedInstanceState);
     	if (mainInstance == null) {
     		mainInstance = this; // set main instance
-    		DialogHelper.waffle_activity = this;
     	}
     	
     	// Initialize jsWaffle setting flags
