@@ -3,7 +3,7 @@ package com.kujirahand.jsWaffle.utils;
 import java.net.URLDecoder;
 import java.util.Hashtable;
 
-public class MailToDecoder {
+public class WaffleMailToDecoder {
 	
 	public String protocol;
 	public String mail;
@@ -12,7 +12,7 @@ public class MailToDecoder {
 	public String attach;
 	public Hashtable<String, String> query;
 	
-	public MailToDecoder(String uri) {
+	public WaffleMailToDecoder(String uri) {
 		String s = uri;
 		int i;
 		//

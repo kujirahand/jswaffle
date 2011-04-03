@@ -1,7 +1,9 @@
 package com.kujirahand.jsWaffle.plugins;
 
 import java.util.HashMap;
+
 import android.content.Intent;
+
 import com.kujirahand.jsWaffle.model.WafflePlugin;
 import com.kujirahand.jsWaffle.utils.ContactAccessor;
 
