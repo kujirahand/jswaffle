@@ -40,7 +40,7 @@ import android.widget.LinearLayout;
 public class WaffleActivity extends Activity {
 	
 	/** jsWaffle Version Info */
-	public static double WAFFLE_VERSON = 1.177;
+	public static double WAFFLE_VERSON = 1.178;
 	
 	public static WaffleActivity mainInstance = null;
 	public WebView webview;

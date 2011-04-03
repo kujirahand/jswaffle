@@ -56,7 +56,7 @@ public class IntentHelper {
 		{
 			// mailto:hoge@example.com?subject=test&body=hogehoge&attach=/sdcard/hoge.jpg
 			Uri mailUri = Uri.parse(url);
-			MailToDecoder dec = new MailToDecoder(url);
+			WaffleMailToDecoder dec = new WaffleMailToDecoder(url);
 			String subject = dec.subject;
 			String body = dec.body;
 			String attach = dec.attach;
