@@ -735,7 +735,7 @@ plugin_defineDroidMethod(
 			cross : function (key, defValue) { return window.localStorage.getItem(key, defValue); }
 		},
 		pref_remove : {
-			droid : function (key) { return _storage.localStorage_remove(key, defValue); },
+			droid : function (key) { return _storage.localStorage_remove(key); },
 			cross : function (key) { return window.localStorage.removeItem(key); }
 		},
 		pref_clear : {

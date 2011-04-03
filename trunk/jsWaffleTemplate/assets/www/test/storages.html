@@ -34,11 +34,16 @@
 		<button onclick="TestSaveFile()">Save File</button>
 		<button onclick="TestLoadFile()">Load File</button>
 		<button onclick="TestPref()">Counter Test(pref_get)</button>
+		<button onclick="RemovePref()">Remove Pref</button>
 	</div>
 	<div class="disp">
 		<div id="storage_disp">counter : ?</div>
 	</div>
 	<script>
+		function RemovePref() {
+			droid.pref_remove("counter");
+			alert(droid.pref_get("counter", 0));
+		}
 		function TestSaveFile() {
 			var txt = prompt("Input Text!!");
 			if (txt == "") { txt = "no input"; }
