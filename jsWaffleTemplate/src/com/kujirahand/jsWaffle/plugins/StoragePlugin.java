@@ -123,7 +123,7 @@ public class StoragePlugin extends WafflePlugin
 		e.commit();
 	}
 	public void localStorage_remove(String key) {
-		Editor e = getPublicPreference().edit();
+		Editor e = getPrivatePreference().edit();
 		e.remove(key);
 		e.commit();
 	}
