@@ -860,8 +860,8 @@ plugin_defineDroidMethod(
 		},
 		/** @id droid.getMemoryInfo */
 		getMemoryInfo : {
-			droid : function (key) { return _storage.preferenceRemove(key, defValue); },
-			cross : function (key) { return {availMem:0, lowMemory:false, threshold:0} }
+			droid : function () { return droid.json_parse(_dev.getMemoryInfo());    },
+			cross : function () { return {availMem:0, lowMemory:false, threshold:0} }
 		},
 		/** @id droid.hasSDCard */
 		hasSDCard : {
@@ -1121,7 +1121,12 @@ var stringify = function(obj) {
 };
 /** @id droid.stringify */
 self.droid.stringify = stringify;
-
-
+/** @id droid.json_parse */
+self.droid.json_parse = function (str) {
+	if (typeof(JSON) != 'undefined') {
+		return JSON.parse(str);
+	}
+	return eval('(' + str + ')');
+};
 
 })(this);
