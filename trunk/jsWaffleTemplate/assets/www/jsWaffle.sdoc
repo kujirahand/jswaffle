@@ -680,7 +680,13 @@
  * @param {Object} value
  * @return {String} JSON string
  */
-
+/**
+ * JSON decode
+ * @id droid.json_parse
+ * @alias droid.json_parse
+ * @param {String} str
+ * @return {Object}
+ */
 
 
 
