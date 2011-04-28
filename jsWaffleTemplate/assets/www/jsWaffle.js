@@ -371,7 +371,7 @@ plugin_defineDroidMethod(
 				};
 				self.droid._httpGet_ng = function (err, tag) {
 					var f = func_bank.getItem(tag);
-					if (typeof(f.ng) == "function") f.ng(str);
+					if (typeof(f.ng) == "function") f.ng(err);
 				};
 				return String(_base.httpGet(url, "droid._httpGet_ok", "droid._httpGet_ng", tag));
 			},
