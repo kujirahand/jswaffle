@@ -1093,9 +1093,9 @@ var escapeString = function (str) {
 	return str;
 };
 var stringify = function(obj) {
-	if (typeof(JSON) != 'undefined') {
-		return JSON.stringify(obj);
-	}
+	//if (typeof(JSON) != 'undefined') {
+	//	return JSON.stringify(obj);
+	//}
 	var type = typeof(obj);
 	switch (type) {
 	case 'number'   : return "" + obj;
@@ -1132,10 +1132,16 @@ var stringify = function(obj) {
 self.droid.stringify = stringify;
 /** @id droid.json_parse */
 self.droid.json_parse = function (str) {
-	if (typeof(JSON) != 'undefined') {
-		return JSON.parse(str);
+	// Many android OS is not support JSON object (1.x/2.2)
+	//if (typeof(JSON) != 'undefined') {
+	//	return JSON.parse(str);
+	//}
+	try {
+		return eval('(' + str + ')');
+	} catch (e) {
+		droid.log("json_parse.error : " + str);
+		return null;	
 	}
-	return eval('(' + str + ')');
 };
 
 })(this);
