@@ -20,6 +20,21 @@
  * @alias droid.beep
  * @return {Void}
  */
+/**
+ * ring sound
+ * ベルを鳴らす
+ * @id droid.ring
+ * @alias droid.ring
+ * @return {Void}
+ */
+
+/**
+ * ring sound stop
+ * ベルを止める
+ * @id droid.ring_stop
+ * @alias droid.ringstop
+ * @return {Void}
+ */
 
 /**
  * vibrate device

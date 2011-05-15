@@ -109,6 +109,15 @@ public class ABasicPlugin extends WafflePlugin
 	}
 	Ringtone ring_tone = null;
 	
+	public void ring_stop() {
+		if (ring_tone == null) {
+			return;
+		}
+		if (ring_tone.isPlaying()) ring_tone.stop();
+		ring_tone.play();
+	}
+	
+	
 	/**
 	 * vibrate
 	 * @param msec
@@ -265,8 +274,10 @@ public class ABasicPlugin extends WafflePlugin
 	 * @return
 	 */
 	public boolean snapshotToFile(String filename, String format) {
-        webview.setDrawingCacheEnabled(true);
-		Bitmap bmp = webview.getDrawingCache();
+		// snapshot
+		webview.setDrawingCacheEnabled(true);
+		Bitmap bmp = Bitmap.createBitmap(webview.getDrawingCache());
+		webview.setDrawingCacheEnabled(false);
 		if (bmp == null) {
 			log_error("snapshot failed: bmp = null");
 			return false;
@@ -279,8 +290,9 @@ public class ABasicPlugin extends WafflePlugin
 		}
 		try {
 			byte[] w = bmp2data(bmp, fmt, 80/*middle*/);
-			writeDataFile(filename, w);
-			return true;
+			boolean b = writeDataFile(filename, w);
+			bmp.recycle(); // recycle !!
+			return b;
 		} catch (Exception e) {
 			log_error("snapshot failed:" + e.getMessage());
 			return false;

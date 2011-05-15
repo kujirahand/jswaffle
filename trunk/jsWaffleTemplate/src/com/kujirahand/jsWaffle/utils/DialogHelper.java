@@ -20,8 +20,8 @@ import android.widget.TimePicker;
 
 public class DialogHelper {
 	public static Context getFocusView() {
+		WaffleActivity wa = WaffleActivity.mainInstance;
 		try {
-			WaffleActivity wa = WaffleActivity.mainInstance;
 			wa.getWindow().makeActive();
 			View v = wa.getCurrentFocus();
 			if (v == null) {
@@ -29,6 +29,7 @@ public class DialogHelper {
 			}
 			return v.getContext();
 		} catch (Exception e) {
+			wa.log_error("getFocusView: " + e.getMessage());
 			return WaffleActivity.mainInstance;
 		}
 	}
