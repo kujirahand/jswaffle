@@ -31,4 +31,13 @@ function setMyMenuItem() {
 			location.reload();
 		}
 	);
+	// get memory info
+	droid.setMenuItem(
+		4, true, "MemotyInfo", "ic_menu_info_details",
+		function() {
+			alert(
+				droid.stringify(droid.getMemoryInfo())
+			);
+		}
+	);
 }

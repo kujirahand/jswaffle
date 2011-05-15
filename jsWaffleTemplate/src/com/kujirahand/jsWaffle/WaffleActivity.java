@@ -40,7 +40,7 @@ import android.widget.LinearLayout;
 public class WaffleActivity extends Activity {
 	
 	/** jsWaffle Version Info */
-	public static double WAFFLE_VERSON = 1.179;
+	public static double WAFFLE_VERSON = 1.1791;
 	
 	public static WaffleActivity mainInstance = null;
 	public WebView webview;
@@ -54,9 +54,9 @@ public class WaffleActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
-    	if (mainInstance == null) {
-    		mainInstance = this; // set main instance
-    	}
+    	//if (mainInstance == null) {
+    	mainInstance = this; // set main instance
+    	//}
     	
     	// Initialize jsWaffle setting flags
     	waffle_flags = new WaffleFlags(this);

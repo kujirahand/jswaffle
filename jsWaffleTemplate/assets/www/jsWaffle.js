@@ -126,6 +126,11 @@ plugin_defineDroidMethod(
 			droid : function () { _base.ring(); },
 			cross : function () { console.log('ring'); }
 		},
+		/** @id droid.ring_stop */
+		ring_stop : {
+			droid : function () { _base.ring_stop(); },
+			cross : function () { console.log('ring_stop'); }
+		},
 		
 		/** @id droid.makeToast */
 		makeToast : {
@@ -222,7 +227,11 @@ plugin_defineDroidMethod(
 				_base.setPromptType(0x12, title);
 				var r = prompt("", items.join(";;;"));
 				_base.setPromptType(0, "prompt");
-				return r.split(";;;");
+				r = String(r);
+				if (r != null) {
+					return r.split(";;;");
+				}
+				return null;
 			},
 			cross : function (title, items) {
 				return prompt(title + ':select(' + items.join(",")+')');

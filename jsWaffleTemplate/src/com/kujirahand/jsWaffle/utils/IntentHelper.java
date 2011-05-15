@@ -176,13 +176,13 @@ public class IntentHelper {
 	private static String getContentType(String url) {
 		// Image
 		if (url.endsWith(".png")) {
-			return "image/png";
+			return "image/*";
 		}
 		else if (url.endsWith(".jpg") || url.endsWith(".jpeg")) {
-			return "image/jpeg";
+			return "image/*";
 		}
 		else if (url.endsWith(".gif") || url.endsWith(".gif")) {
-			return "image/gif";
+			return "image/*";
 		}
 		// Video
 		if (url.endsWith(".3gp")||url.endsWith(".3gpp")) {
