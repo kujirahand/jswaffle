@@ -51,11 +51,12 @@ public class DevInfoPlugin extends WafflePlugin {
 			waffle_activity.getSystemService(Activity.ACTIVITY_SERVICE));
 		ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();
 		man.getMemoryInfo(info);
-		return String.format(
-				"{availMem:%d, lowMemory:%s, threshold:%d}", 
+		String s = String.format(
+				"{'availMem':%d, 'lowMemory':%s, 'threshold':%d}", 
 				info.availMem,
 				((info.lowMemory) ? "true" : "false"),
 				info.threshold);
+		return s;
 	}
 	
 	public boolean hasSDCard() {

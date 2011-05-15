@@ -35,9 +35,9 @@ function setMyMenuItem() {
 	droid.setMenuItem(
 		4, true, "MemotyInfo", "ic_menu_info_details",
 		function() {
-			alert(
-				droid.stringify(droid.getMemoryInfo())
-			);
+			var o = droid.getMemoryInfo();
+			var s = droid.stringify(o);
+			alert(s);
 		}
 	);
 }

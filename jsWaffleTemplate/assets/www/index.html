@@ -39,12 +39,13 @@
 	<script type="text/javascript">
 		var ring_flag = false;
 		function check_ring() {
-			if (b == false) {
+			if (ring_flag == false) {
 				droid.ring(); // ベルを鳴らす
+				ring_flag = true;
 			} else {
 				droid.ring_stop(); // ベルを止める
+				ring_flag = false;
 			}
-			ring_flag = !ring_flag;
 		}
 	</script>
 	
