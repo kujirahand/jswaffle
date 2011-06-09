@@ -153,7 +153,13 @@
  * @alias droid.log_error 
  * @param {String} msg	log message
  */
-
+/**
+ * get last error string
+ * 前回発生したエラーを取得する
+ * @id droid.getLastError
+ * @alias droid.getlastError
+ * @return {string}
+ */
 
 /**
  * Get Res Strings
@@ -611,6 +617,21 @@
  * @alias droid.fileCopy
  * @param {String} src source url
  * @param {String} des destination url
+ * @return {Boolean}
+ */
+
+/**
+ * audio recording
+ * @id droid.audiorecStart
+ * @alias droid.audiorecStart
+ * @param {String} save filename (*.amr/*.3gp)
+ * @return {Boolean}
+ */
+
+/**
+ * audio recording
+ * @id droid.audiorecStop
+ * @alias droid.audiorecStop
  * @return {Boolean}
  */
 
