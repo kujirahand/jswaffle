@@ -64,6 +64,36 @@
 		}
 	</script>
 
+	<h2>Voice Recorder</h2>
+	<div id="db_buttons_div" class="buttons">
+		<button onclick="rec_start()">Recording Start</button>
+		<button onclick="rec_stop()">Recordeing Stop</button>
+		<button onclick="rec_start2()">VoiceRecoder</button>
+	</div>
+	<script type="text/javascript">
+		var rec_path = "/sdcard/test.amr";
+		function rec_start() {
+			alert("録音を開始します");
+			var b = droid.audiorecStart(rec_path);
+			if (!b) {
+				alert("[失敗]" + droid.getLastError());
+			}
+		}
+		function rec_stop() {
+			droid.audiorecStop();
+			alert("録音を停止しました");
+			if (droid.fileExists(rec_path)) {
+				droid.playSound(rec_path);
+			}
+		}
+		function rec_start2(){
+			// オーディオレコーダーを起動するだけ
+			droid.startIntentForResult("record:/sdcard/", function(s){
+				alert(s);
+			});
+		}
+	</script>
+	
 	<h2>Database(SQLite)</h2>
 	<div id="db_buttons_div" class="buttons">
 		<button onclick="openDB()">Open DB</button>

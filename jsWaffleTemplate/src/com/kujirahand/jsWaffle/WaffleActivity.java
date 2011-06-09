@@ -40,7 +40,7 @@ import android.widget.LinearLayout;
 public class WaffleActivity extends Activity {
 	
 	/** jsWaffle Version Info */
-	public static double WAFFLE_VERSON = 1.1791;
+	public static double WAFFLE_VERSON = 1.180;
 	
 	public static WaffleActivity mainInstance = null;
 	public WebView webview;
@@ -197,10 +197,12 @@ public class WaffleActivity extends Activity {
 	}
 	public void log_error(String msg) {
 		Log.e(WaffleActivity.LOG_TAG, msg);
+		last_error_str = msg;
 	}
 	public void log_warn(String msg) {
 		Log.w(WaffleActivity.LOG_TAG, msg);
 	}
+	public String last_error_str = "";
 	
 	/**
 	 * call JavaScript Event

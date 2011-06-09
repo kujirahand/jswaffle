@@ -23,7 +23,6 @@ import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.text.ClipboardManager;
-import android.util.Log;
 import android.widget.Toast;
 
 /*
@@ -57,13 +56,13 @@ public class ABasicPlugin extends WafflePlugin
 	 * Log
 	 */
 	public void log(String msg) {
-		Log.d(WaffleActivity.LOG_TAG, msg);
+		WaffleActivity.mainInstance.log(msg);
 	}
 	public void log_error(String msg) {
-		Log.e(WaffleActivity.LOG_TAG, msg);
+		WaffleActivity.mainInstance.log_error(msg);
 	}
 	public void log_warn(String msg) {
-		Log.w(WaffleActivity.LOG_TAG, msg);
+		WaffleActivity.mainInstance.log_warn(msg);
 	}
 	/**
 	 * Get android resource string
@@ -76,6 +75,14 @@ public class ABasicPlugin extends WafflePlugin
 			return "";
 		}
 		return waffle_activity.getResources().getString(id);
+	}
+	
+	/**
+	 * Get last error jsWaffle
+	 * @return error string
+	 */
+	public String getLastError() {
+		return WaffleActivity.mainInstance.last_error_str;
 	}
 		
 	/**
@@ -104,8 +111,10 @@ public class ABasicPlugin extends WafflePlugin
 			Uri ringtone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
 			ring_tone = RingtoneManager.getRingtone(waffle_activity, ringtone);
 		}
-		if (ring_tone.isPlaying()) return;
-		ring_tone.play();
+		if (ring_tone != null) {
+			if (ring_tone.isPlaying()) return;
+			ring_tone.play();
+		}
 	}
 	Ringtone ring_tone = null;
 	
@@ -114,7 +123,6 @@ public class ABasicPlugin extends WafflePlugin
 			return;
 		}
 		if (ring_tone.isPlaying()) ring_tone.stop();
-		ring_tone.play();
 	}
 	
 	
@@ -275,9 +283,15 @@ public class ABasicPlugin extends WafflePlugin
 	 */
 	public boolean snapshotToFile(String filename, String format) {
 		// snapshot
-		webview.setDrawingCacheEnabled(true);
-		Bitmap bmp = Bitmap.createBitmap(webview.getDrawingCache());
-		webview.setDrawingCacheEnabled(false);
+		Bitmap bmp = null;
+		try {
+			webview.setDrawingCacheEnabled(true);
+			bmp = Bitmap.createBitmap(webview.getDrawingCache());
+			webview.setDrawingCacheEnabled(false);
+		} catch (Exception e) {
+			log_error("snapshot failed: " + e.getMessage());
+			return false;
+		}
 		if (bmp == null) {
 			log_error("snapshot failed: bmp = null");
 			return false;

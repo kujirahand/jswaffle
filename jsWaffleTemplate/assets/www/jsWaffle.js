@@ -105,6 +105,11 @@ plugin_defineDroidMethod(
 			droid : function (msg) { _base.log_warn(msg); },
 			cross : function (msg) { console.warn(msg); }
 		},
+		/** @id droid.getLastError */
+		getLastError : {
+			droid : function () { return String(_base.getLastError()); },
+			cross : function () { console.log('getLastError'); }
+		},
 		
 		/** @id droid.beep */
 		beep : {
@@ -835,6 +840,24 @@ plugin_defineDroidMethod(
 			}
 		},
 		
+		/** @id droid.audiorecStart */
+		audiorecStart : {
+			droid : function (fname) {
+				return _storage.audiorecStart(fname);
+			},
+			cross : function (fname) {
+				return false;
+			}
+		},
+		/** @id droid.audiorecStop */
+		audiorecStop : {
+			droid : function (fname) {
+				return _storage.audiorecStop(fname);
+			},
+			cross : function (fname) {
+				return false;
+			}
+		},
 		___ : end_of_define_method
 	}
 );

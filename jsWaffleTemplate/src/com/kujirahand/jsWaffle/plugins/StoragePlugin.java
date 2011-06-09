@@ -3,12 +3,14 @@ package com.kujirahand.jsWaffle.plugins;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.util.Log;
 
@@ -271,5 +273,54 @@ public class StoragePlugin extends WafflePlugin
 			return false;
 		}
 	 }
-
+	
+	/**
+	 * recording audio
+	 * @fname *.3gp/*.amr
+	 */
+	public boolean audiorecStart(String fname) {
+		
+		if (mRecorder != null) {
+			waffle_activity.log_error("audiorecStart() : already started.");
+			return false;
+		}
+		
+		int fmt = MediaRecorder.OutputFormat.DEFAULT;
+		if (fname.endsWith(".3gp")) {
+			fmt = MediaRecorder.OutputFormat.THREE_GPP;
+		} else if (fname.endsWith(".amr")) {
+			// fmt = MediaRecorder.OutputFormat.RAW_AMR;
+		}
+		mRecorder = new MediaRecorder();
+		mRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+		mRecorder.setOutputFormat(fmt);
+		mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+		mRecorder.setOutputFile(fname);
+		
+		try {
+			mRecorder.prepare();
+			mRecorder.start();
+			return true;
+		} catch (IllegalStateException e) {
+			waffle_activity.log_error("audiorecStart() : state error : " + e.getMessage());
+			return false;
+		} catch (IOException e) {
+			waffle_activity.log_error("audiorecStart() : io error : " + e.getMessage());
+			return false;
+		}
+	}
+	private MediaRecorder mRecorder = null;
+	
+	public boolean audiorecStop(String fname) {
+		try {
+			if (mRecorder != null) {
+				mRecorder.stop();
+				mRecorder.release();
+				mRecorder = null;
+			}
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 }
