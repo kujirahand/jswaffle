@@ -155,8 +155,14 @@
 		<button onclick="location.href='test/sensors.html'">Sensors Sample</button>
 		<button onclick="location.href='test/storages.html'">Storages Sample</button>
 		<button onclick="location.href='test/cameras.html'">Camera/Video Sample</button>
+		<button id="flash_btn" disabled onclick="location.href='test-flash/test.html'">Flash Sample</button>
 	</div>
-	
+	<script type="text/javascript">
+		var ver = droid.getAndroidVersionInt();
+		if (ver >= 8 /* android2.2 */) {
+			$("flash_btn").disabled = false;
+		}
+	</script>
 	<br/><br/><br/>
 
 </body>
