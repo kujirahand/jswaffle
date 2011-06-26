@@ -59,8 +59,7 @@
  * [menu]ボタンを押した時に出るメニューを設定する
 
  * (example) iconName is "ic_menu_edit/ic_menu_gallery/ic_menu_help/ic_menu_info_details/ic_menu_manage/ic_menu_preferences"
- * @see http://www.taosoftware.co.jp/blog/2008/11/android_5.html About Android's icon name
- * 
+ * @see http://goo.gl/Qs2ja
  * @id droid.setMenuItem
  * @alias droid.setMenuItem
  * @param {Integer} itemNo (0-5)

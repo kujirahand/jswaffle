@@ -1,5 +1,8 @@
 package com.kujirahand.jsWaffle;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 import com.kujirahand.jsWaffle.model.IWafflePlugin;
 import com.kujirahand.jsWaffle.model.WaffleFlags;
 import com.kujirahand.jsWaffle.model.WafflePluginManager;
@@ -19,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -178,6 +182,25 @@ public class WaffleActivity extends Activity {
         setting.setJavaScriptCanOpenWindowsAutomatically(true);
         setting.setLayoutAlgorithm(LayoutAlgorithm.NORMAL);
         setting.setBuiltInZoomControls(waffle_flags.useBuiltInZoomControls);
+        
+        // for Flash
+        int sdkVersion = Integer.parseInt(Build.VERSION.SDK);
+        if (sdkVersion >= 8/* OS2.2 */) {
+        	try {
+	        	// setting.setPluginState(PluginState.ON);
+        		// TODO: 下位互換性のため、リフレクションを使って対応
+        		@SuppressWarnings("unchecked")
+        		Class WebSettings_c = Class.forName("android.webkit.WebSettings");
+        		Field mPluginState = WebSettings_c.getDeclaredField("mPluginState");
+        		Method setPluginState = WebSettings_c.getMethod("setPluginState", new Class[] { mPluginState.getType() });
+        		//@SuppressWarnings("unchecked")
+        		@SuppressWarnings("unchecked")
+        		Object v_on = Enum.valueOf((Class<Enum>)mPluginState.getType(), "ON");
+        		setPluginState.invoke(setting, new Object[] { v_on });
+        	} catch (Exception e) {
+        		log_error("WebSettings.setPluginState : " + e.getMessage());
+        	}
+        }
     }
        
     public void showPage(String uri) {
