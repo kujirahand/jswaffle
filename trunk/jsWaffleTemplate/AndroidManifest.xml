@@ -6,17 +6,25 @@
 
 	<!-- バイブ機能を使うとき -->
 	<uses-permission android:name="android.permission.VIBRATE"/>
+	
 	<!-- インターネットへのアクセスを使う時 -->
 	<uses-permission android:name="android.permission.INTERNET" />
+	
 	<!-- GPSを使う時 -->
-	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	<uses-permission android:name="android.permission.ACCESS_ASSISTED_GPS" />
+	<uses-permission android:name="android.permission.ACCESS_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	
 	<!-- SDカードなどへ書き込みを行う時 -->
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	
 	<!-- コンタクトの情報を読み取る時 -->
 	<uses-permission android:name="android.permission.READ_CONTACTS" />
+	
 	<!-- カメラを使う時 -->
 	<uses-permission android:name="android.permission.CAMERA" />
+	
 	<!-- 録音機能を使う時 -->
 	<uses-permission android:name="android.permission.RECORD_AUDIO"></uses-permission>  
 	
