@@ -356,7 +356,11 @@ public class ABasicPlugin extends WafflePlugin
 				@Override
 				public void run() {
 					String result = WaffleUtils.httpPostJSON(url, json);
-					String query = callback + "(" + (result) + "," + tag +  ")";
+					// escape result
+					result = result.replace("\\", "\\\\");
+					result = result.replace("\"", "\\\"");
+					// result
+					String query = callback + "(\"" + (result) + "\"," + tag +  ")";
 					callJsEvent(query);
 				}
 			 }).start();

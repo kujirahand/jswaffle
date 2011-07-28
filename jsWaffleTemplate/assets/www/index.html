@@ -105,6 +105,7 @@
 		<button onclick="droid.startIntent('http://d.aoikujira.com/android-app/jswaffle-ad.php')">Show Web Page</button>
 		<button id="httpget_btn" onclick="testHTTP()">httpGet:Get IP</button>
 		<button id="dl_btn" onclick="testHTTPDownload()">httpDownload:DL Image</button>
+		<button id="post_btn" onclick="testHTTPPost()">httpPost:Get IP</button>
 	</div>
 	<script type="text/javascript">
 		function testHTTP() {
@@ -123,6 +124,14 @@
 					$("dl_btn").disabled = false;
 					if (!status) { alert('download error'); return; }
 					droid.startIntent("file:///sdcard/logo.png");
+				}
+			);
+		}
+		function testHTTPPost() {
+			droid.httpPost("http://api.aoikujira.com/ip/get.php",
+				{test:100, test2:150},
+				function(result){
+					alert(result);
 				}
 			);
 		}
