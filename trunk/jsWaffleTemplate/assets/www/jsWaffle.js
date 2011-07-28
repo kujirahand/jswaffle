@@ -216,10 +216,16 @@ plugin_defineDroidMethod(
 		/** @id droid.dialogList */
 		dialogList : {
 			droid : function (title, items) {
+				if (typeof(items) == "string") { items = items.split("\n"); }
+				if (!(items instanceof Array)) { items = []; }
 				_base.setPromptType(0x11, title);
 				var r = prompt("", items.join(";;;"));
 				_base.setPromptType(0, "prompt");
-				return String(r);
+				if (r == null) {
+					return null;
+				} else {
+					return String(r);
+				}
 			},
 			cross : function (title, items) {
 				return prompt(title + ':select(' + items.join(",")+')');
@@ -426,7 +432,7 @@ plugin_defineDroidMethod(
 		/** @id droid.httpPost */
 		httpPost : {
 			droid : function (url, post_obj, callback) {
-				var json = self.droid.stringfy(post_obj);
+				var json = self.droid.stringify(post_obj);
 				var tag = func_bank.registerItem(callback);
 				self.droid._httpPost = function (result, tag) {
 					var f = func_bank.getItem(tag);
@@ -435,8 +441,7 @@ plugin_defineDroidMethod(
 					}
 				};
 				var res = _base.httpPostJSON(url, json, "droid._httpPost", tag);
-				callback(res);
-				return true;
+				return res;
 			},
 			cross : function (url, post_obj, callback) {
 				console.log('[dummy] httpPost : ' + url);

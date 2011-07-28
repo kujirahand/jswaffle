@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -22,6 +23,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.json.JSONObject;
 
 import com.kujirahand.jsWaffle.WaffleActivity;
 
@@ -325,9 +327,20 @@ public class WaffleUtils {
 		String sReturn = "";
 	    try {
 	    	HttpPost objPost   = new HttpPost(sUrl);
-	    	List<NameValuePair> objValuePairs = new ArrayList<NameValuePair>(2);  
-	    	objValuePairs.add(new BasicNameValuePair("json", sJson));
-	        objPost.setEntity(new UrlEncodedFormEntity(objValuePairs, "UTF-8"));
+	    	try {
+	    		JSONObject j = new JSONObject(sJson);
+	    		List<NameValuePair> pairs = new ArrayList <NameValuePair>();
+	    		
+	    		@SuppressWarnings("unchecked")
+	    		Iterator<String> i = j.keys();
+	    		while(i.hasNext()) {
+	    			String pname = i.next();
+	    			BasicNameValuePair nv = new BasicNameValuePair(pname, j.getString(pname));
+	    			pairs.add(nv);
+	    		}
+	    		objPost.setEntity(new UrlEncodedFormEntity(pairs, "UTF-8"));
+	    	} catch (Exception e) {
+	    	}
 	        HttpResponse objResponse = objHttp.execute(objPost);
 	        if (objResponse.getStatusLine().getStatusCode() < 400){
 	            InputStream objStream = objResponse.getEntity().getContent();

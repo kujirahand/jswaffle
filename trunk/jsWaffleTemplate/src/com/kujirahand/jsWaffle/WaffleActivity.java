@@ -44,7 +44,7 @@ import android.widget.LinearLayout;
 public class WaffleActivity extends Activity {
 	
 	/** jsWaffle Version Info */
-	public static double WAFFLE_VERSON = 1.180;
+	public static double WAFFLE_VERSON = 1.181;
 	
 	public static WaffleActivity mainInstance = null;
 	public WebView webview;
@@ -188,7 +188,7 @@ public class WaffleActivity extends Activity {
         if (sdkVersion >= 8/* OS2.2 */) {
         	try {
 	        	// setting.setPluginState(PluginState.ON);
-        		// TODO: 下位互換性のため、リフレクションを使って対応
+        		// 下位互換性のため、リフレクションを使って対応
         		@SuppressWarnings("unchecked")
         		Class WebSettings_c = Class.forName("android.webkit.WebSettings");
         		Field mPluginState = WebSettings_c.getDeclaredField("mPluginState");

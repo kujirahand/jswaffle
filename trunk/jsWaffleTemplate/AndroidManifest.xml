@@ -28,6 +28,9 @@
 	<!-- 録音機能を使う時 -->
 	<uses-permission android:name="android.permission.RECORD_AUDIO"></uses-permission>  
 	
+	<!-- 壁紙変更機能を使う時  -->
+	<uses-permission android:name="android.permission.SET_WALLPAPER" />
+	
     <application
     	android:icon="@drawable/icon"
     	android:label="@string/app_name"
