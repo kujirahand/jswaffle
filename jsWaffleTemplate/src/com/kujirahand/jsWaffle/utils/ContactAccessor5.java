@@ -22,14 +22,10 @@ public class ContactAccessor5 extends ContactAccessor {
 	// ref) reflection -- http://www.ne.jp/asahi/hishidama/home/tech/java/reflection.html#h2_field
 	// ref) http://www.electrodream.jp/iphonedev/index.php/2010/04/%E7%9D%80%E4%BF%A1%E9%9F%B3%E3%82%A2%E3%83%97%E3%83%AA%E3%80%81%E7%B0%A1%E5%8D%98%E3%81%A8%E3%81%AF%E3%81%84%E3%81%88%E3%82%84%E3%81%AF%E3%82%8A%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E3%81%82%E3%82%8B/
 	
-	@SuppressWarnings("unchecked")
-	Class _ContactsContract;
-	@SuppressWarnings("unchecked")
-	Class _ContactsContract_Contacts;
-	@SuppressWarnings("unchecked")
-	Class _CommonDataKinds_Email;
-	@SuppressWarnings("unchecked")
-	Class _CommonDataKinds_Phone;
+	Class<?> _ContactsContract;
+	Class<?> _ContactsContract_Contacts;
+	Class<?> _CommonDataKinds_Email;
+	Class<?> _CommonDataKinds_Phone;
 	
 	final static String ContactsContact = "android.provider.ContactsContract";
 	final static String ContactsContract_Contacts = "android.provider.ContactsContract$Contacts";
@@ -42,8 +38,7 @@ public class ContactAccessor5 extends ContactAccessor {
 		_CommonDataKinds_Phone = c(ContactsContract_CommonDataKinds + "$Phone");
 	}
 	
-	@SuppressWarnings("unchecked")
-	public Class c(String className) {
+	public Class<?> c(String className) {
 		try {
 			return Class.forName(className);
 		} catch (Exception e) {
@@ -51,8 +46,7 @@ public class ContactAccessor5 extends ContactAccessor {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	public Uri getFieldUri(Class klass, String field) {
+	public Uri getFieldUri(Class<?> klass, String field) {
 		if (klass == null) return null;
 		try {
 			Field f = klass.getField(field);
@@ -63,8 +57,7 @@ public class ContactAccessor5 extends ContactAccessor {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	public String getFieldStr(Class klass, String field) {
+	public String getFieldStr(Class<?> klass, String field) {
 		if (klass == null) return null;
 		try {
 			Field f = klass.getField(field);

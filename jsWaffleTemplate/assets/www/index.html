@@ -158,6 +158,18 @@
 		}
 	</script>
 	
+	<h2>Voice Recognizer</h2>
+	<div class="buttons">
+		<button onclick="startVoiceRecognizer()">VoiceRecognizer</button>
+	</div>
+	<script type="text/javascript">
+		function startVoiceRecognizer() {
+			droid.recognizeSpeech(function(n){
+				alert(n);
+			});
+		}
+	</script>
+	
 	<h2>More Samples</h2>
 	<div class="buttons">
 		<button onclick="location.href='test/dialogs.html'">Dialogs Sample</button>
