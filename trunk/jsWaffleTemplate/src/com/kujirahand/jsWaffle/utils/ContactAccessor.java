@@ -21,8 +21,7 @@ public abstract class ContactAccessor {
 	            className = "ContactAccessor5";
 	        }
 	        try {
-	        	@SuppressWarnings("unchecked")
-	       	 	Class clazz = 
+	       	 	Class<?> clazz = 
 	            	Class.forName("com.kujirahand.jsWaffle.utils." + className)
 	                .asSubclass(ContactAccessor.class);
 	                 sInstance = (ContactAccessor)clazz.newInstance();

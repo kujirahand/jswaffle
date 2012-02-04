@@ -339,6 +339,15 @@
  * @param {Object} callback_fn (Function (url) {} )
  * @return {Void}
  */
+ 
+/**
+ * Voice Recognizer
+ * @id droid.recognizeSpeech
+ * @alias droid.recognizeSpeech
+ * @param {Function} callback_fn
+ * @param {String} language (undefined|ja_JP|en...)
+ * @return {Void}
+ */
 
 /**
  * Show Route with GoogleMaps

@@ -189,13 +189,11 @@ public class WaffleActivity extends Activity {
         	try {
 	        	// setting.setPluginState(PluginState.ON);
         		// 下位互換性のため、リフレクションを使って対応
-        		@SuppressWarnings("unchecked")
-        		Class WebSettings_c = Class.forName("android.webkit.WebSettings");
+        		Class<?> WebSettings_c = Class.forName("android.webkit.WebSettings");
         		Field mPluginState = WebSettings_c.getDeclaredField("mPluginState");
         		Method setPluginState = WebSettings_c.getMethod("setPluginState", new Class[] { mPluginState.getType() });
-        		//@SuppressWarnings("unchecked")
-        		@SuppressWarnings("unchecked")
-        		Object v_on = Enum.valueOf((Class<Enum>)mPluginState.getType(), "ON");
+        		@SuppressWarnings({ "rawtypes", "unchecked" })
+				Object v_on = Enum.valueOf((Class<Enum>)mPluginState.getType(), "ON");
         		setPluginState.invoke(setting, new Object[] { v_on });
         	} catch (Exception e) {
         		log_error("WebSettings.setPluginState : " + e.getMessage());

@@ -194,6 +194,14 @@ public class ABasicPlugin extends WafflePlugin
 		if (mp == null) return false;
 		return (mp.isPlaying());
 	}
+	public void unloadPlayer(MediaPlayer mp) {
+		if (mp == null) return;
+		try {
+			mp.release();
+			mp = null;
+		} catch (Exception e) {
+		}
+	}
 	
 	/**
 	 * play sound file (for Realtime play or loop) ... OGG is best!

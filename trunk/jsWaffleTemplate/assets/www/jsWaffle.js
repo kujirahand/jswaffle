@@ -327,7 +327,10 @@ plugin_defineDroidMethod(
 		
 		/** @id droid.stopSound */
 		stopSound : {
-			droid : function (playerObj) { _base.stopPlayer(playerObj); /* or playerObj.stop() */ },
+			droid : function (playerObj) {
+				_base.stopPlayer(playerObj); /* or playerObj.stop() */ 
+				_base.unloadPlayer(playerObj);
+			},
 			cross : function () {}
 		},
 		
@@ -1092,6 +1095,23 @@ plugin_defineDroidMethod(
 				return false;
 			}
 		},
+		
+		/** @id droid.recognizeSpeech */
+		recognizeSpeech : {
+			droid : function (callback_fn, lang) {
+				self.droid._recognizeSpeech_callback = callback_fn;
+				self.droid._recognizeSpeech = function (str) {
+					self.droid._recognizeSpeech_callback(str);
+				};
+				if (lang == undefined) lang = "";
+				return _intent.recognizeSpeech("droid._recognizeSpeech", lang);
+			},
+			cross : function (callback_fn) {
+				console.log("recognizeSpeech");
+				return true;
+			}
+		},
+
 		
 		/** @id droid.showRoute */
 		showRoute : {

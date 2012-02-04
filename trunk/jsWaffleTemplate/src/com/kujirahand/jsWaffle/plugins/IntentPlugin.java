@@ -1,13 +1,18 @@
 package com.kujirahand.jsWaffle.plugins;
 
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.logging.ConsoleHandler;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.speech.RecognizerIntent;
+import android.util.Log;
 
 import com.kujirahand.jsWaffle.WaffleActivityFullScreen;
 import com.kujirahand.jsWaffle.WaffleActivitySub;
@@ -20,11 +25,13 @@ public class IntentPlugin extends WafflePlugin {
 	public final static int ACTIVITY_REQUEST_CODE_BARCODE = 0xFF0001;
 	public final static int ACTIVITY_REQUEST_CODE_CONTACT = 0xFF0002;
 	public final static int ACTIVITY_REQUEST_CODE_GALLARY = 0xFF0003;
+	public final static int ACTIVITY_REQUEST_CODE_VOICERECOG = 0xFF0004;
 	
 	// Callback string
 	private String intent_startActivity_callback = null;
 	private String intent_startActivity_callback_barcode = null;
 	private String intent_startActivity_callback_gallery = null;
+	private String intent_startActivity_callback_voicerec = null;
 
 	/**
 	 * Start Intent
@@ -127,6 +134,37 @@ public class IntentPlugin extends WafflePlugin {
 	}
 	
 	/**
+	 * RecognizerIntent / recognizeSpeech
+	 * @param callbackName
+	 * @param option Language(ja_JP || en)
+	 * @return tried
+	 */
+	public boolean recognizeSpeech(String callbackName, String option) {
+		// Log.d("locale","locale=" + Locale.ENGLISH.toString());
+		Intent intent = new Intent(
+                RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+		intent.putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+		if (option != null && option != "") {
+			intent.putExtra(
+					RecognizerIntent.EXTRA_LANGUAGE,
+					option);
+		}
+		/* intent.putExtra(
+                RecognizerIntent.EXTRA_PROMPT,
+                "Please Speak!"); */
+		intent_startActivity_callback_voicerec = callbackName;
+		try {
+			waffle_activity.startActivityForResult(intent, ACTIVITY_REQUEST_CODE_VOICERECOG);
+			return true;
+		}
+		catch (Exception e) {
+			return false;
+		}
+	}
+	
+	/**
 	 * Intent Exists?
 	 * @param intentName (ex: com.kujirahand.jsWaffle.xxx)
 	 */
@@ -182,16 +220,34 @@ public class IntentPlugin extends WafflePlugin {
 			}
 	        param = intent_startActivity_callback_barcode + "('" + contents + "','" + format + "')";
 			waffle_activity.callJsEvent(param);
+		
 		} else if (requestCode == ACTIVITY_REQUEST_CODE_GALLARY) {
 			String fname = intent.getData().toString();
 	        param = intent_startActivity_callback_gallery + "('" + fname + "')";
 			waffle_activity.callJsEvent(param);
+		
+		} else if (requestCode == ACTIVITY_REQUEST_CODE_VOICERECOG) {
+			String voice_str = "";
+			ArrayList<String> voice_results = intent.getStringArrayListExtra(
+                    RecognizerIntent.EXTRA_RESULTS);
+			if (voice_results.size() > 0) {
+				/*
+				for (int i = 0; i < voice_results.size(); i++) {
+					 voice_str += voice_results.get(i);
+		        }
+		        */
+				voice_str = voice_results.get(0);
+			}
+			param = intent_startActivity_callback_voicerec + "('" + voice_str + "')";
+			waffle_activity.callJsEvent(param);
+		
 		} else if (
 			requestCode == IntentHelper.request_code && 
 			(IntentHelper.last_intent_type == MediaStore.ACTION_IMAGE_CAPTURE ||
 					IntentHelper.last_intent_type == MediaStore.ACTION_VIDEO_CAPTURE)
 		) {
 			cameraResult(requestCode, resultCode, intent);
+		
 		} else {
 			if (intent_startActivity_callback == null) return;
 			param = intent_startActivity_callback + "(" + requestCode + "," + resultCode + ")";
