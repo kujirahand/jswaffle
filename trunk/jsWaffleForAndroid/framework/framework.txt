@@ -1,2 +1,0 @@
---- jsWaffle framework ---
-https://code.google.com/p/jswaffle/source/browse/#svn/trunk/jsWaffleTemplate
