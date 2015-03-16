@@ -69,9 +69,7 @@ var plugin_defineDroidMethod = function (pluin_info, method_list) {
 	if (plugin_empty) {
 		self[plugin_name] = {}; // dummy
 	}
-
-	console.log("plugins=" + plugin_name, self[plugin_name]);
-
+	
 	// insert method to droid
 	for (var method_name in method_list) {
 		var method_info = method_list[method_name];
@@ -199,15 +197,6 @@ plugin_defineDroidMethod(
 			},
 			cross : function (itemNo, visible, title, iconName, callback) {
 				console.log('setMenuItem:' + [itemNo, visible, title, iconName].join(','));
-			}
-		},
-		
-		showMenu : {
-			droid : function () {
-				_base.showMenu();
-			},
-			cross : function () {
-				console.log("showMenu");
 			}
 		},
 		
@@ -380,7 +369,7 @@ plugin_defineDroidMethod(
 		/** @id droid.quit */
 		quit : {
 			droid : function() { _base.finish(); },
-			cross : function() { console.log("quit"); /*window.close();*/ }
+			cross : function() { console.log("quit"); window.close(); }
 		},
 		
 		/** @id droid.snapshotToFile */
@@ -485,17 +474,6 @@ plugin_defineDroidMethod(
 			}
 		},
 		
-		/** @id droid.stopBackKey */
-		stopBackKey : {
-			droid : function () {
-				return _base.stopBackKey();
-			},
-			cross : function () {
-				console.log("[dummy] stopBackKey");
-				return true;
-			}
-		},
-		
 		___ : end_of_define_method
 	});
 
@@ -595,7 +573,6 @@ plugin_defineDroidMethod(
 		/** @id droid.openDatabase */
 		openDatabase : {
 			droid : function (dbname) {
-			    console.log("openDatabase=" + dbname);
 				var db = _db.openDatabase(dbname);
 				return db;
 			},
@@ -618,7 +595,6 @@ plugin_defineDroidMethod(
 					var o = func_bank.getItem(tag);
 					if (typeof(o.ng) == 'function') o.ng(err);
 				};
-			    console.log("executeSql="+sql);
 				_db.executeSql(db, sql, "droid._executeSql_ok", "droid._executeSql_ng", tag);
 			},
 			cross : function (db, sql, fn_ok, fn_ng) {
@@ -1153,16 +1129,6 @@ plugin_defineDroidMethod(
 			cross : function () {
 			}
 		},
-		
-		/** @id droid.intent_download */
-		intent_download : {
-			droid : function (uri, savePath) {
-				return _intent.intent_download(uri, savePath);
-			},
-			cross : function () {
-			}
-		},
-		
 		___ : end_of_define_method
 	}
 );
@@ -1224,11 +1190,6 @@ self.droid.json_parse = function (str) {
 		droid.log("json_parse.error : " + str);
 		return null;	
 	}
-};
-
-/** @id dorid.onbackkey */
-self.droid.onbackkey = function (e) {
-	// e.stopBackKey();
 };
 
 })(this);
