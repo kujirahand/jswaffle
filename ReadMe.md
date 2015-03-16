@@ -8,3 +8,8 @@ Info:
 
 - (WebSite) http://d.aoikujira.com/jsWaffle/wiki/
 
+# How to make
+
+http://d.aoikujira.com/jsWaffle/wiki/go.php?100
+
+
