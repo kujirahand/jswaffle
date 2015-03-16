@@ -1,0 +1,32 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.mytest">
+
+    <!-- バイブ機能を使うとき -->
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
+    <!-- インターネットへのアクセスを使う時 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- SDカードなどへ書き込みを行う時 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <!-- 最小SDKの指定 -->
+    <uses-sdk android:minSdkVersion="17" android:targetSdkVersion="17"/>
+
+    <!-- アプリの指定 -->
+    <application android:allowBackup="true"
+        android:label="jsWaffleApp"
+        android:icon="@mipmap/ic_launcher">
+
+        <activity
+            android:label="jsWaffleApp"
+            android:name="com.example.mytest.Main">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>
