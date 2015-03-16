@@ -1,27 +1,44 @@
 package com.kujirahand.jsWaffle.model;
 
 import com.kujirahand.jsWaffle.WaffleActivity;
+
 import android.content.Intent;
 import android.webkit.WebView;
+import android.webkit.JavascriptInterface;
 
 
 /**
  * jsWaffle Plugin Interfalce
- * @author kujira
  *
+ * @author kujira
  */
 
 public interface IWafflePlugin {
-	/* initialize method */
-	void setWebView(WebView web);
-	void setContext(WaffleActivity app);
-	/* activity events */
-	void onPause();
-	void onResume();
-	// void onUnload(); // Android1.6 not supported
-	void onDestroy(); // To remove listener from system
-	void onActivityResult(int requestCode, int resultCode, Intent intent);
-	/* webview event */
-	void onPageStarted(String url);
-	void onPageFinished(String url);
+    /* initialize method */
+    @JavascriptInterface
+    void setWebView(WebView web);
+
+    @JavascriptInterface
+    void setContext(WaffleActivity app);
+
+    /* activity events */
+    @JavascriptInterface
+    void onPause();
+
+    @JavascriptInterface
+    void onResume();
+
+    // void onUnload(); // Android1.6 not supported
+    @JavascriptInterface
+    void onDestroy(); // To remove listener from system
+
+    @JavascriptInterface
+    void onActivityResult(int requestCode, int resultCode, Intent intent);
+
+    /* webview event */
+    @JavascriptInterface
+    void onPageStarted(String url);
+
+    @JavascriptInterface
+    void onPageFinished(String url);
 }

@@ -1,236 +1,145 @@
 package com.kujirahand.jsWaffle.plugins;
 
-import java.io.File;
-import java.util.ArrayList;
+import android.util.Log;
+import android.webkit.JavascriptInterface;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-import android.net.Uri;
-
-import com.kujirahand.jsWaffle.WaffleActivity;
 import com.kujirahand.jsWaffle.model.WafflePlugin;
 
-public class DatabasePlugin extends WafflePlugin {
-	ArrayList<DBHelper> dblist = null;
-	/**
-	 * open database
-	 * @param dbname
-	 * @return DBHelper object
-	 */
-	public DBHelper openDatabase(String dbname) {
-		if (dblist == null) { dblist = new ArrayList<DBHelper>(); }
-		DBHelper db = new DBHelper(waffle_activity);
-		boolean b = db.openDatabase(dbname);
-		if (!b) return null;
-		dblist.add(db);
-		return db;
-	}
-	public void executeSql(final DBHelper db, final String sql, String fn_ok, String fn_ng, final String tag) {
-		if (!(db instanceof DBHelper)) {
-			waffle_activity.log_error("executeSql : db is not DBHelper instance!!");
-			return;
-		}
-		db.callback_result = fn_ok;
-		db.callback_error = fn_ng;
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				db.executeSql(sql, null, tag);
-			}
-		}).start();
-	}
-	public String executeSqlSync(DBHelper db, String sql) {
-		if (!(db instanceof DBHelper)) {
-			waffle_activity.log_error("executeSql : db is not DBHelper instance!!");
-			return null;
-		}
-		String json = db.executeSqlSync(sql, null);
-		if (json == null || json == "null") {
-			return null;
-		}
-		return json;
-	}
-	public String getDatabaseError(DBHelper db) {
-		if (!(db instanceof DBHelper)) {
-			waffle_activity.log_error("executeSql : db is not DBHelper instance!!");
-			return null;
-		}
-		return db.lastError;
-	}
-	public void closeAll() {
-		if (dblist == null) return;
-		if (dblist.size() > 0) {
-			for (int i = 0; i < dblist.size(); i++) {
-				dblist.get(i).closeDatabase();
-			}
-		}
-	}
+import java.util.ArrayList;
 
-	public void onResume() {
-		if (dblist == null) return;
-		if (dblist.size() > 0) {
-			for (int i = 0; i < dblist.size(); i++) {
-				dblist.get(i).reopenDatabase();
-			}
-		}
-	}
-	
-	public void onPause() {
-		closeAll();
-	}
-	
-	public void onPageStarted() {
-		if (dblist == null) return;
-		closeAll();
-		dblist.clear();
-	}
-	
-	public void onDestroy() {
-		if (dblist == null) return;
-		closeAll();
-		dblist.clear();
-	}
+final public class DatabasePlugin extends WafflePlugin {
+    ArrayList<JWDBHelper> dblist = null;
+    public static boolean isLive = false;
+
+    /**
+     * open database
+     *
+     * @param dbname
+     * @return DBHelper object
+     */
+    @JavascriptInterface
+    public int openDatabase(String dbname) {
+        waffle_activity.log("openDatabase=" + dbname);
+        if (dblist == null) {
+            dblist = new ArrayList<JWDBHelper>();
+        }
+        JWDBHelper db = new JWDBHelper(waffle_activity);
+        boolean b = db.openDatabase(dbname);
+        if (!b) return -1;
+        dblist.add(db);
+        return (100 + dblist.size() - 1);
+    }
+
+    private JWDBHelper getDB(int dbId) {
+        JWDBHelper db = null;
+        dbId -= 100;
+        if (dbId >= 0) {
+            return dblist.get(dbId);
+        }
+        return null;
+    }
+
+    @JavascriptInterface
+    public void executeSql(int dbId, final String sql, String fn_ok, String fn_ng, final String tag) {
+        waffle_activity.log("executeSql=" + sql);
+        final JWDBHelper db = getDB(dbId);
+        if (!(db instanceof JWDBHelper)) {
+            waffle_activity.log_error("executeSql : db is not DBHelper instance!!");
+            return;
+        }
+        // If it is not live, do not execute SQL
+        if (!isLive) return;
+        db.callback_result = fn_ok;
+        db.callback_error = fn_ng;
+        //
+        waffle_activity.runOnUiThread(
+            new Runnable() {
+                @Override
+                public void run() {
+                    db.executeSql(sql, null, tag);
+                }
+            }
+        );
+    }
+
+    @JavascriptInterface
+    public String executeSqlSync(int dbId, String sql) {
+        waffle_activity.log("executeSqlSync=" + sql);
+        JWDBHelper db = getDB(dbId);
+        if (!(db instanceof JWDBHelper)) {
+            waffle_activity.log_error("executeSql : db is not DBHelper instance!!");
+            return null;
+        }
+        String json = db.executeSqlSync(sql, null);
+        if (json == null || json == "null") {
+            return null;
+        }
+        return json;
+    }
+
+    @JavascriptInterface
+    public String getDatabaseError(int dbId) {
+        JWDBHelper db = getDB(dbId);
+        if (!(db instanceof JWDBHelper)) {
+            waffle_activity.log_error("executeSql : db is not DBHelper instance!!");
+            return null;
+        }
+        return db.lastError;
+    }
+
+    @JavascriptInterface
+    public void closeAll() {
+        if (dblist == null) return;
+        if (dblist.size() > 0) {
+            for (int i = 0; i < dblist.size(); i++) {
+                try {
+                    JWDBHelper d = dblist.get(i);
+                    if (d != null) d.closeDatabase();
+                } catch (Exception e) {
+                    Log.e("DatabasePlugin", "[ERROR]" + e.getMessage());
+                }
+            }
+        }
+    }
+
+    @JavascriptInterface
+    public void onResume() {
+        isLive = true;
+        if (dblist == null) return;
+        try {
+            if (dblist.size() > 0) {
+                for (int i = 0; i < dblist.size(); i++) {
+                    dblist.get(i).reopenDatabase();
+                }
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    @JavascriptInterface
+    public void onPause() {
+        isLive = false;
+        try {
+            closeAll();
+        } catch (Exception e) {
+        }
+    }
+
+    @JavascriptInterface
+    public void onPageStarted() {
+        isLive = true;
+        if (dblist == null) return;
+        closeAll();
+        dblist.clear();
+    }
+
+    @JavascriptInterface
+    public void onDestroy() {
+        isLive = false;
+        if (dblist == null) return;
+        closeAll();
+        dblist.clear();
+    }
 }
 
 
-class DBHelper
-{
-	SQLiteDatabase myDb;
-	String path;
-	WaffleActivity context;
-	String dbname;
-	
-	public String callback_error = null;
-	public String callback_result = null;
-	
-	public String lastError = null;
-	
-	public DBHelper(WaffleActivity context)
-	{    	
-		this.context = context;
-	}
-	
-	public String getDBDir(String packageName)
-	{
-		return "/data/data/" + packageName + "/databases/";
-	}
-	
-	public void closeDatabase() {
-		if (myDb != null) {
-			myDb.close();
-		}
-	}
-	
-	public void reopenDatabase() {
-		openDatabase(dbname);
-	}
-	
-	public boolean openDatabase(String dbname)
-	{
-		this.dbname = dbname;
-		// sd file?
-		Uri uri = Uri.parse(dbname);
-		File dbFile = null;
-		try {
-			String scheme = uri.getScheme();
-			if (scheme == null) {
-				if (dbname.startsWith("/sdcard/") || dbname.startsWith("/data/")) {
-					dbFile = new File(dbname);
-				} else {
-					dbFile = context.getDatabasePath(dbname);
-				}
-			} else if (scheme.equals("file")) {
-				dbFile = new File(uri.getPath());
-			}
-			else {
-				return false;
-			}
-		} catch (Exception e) {
-			context.log_error("[DBOpenError] file path problem in " + dbname + ":" + e.getMessage());
-			return false;
-		}
-		
-		try {
-			myDb = SQLiteDatabase.openOrCreateDatabase(dbFile, null);
-		} catch (Exception e) {
-			context.log_error("[DBOpenError] db problem in " + dbname + ":" + e.getMessage());
-			return false;
-		}
-		// SQLiteDatabase.OPEN_READWRITE + SQLiteDatabase.CREATE_IF_NECESSARY);
-		
-		if (myDb == null) return false;
-		return true;
-	}
-	
-	public void executeSql(String query, String[] params, String tag)
-	{
-			try{
-				Cursor myCursor = myDb.rawQuery(query, params);			
-				processResults(myCursor, tag, true);
-			}
-			catch (SQLiteException ex)
-			{
-				String err = ex.getMessage();
-				lastError = err;
-				err = err.replace("\"", "\\\"");
-				context.log_error("[DBError]" + err);
-				
-				String q = callback_error + "(\"" + err + "\",\"" + tag + "\")";
-				context.callJsEvent(q);
-				
-			}
-	}
-	
-	public String executeSqlSync(String query, String[] params)
-	{
-		try {
-			Cursor myCursor = myDb.rawQuery(query, params);			
-			return processResults(myCursor, "", false);
-		} catch (SQLiteException ex) {
-			lastError = ex.getMessage();
-			return null;
-		}
-	}
-	
-	public String processResults(Cursor cur, String tag, boolean flagCallJS)
-	{		
-		String key = "";
-		String value = "";
-		String resultString = "";
-		if (cur.moveToFirst()) {
-			int colCount = cur.getColumnCount();
-			do {
-				resultString += "{";
-				for(int i = 0; i < colCount; ++i)
-				{
-					 key  = cur.getColumnName(i);
-					 value = cur.getString(i);
-					 value = value.replace("\\", "\\\\");
-					 value = value.replace("\"", "\\\"");
-					 value = value.replace("\r", "\\r");
-					 value = value.replace("\n", "\\n");
-					 value = value.replace("\t", "\\t");
-					 resultString += "\"" + key + "\":\"" + value + "\"";
-					 //resultString += "\"" + key + "\":\"" + value + "\"";
-					 if (i != (colCount - 1)) resultString += ",";
-				}
-				resultString += "},";
-			} while (cur.moveToNext());
-			if (resultString != "") {
-				resultString = resultString.substring(0, resultString.length() - 1);
-			}
-			resultString = "[" + resultString + "]";
-			cur.close();
-			//resultString = java.net.URLEncoder.encode(resultString);
-		} else {
-			resultString = "null";
-			cur.close();
-		}
-		if (flagCallJS) {
-			String q = callback_result + "("+resultString+","+tag+")";
-			context.callJsEvent(q);
-		}
-		return resultString;
-	}
-}

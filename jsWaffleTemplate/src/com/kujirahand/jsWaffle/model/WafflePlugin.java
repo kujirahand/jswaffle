@@ -4,43 +4,52 @@ import com.kujirahand.jsWaffle.WaffleActivity;
 
 import android.content.Intent;
 import android.webkit.WebView;
+import android.webkit.JavascriptInterface;
 
 public class WafflePlugin implements IWafflePlugin {
-	
-	protected WebView webview;
-	protected WaffleActivity waffle_activity;
-	
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-	}
 
-	@Override
-	public void onDestroy() {
-	}
+    protected WebView webview;
+    protected WaffleActivity waffle_activity;
 
-	@Override
-	public void onPause() {
-	}
+    @Override
+    @JavascriptInterface
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+    }
 
-	@Override
-	public void onResume() {
-	}
-	
-	@Override
-	public void onPageStarted(String url) {
-	}
-	
-	@Override
-	public void onPageFinished(String url) {
-	}
-	
-	@Override
-	public void setContext(WaffleActivity app) {
-		this.waffle_activity = app;
-	}
+    @Override
+    @JavascriptInterface
+    public void onDestroy() {
+    }
 
-	@Override
-	public void setWebView(WebView web) {
-		this.webview = web;
-	}
+    @Override
+    @JavascriptInterface
+    public void onPause() {
+    }
+
+    @Override
+    @JavascriptInterface
+    public void onResume() {
+    }
+
+    @Override
+    @JavascriptInterface
+    public void onPageStarted(String url) {
+    }
+
+    @Override
+    @JavascriptInterface
+    public void onPageFinished(String url) {
+    }
+
+    @Override
+    @JavascriptInterface
+    public void setContext(WaffleActivity app) {
+        this.waffle_activity = app;
+    }
+
+    @Override
+    @JavascriptInterface
+    public void setWebView(WebView web) {
+        this.webview = web;
+    }
 }
