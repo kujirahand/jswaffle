@@ -1,5 +1,7 @@
 package com.kujirahand.jsWaffle.plugins;
 
+import android.os.Handler;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 
 import android.webkit.JavascriptInterface;
@@ -27,6 +29,7 @@ import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.text.ClipboardManager;
+import android.webkit.WebView;
 import android.widget.Toast;
 
 /*
@@ -485,6 +488,34 @@ final public class ABasicPlugin extends WafflePlugin {
     public boolean stopBackKey() {
         ABasicPlugin.flagStopBackKey = true;
         return true;
+    }
+
+    @JavascriptInterface
+    public void setAdMob(boolean b) {
+        waffle_activity.setAdMob(b);
+    }
+
+
+    @JavascriptInterface
+    public void setKeyboardVisible(boolean b) {
+        final Handler h = new Handler();
+        final boolean bShow = b;
+        final WebView webview = this.webview;
+        final Runnable run = new Runnable() {
+            @Override
+            public void run() {
+                InputMethodManager manager =
+                        (InputMethodManager)waffle_activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (bShow) {
+                    manager.showSoftInput(webview, InputMethodManager.SHOW_IMPLICIT);
+                    log("show keybd");
+                 } else {
+                    manager.hideSoftInputFromWindow(webview.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
+                    log("hide keybd");
+                }
+            }
+        };
+        h.postDelayed(run, 1500);
     }
 
     //---------------------------------------------------------------

@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.media.MediaRecorder;
 import android.net.Uri;
+import android.os.Environment;
 import android.util.Log;
 
 import com.kujirahand.jsWaffle.WaffleActivity;
@@ -161,6 +162,13 @@ final public class StoragePlugin extends WafflePlugin {
         e.commit();
     }
 
+    @JavascriptInterface
+    public String getStoragePath() {
+        //return Environment.getExternalStorageDirectory().getAbsolutePath();
+        return waffle_activity.getFilesDir().getAbsoluteFile().getAbsolutePath();
+    }
+
+
     //---------------------------------------------------------------
     // file method
     //---------------------------------------------------------------
@@ -220,16 +228,24 @@ final public class StoragePlugin extends WafflePlugin {
     public boolean fileExists(String filename) {
         File file = null;
         Uri uri = Uri.parse(filename);
-        if (uri.getScheme() == null) {
-            if (filename.startsWith("/sdcard/") || filename.startsWith("/data/")) {
-                file = new File(filename);
-            } else {
-                file = waffle_activity.getFileStreamPath(filename);
+        try {
+            if (uri.getScheme() == null) {
+                if (filename.startsWith("/sdcard/") || filename.startsWith("/data/")) {
+                    try {
+                        file = new File(filename);
+                    } catch (Exception e) {
+                        return false;
+                    }
+                } else {
+                    file = waffle_activity.getFileStreamPath(filename);
+                }
+            } else { // file
+                file = new File(uri.getPath());
             }
-        } else { // file
-            file = new File(uri.getPath());
+            return file.exists();
+        } catch (Exception e) {
+            return false;
         }
-        return file.exists();
     }
 
     /**
