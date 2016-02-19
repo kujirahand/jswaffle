@@ -456,7 +456,21 @@ plugin_defineDroidMethod(
 				return droid._clipboard;
 			}
 		},
-		
+
+
+        /** @id droid.setAdMob */
+        setAdMob : {
+            droid : function (b) { _base.setAdMob(b); },
+            cross : function (b) {  }
+        },
+        /** @id droid.setKeyboardVisible */
+        setKeyboardVisible : {
+            droid : function (b) { _base.setKeyboardVisible(b); },
+            cross : function (b) {  }
+        },
+
+
+
 		___ : end_of_define_method
 	});
 
@@ -728,6 +742,10 @@ if (typeof(navigator.geolocation) == "undefined") {
 plugin_defineDroidMethod(
 	{ pluginName:'_storage', className:'StoragePlugin' },
 	{
+		getStoragePath : {
+			droid : function (key, value) { return _storage.getStoragePath(); },
+			cross : function (key, value) { "/mnt/sdcard"; }
+		},
 		pref_set : {
 			droid : function (key, value) { _storage.localStorage_put(key, value); },
 			cross : function (key, value) { window.localStorage.setItem(key, value); }
