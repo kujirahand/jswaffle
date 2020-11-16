@@ -9,30 +9,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-
-
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
+import java.net.URL;
 import org.json.JSONObject;
-
-import com.kujirahand.jsWaffle.WaffleActivity;
 
 import android.app.Activity;
 import android.content.res.AssetManager;
 import android.net.Uri;
+import android.os.Environment;
 import android.util.Log;
+
+import com.kujirahand.jsWaffle.WaffleActivity;
+import com.kujirahand.jsWaffle.utils.HTTPTask;
 
 public class WaffleUtils {
 
@@ -130,8 +122,15 @@ public class WaffleUtils {
         Uri uri = Uri.parse(filename);
         String scheme = uri.getScheme();
         String path = uri.getPath();
-        if (path.startsWith("/sdcard/") || path.startsWith("/data/")) {
-            uri = Uri.parse("file://" + filename);
+        if (path.startsWith("/sdcard/")) {
+            path = path.substring(8);
+            File sdcard = Environment.getExternalStorageDirectory();
+            uri = Uri.parse("file:/" + sdcard.getAbsolutePath() + "/" + path);
+        }
+        else if (path.startsWith("/Downloads")) {
+            path = path.substring(10);
+            File ff = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            uri = Uri.parse("file:/" + ff.getAbsolutePath() + path);
         }
         if ((scheme == null) && (path.startsWith("www/") || path.startsWith("/www/"))) {
             if (path.startsWith("/www")) {
@@ -153,6 +152,7 @@ public class WaffleUtils {
             Uri uri = checkFileUri(filename);
             String scheme = uri.getScheme();
             String path = uri.getPath();
+            WaffleActivity.mainInstance.log_warn("URI=" + uri);
 
             if (scheme == null) {
                 result = app.getFileStreamPath(path);
@@ -163,6 +163,7 @@ public class WaffleUtils {
                 // error
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return result;
     }
@@ -177,6 +178,7 @@ public class WaffleUtils {
             }
             output = new FileOutputStream(f);
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return output;
     }
@@ -252,42 +254,30 @@ public class WaffleUtils {
         output.close();
     }
 
+    public static String httpLastError = null;
+
     /**
      * get data from url
      *
      * @param url
      * @return get data
-     * @see http://se-suganuma.blogspot.com/2010/02/androidhttpclienthttpgetjson.html
      */
-    public static String httpGet(String url) {
-        HttpClient objHttp = new DefaultHttpClient();
-        HttpParams params = objHttp.getParams();
-        HttpConnectionParams.setConnectionTimeout(params, http_timeout); //接続のタイムアウト
-        HttpConnectionParams.setSoTimeout(params, http_timeout); //データ取得のタイムアウト
-        String sReturn = "";
+    public static void httpGet(String url, String JSCallbackOk, String JSCallbackNg, int tag) {
         try {
-            HttpGet objGet = new HttpGet(url);
-            HttpResponse objResponse = objHttp.execute(objGet);
-            if (objResponse.getStatusLine().getStatusCode() < 400) {
-                InputStream objStream = objResponse.getEntity().getContent();
-                InputStreamReader objReader = new InputStreamReader(objStream);
-                BufferedReader objBuf = new BufferedReader(objReader);
-                StringBuilder objJson = new StringBuilder();
-                String sLine;
-                while ((sLine = objBuf.readLine()) != null) {
-                    objJson.append(sLine);
-                }
-                sReturn = objJson.toString();
-                objStream.close();
-            }
-        } catch (IOException e) {
+            HTTPTask task = new HTTPTask();
+            task.JSCallbackOk = JSCallbackOk;
+            task.JSCallbackNg = JSCallbackNg;
+            task.JSMethod = "string";
+            task.Tag = tag;
+            task.execute(new URL(url));
+        } catch (MalformedURLException e) {
             httpLastError = e.getMessage();
-            return null;
+            e.printStackTrace();
+        } catch (Exception ee) {
+            httpLastError = ee.getMessage();
+            ee.printStackTrace();
         }
-        return sReturn;
     }
-
-    public static String httpLastError = null;
 
     /**
      * http download
@@ -296,33 +286,25 @@ public class WaffleUtils {
      * @param filename
      * @return
      */
-    public static boolean httpDownloadToFile(String url, String filename, Activity app) {
-        // 保存先をセット
-        FileOutputStream outStream = getOutputStream(filename, app);
-        if (outStream == null) return false;
-        // ダウンロード
-        HttpClient objHttp = new DefaultHttpClient();
-        HttpParams params = objHttp.getParams();
-        HttpConnectionParams.setConnectionTimeout(params, http_timeout); //接続のタイムアウト
-        HttpConnectionParams.setSoTimeout(params, http_timeout); //データ取得のタイムアウト
+    public static boolean httpDownloadToFile(String url, String filename, String callbackOk, String callbackNg, int tag) {
         try {
-            byte[] buf = new byte[BUFFSIZE];
-            HttpGet objGet = new HttpGet(url);
-            HttpResponse objResponse = objHttp.execute(objGet);
-            if (objResponse.getStatusLine().getStatusCode() < 400) {
-                InputStream objStream = objResponse.getEntity().getContent();
-                int retCount = 0;
-                while ((retCount = objStream.read(buf)) > 0) {
-                    outStream.write(buf, 0, retCount);
-                }
-                objStream.close();
-                outStream.close();
+            HTTPTask task = new HTTPTask();
+            task.JSCallbackOk = callbackOk;
+            task.JSCallbackNg = callbackNg;
+            task.JSFilename = filename;
+            task.JSFileStream = getOutputStream(filename, WaffleActivity.getInstance());
+            if (task.JSFileStream == null) {
+                WaffleActivity.getInstance().log("JSFileStream is NULL");
             }
-            return true;
-        } catch (IOException e) {
-            Log.e(WaffleActivity.LOG_TAG, "httpDownload.failed:" + e.getMessage());
-            return false;
+            task.JSMethod = "file";
+            task.Tag = tag;
+            task.execute(new URL(url));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (Exception ee) {
+            ee.printStackTrace();
         }
+        return false;
     }
 
     /**
@@ -333,40 +315,6 @@ public class WaffleUtils {
      * @return
      */
     public static String httpPostJSON(String sUrl, String sJson) {
-        HttpClient objHttp = new DefaultHttpClient();
-        String sReturn = "";
-        try {
-            HttpPost objPost = new HttpPost(sUrl);
-            try {
-                JSONObject j = new JSONObject(sJson);
-                List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-
-                @SuppressWarnings("unchecked")
-                Iterator<String> i = j.keys();
-                while (i.hasNext()) {
-                    String pname = i.next();
-                    BasicNameValuePair nv = new BasicNameValuePair(pname, j.getString(pname));
-                    pairs.add(nv);
-                }
-                objPost.setEntity(new UrlEncodedFormEntity(pairs, "UTF-8"));
-            } catch (Exception e) {
-            }
-            HttpResponse objResponse = objHttp.execute(objPost);
-            if (objResponse.getStatusLine().getStatusCode() < 400) {
-                InputStream objStream = objResponse.getEntity().getContent();
-                InputStreamReader objReader = new InputStreamReader(objStream);
-                BufferedReader objBuf = new BufferedReader(objReader);
-                StringBuilder objJson = new StringBuilder();
-                String sLine;
-                while ((sLine = objBuf.readLine()) != null) {
-                    objJson.append(sLine);
-                }
-                sReturn = objJson.toString();
-                objStream.close();
-            }
-        } catch (IOException e) {
-            return null;
-        }
-        return sReturn;
+        return "";
     }
 }

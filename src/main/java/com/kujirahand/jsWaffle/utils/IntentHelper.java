@@ -14,6 +14,8 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import static com.kujirahand.jsWaffle.utils.WaffleUtils.detectFile;
+
 public class IntentHelper {
 
     public static int request_code = 0;
@@ -78,9 +80,9 @@ public class IntentHelper {
                 appContext.startActivity(intentMail);
             }
             return true;
-        } else if (url.startsWith("file:") || url.startsWith("/sdcard/")) {
-            return runFile(appContext, url);
-        } else if (url.startsWith("camera:")) {
+        }
+        // check file
+        if (url.startsWith("camera:")) {
             return runCamera(appContext, url, MediaStore.ACTION_IMAGE_CAPTURE);
         } else if (url.startsWith("video:")) {
             return runCamera(appContext, url, MediaStore.ACTION_VIDEO_CAPTURE);
@@ -88,6 +90,14 @@ public class IntentHelper {
         // could not set savefile (but set savedir) ... 保存ファイル名を指定できないのでカメラから分離する
         else if (url.startsWith("record:")) {
             return runCamera(appContext, url, MediaStore.Audio.Media.RECORD_SOUND_ACTION);
+        }
+        // file
+        File ff = detectFile(url, WaffleActivity.getInstance());
+        if (ff.exists()) {
+            return runFile(appContext, "file://" + ff.getAbsolutePath());
+        }
+        if (url.startsWith("file:") || url.startsWith("/sdcard/")) {
+            return runFile(appContext, url);
         }
         return false;
     }
@@ -134,7 +144,8 @@ public class IntentHelper {
                 appContext.startActivity(intentFile);
                 return true;
             } catch (Exception e) {
-                err("[Intent]" + e.getMessage());
+                err("[Intent]" + ctype + " : " + e.getMessage());
+                e.printStackTrace();
                 return false;
             }
         }

@@ -39,6 +39,8 @@ import android.webkit.WebSettings.LayoutAlgorithm;
 import android.widget.LinearLayout;
 import android.webkit.JavascriptInterface;
 
+import java.net.URLEncoder;
+
 public class WaffleActivity extends Activity {
 
     /**
@@ -56,6 +58,14 @@ public class WaffleActivity extends Activity {
     protected WaffleFlags waffle_flags;
 
     protected boolean flagAdViewVislbe = false;
+
+    /**
+     * Get mainInstance
+     * @return WaffleActivity
+     */
+    public static WaffleActivity getInstance() {
+        return mainInstance;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -266,6 +276,27 @@ public class WaffleActivity extends Activity {
                 }
             }
         });
+    }
+
+    /**
+     * call JavaScript Event
+     *
+     * @param funcname JS function name
+     * @param arg argument(not encoded)
+     * @param tag tag
+     */
+    public void callJsEventWithArg(final String funcname, final String arg, final int tag) {
+        // encode arg
+        String argEnc = arg;
+        try {
+            argEnc = URLEncoder.encode(arg, "application/x-www-form-urlencoded");
+            argEnc = argEnc.replace("\'","\\\'");
+        } catch (Exception e) {
+        }
+        // gen query
+        String query = funcname + "('" + argEnc + "'," + String.valueOf(tag) + ")";
+        // execute javascript
+        callJsEvent(query);
     }
 
     //-----------------------------------------------------------------

@@ -410,19 +410,11 @@ final public class ABasicPlugin extends WafflePlugin {
      * get data from url sync
      */
     @JavascriptInterface
-    public boolean httpGet(final String url, final String callback_ok, final String callback_ng, final String tag) {
+    public boolean httpGet(final String url, final String callback_ok, final String callback_ng, final int tag) {
         waffle_activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                String result = WaffleUtils.httpGet(url);
-                String query = "";
-                if (result != null) {
-                    result = URLEncoder.encode(result);
-                    query = callback_ok + "('" + result + "'," + tag + ")";
-                } else {
-                    query = callback_ng + "('" + WaffleUtils.httpLastError + "'," + tag + ")";
-                }
-                callJsEvent(query);
+                WaffleUtils.httpGet(url, callback_ok, callback_ng, tag);
             }
         });
         return true;
@@ -450,17 +442,16 @@ final public class ABasicPlugin extends WafflePlugin {
      *
      * @param url
      * @param filename
-     * @param callback
+     * @param callbackOk
+     * @param callbackNg
      * @param tag
      */
     @JavascriptInterface
-    public void httpDownload(final String url, final String filename, final String callback, final int tag) {
+    public void httpDownload(final String url, final String filename, final String callbackOk, final String callbackNg, final int tag) {
         waffle_activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                boolean b = WaffleUtils.httpDownloadToFile(url, filename, waffle_activity);
-                String query = callback + "(" + (b ? "true" : "false") + "," + tag + ")";
-                callJsEvent(query);
+                WaffleUtils.httpDownloadToFile(url, filename, callbackOk, callbackNg, tag);
             }
         });
     }

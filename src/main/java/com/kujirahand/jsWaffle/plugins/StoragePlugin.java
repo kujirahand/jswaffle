@@ -1,11 +1,14 @@
 package com.kujirahand.jsWaffle.plugins;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Base64;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -216,6 +219,45 @@ final public class StoragePlugin extends WafflePlugin {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * loadFileBase64
+     *
+     * @param filename
+     * @return text
+     */
+    @JavascriptInterface
+    public String loadFileBase64(String filename) {
+        try {
+            byte[] bytes = loadFileBytes(filename);
+            String base64str = Base64.getEncoder().encodeToString(bytes);
+            return base64str;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * loadFileBytes
+     *
+     * @param filename
+     * @return bytes
+     */
+    @JavascriptInterface
+    public byte[] loadFileBytes(String filename) {
+        try (InputStream input = WaffleUtils.getInputStream(filename, waffle_activity);
+             ByteArrayOutputStream bout = new ByteArrayOutputStream();) {
+            byte[] buffer = new byte[1024];
+            int len = 0;
+            while((len = input.read(buffer)) != -1) {
+                bout.write(buffer, 0, len);
+            }
+            return bout.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
