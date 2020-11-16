@@ -456,13 +456,6 @@ plugin_defineDroidMethod(
 				return droid._clipboard;
 			}
 		},
-
-
-        /** @id droid.setAdMob */
-        setAdMob : {
-            droid : function (b) { _base.setAdMob(b); },
-            cross : function (b) {  }
-        },
         /** @id droid.setKeyboardVisible */
         setKeyboardVisible : {
             droid : function (b) { _base.setKeyboardVisible(b); },

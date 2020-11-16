@@ -490,11 +490,6 @@ final public class ABasicPlugin extends WafflePlugin {
         return true;
     }
 
-    @JavascriptInterface
-    public void setAdMob(boolean b) {
-        waffle_activity.setAdMob(b);
-    }
-
 
     @JavascriptInterface
     public void setKeyboardVisible(boolean b) {

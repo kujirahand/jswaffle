@@ -1,8 +1,5 @@
 package com.kujirahand.jsWaffle;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
 import com.kujirahand.jsWaffle.model.IWafflePlugin;
 import com.kujirahand.jsWaffle.model.WaffleFlags;
 import com.kujirahand.jsWaffle.model.WafflePluginManager;
@@ -58,7 +55,6 @@ public class WaffleActivity extends Activity {
     public WafflePluginManager pluginManager;
     protected WaffleFlags waffle_flags;
 
-    protected AdView adView = null;
     protected boolean flagAdViewVislbe = false;
 
     @Override
@@ -175,45 +171,6 @@ public class WaffleActivity extends Activity {
         webview = new WebView(this);
         webview.setLayoutParams(webviewParams);
         root.addView(webview);
-
-        // for AdMob
-        if (waffle_flags.useAdMob) {
-            adView = new AdView(getApplicationContext());
-            adView.setAdUnitId(waffle_flags.idAdMob);
-            adView.setAdSize(AdSize.BANNER);
-
-            AdRequest adRequest = new AdRequest.Builder()
-                    .addTestDevice(AdRequest.DEVICE_ID_EMULATOR).build();
-            adView.loadAd(adRequest);
-            root.addView(adView);
-            flagAdViewVislbe = true;
-        }
-    }
-
-    protected void showAdMob() {
-        if (flagAdViewVislbe) return;
-        try {
-            // root.addView(adView);
-            adView.setVisibility(AdView.VISIBLE);
-        } catch (Exception e) {
-            log(e.getMessage());
-        }
-        flagAdViewVislbe = true;
-    }
-
-    protected void hideAdMob() {
-        if (!flagAdViewVislbe) return;
-        try {
-            adView.setVisibility(AdView.GONE);
-            flagAdViewVislbe = false;
-            // root.removeView(adView);
-        } catch ( Exception e) {
-            log(e.getLocalizedMessage());
-        }
-    }
-
-    public void setAdMob(boolean b) {
-        if (b) { showAdMob(); } else { hideAdMob(); }
     }
 
     protected void setWebViewParams() {
