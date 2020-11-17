@@ -398,15 +398,20 @@ plugin_defineDroidMethod(
 		/** @id droid.httpDownload */
 		httpDownload : {
 			droid : function (url, filename, callback) {
-				var tag = func_bank.getTag();
-				func_bank.setItem(tag, callback);
-				self.droid._httpDownload = function(ok, tag) {
-					var callback = func_bank.getItem(tag);
-					if(typeof(callback) == "function") {
-						callback(ok);
+				var tag = func_bank.registerItem({ok:callback, ng:callback});
+				self.droid._httpDownload_ok = function(path, tag) {
+					var f = func_bank.getItem(tag);
+					if(typeof(f.ok) == "function") {
+						f.ok(path);
 					}
 				};
-				_base.httpDownload(url, filename, "droid._httpDownload", tag);
+				self.droid._httpDownload_ng = function(reason, tag) {
+					var f = func_bank.getItem(tag);
+					if(typeof(callback) == "function") {
+						f.ng(false, reason);
+					}
+				};
+				_base.httpDownload(url, filename, "droid._httpDownload_ok", "droid._httpDownload_ng", tag);
 			},
 			cross : function (url, filename, callback) {
 				console.log('[dummy] httpDownload : ' + url);
@@ -417,16 +422,21 @@ plugin_defineDroidMethod(
 		/** @id droid.httpPost */
 		httpPost : {
 			droid : function (url, post_obj, callback) {
-				var json = self.droid.stringfy(post_obj);
-				var tag = func_bank.registerItem(callback);
-				self.droid._httpPost = function (result, tag) {
+				var json = self.droid.stringify(post_obj);
+				var tag = func_bank.registerItem({ok:callback, ng:callback});
+				self.droid._httpPost_ok = function(res, tag) {
 					var f = func_bank.getItem(tag);
-					if (typeof(f) == "function") {
-						f(String(result));
+					if(typeof(f.ok) == "function") {
+						f.ok(true, res);
 					}
 				};
-				var res = _base.httpPostJSON(url, json, "droid._httpPost", tag);
-				callback(res);
+				self.droid._httpPost_ng = function(reason, tag) {
+					var f = func_bank.getItem(tag);
+					if(typeof(callback) == "function") {
+						f.ng(false, reason);
+					}
+				};
+				_base.httpPostJSON(url, json, "droid._httpPost_ok", "droid._httpPost_ng", tag);
 				return true;
 			},
 			cross : function (url, post_obj, callback) {
@@ -778,6 +788,26 @@ plugin_defineDroidMethod(
 			}
 		},
 		
+		/** @id droid.loadFileBase64 */
+		loadFileBase64 : {
+			droid : function (filename) {
+				return String(_storage.loadFileBase64(filename));
+			},
+			cross : function (filename) {
+				return localStorage.getItem(filename);
+			}
+		},
+
+		/** @id droid.loadFileBytes */
+		loadFileBytes : {
+			droid : function (filename) {
+				return _storage.loadFileBytes(filename);
+			},
+			cross : function (filename) {
+				return localStorage.getItem(filename);
+			}
+		},
+
 		/** @id droid.fileList */
 		fileList : {
 			droid : function (path) {

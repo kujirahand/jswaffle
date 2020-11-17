@@ -9,6 +9,35 @@
 <body>
 	<h1>Hello, World!</h1>
 	<div>Hello, by jsWaffle.</div>
+
+	<h2>HTTP Test</h2>
+	<div class="buttons">
+		<button id="httpget_btn" onclick="testHTTP()">httpGet:Get IP</button>
+		<button id="dl_btn" onclick="testHTTPDownload()">httpDownload:DL Image</button>
+		<img id="b_img" />
+	</div>
+	<script>
+    function testHTTP() {
+        $("httpget_btn").disabled = true;
+        droid.httpGet("https://api.aoikujira.com/ip/json",
+            function(str){ alert(str); $("httpget_btn").disabled = false; },
+            function(err){ alert(err); $("httpget_btn").disabled = false; }
+        );
+    }
+    function testHTTPDownload() {
+        $("dl_btn").disabled = true;
+        droid.httpDownload(
+            "https://d.aoikujira.com/jsWaffle/img/jsWaffle-icon300.png",
+            "logo.png",
+            function (status, path) {
+                $("dl_btn").disabled = false;
+                if (!status) { alert('download error'); return; }
+                b64 = droid.loadFileBase64("logo.png");
+                $("b_img").src = "data:image/png;base64," + b64;
+            }
+        );
+    }
+</script>
 </body>
 </html>
 

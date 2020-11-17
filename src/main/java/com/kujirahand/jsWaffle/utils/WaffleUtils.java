@@ -312,9 +312,20 @@ public class WaffleUtils {
      *
      * @param sUrl  送信先URL
      * @param sJson 文字列に変換したJSONデータ
-     * @return
      */
-    public static String httpPostJSON(String sUrl, String sJson) {
-        return "";
+    public static void httpPostJSON(String sUrl, String sJson, String callbackOk, String callbackNg, int tag) {
+        try {
+            HTTPTask task = new HTTPTask();
+            task.JSCallbackOk = callbackOk;
+            task.JSCallbackNg = callbackNg;
+            task.JSMethod = "post";
+            task.JSonStr = sJson;
+            task.Tag = tag;
+            task.execute(new URL(sUrl));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (Exception ee) {
+            ee.printStackTrace();
+        }
     }
 }

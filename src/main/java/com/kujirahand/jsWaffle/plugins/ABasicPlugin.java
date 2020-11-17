@@ -421,17 +421,11 @@ final public class ABasicPlugin extends WafflePlugin {
     }
 
     @JavascriptInterface
-    public boolean httpPostJSON(final String url, final String json, final String callback, final int tag) {
+    public boolean httpPostJSON(final String url, final String json, final String callbackOk, final String callbackNg, final int tag) {
         waffle_activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                String result = WaffleUtils.httpPostJSON(url, json);
-                // escape result
-                result = result.replace("\\", "\\\\");
-                result = result.replace("\"", "\\\"");
-                // result
-                String query = callback + "(\"" + (result) + "\"," + tag + ")";
-                callJsEvent(query);
+                WaffleUtils.httpPostJSON(url, json, callbackOk, callbackNg, tag);
             }
         });
         return true;
